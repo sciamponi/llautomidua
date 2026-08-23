@@ -15,10 +15,16 @@ export function Hero() {
               A Automatiza Solução reúne ferramentas, tecnologia e oportunidades para quem quer vender mais, automatizar processos e transformar conhecimento em negócio.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
-              <button className="bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#1E8CFF]/90 transition-all">
-                QUERO CONHECER
+              <button 
+                onClick={() => window.location.href = '/solucoes'}
+                className="bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#1E8CFF]/90 transition-all"
+              >
+                ENCONTRAR MINHA SOLUÇÃO
               </button>
-              <button className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all">
+              <button 
+                onClick={() => window.location.href = '/parceiros'}
+                className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all"
+              >
                 QUERO SER PARCEIRO
               </button>
             </div>

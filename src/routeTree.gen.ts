@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as AutomacaoIndexRouteImport } from './routes/automacao/index'
+import { Route as AutomediaIndexRouteImport } from './routes/automedia/index'
 import { Route as BarberiaIndexRouteImport } from './routes/barberia/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as EsmalteriaIndexRouteImport } from './routes/esmalteria/index'
@@ -34,6 +35,11 @@ const ParceirosRoute = ParceirosRouteImport.update({
 const AutomacaoIndexRoute = AutomacaoIndexRouteImport.update({
   id: '/automacao/',
   path: '/automacao/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutomediaIndexRoute = AutomediaIndexRouteImport.update({
+  id: '/automedia/',
+  path: '/automedia/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BarberiaIndexRoute = BarberiaIndexRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
   '/automacao/': typeof AutomacaoIndexRoute
+  '/automedia/': typeof AutomediaIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/esmalteria/': typeof EsmalteriaIndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
   '/automacao': typeof AutomacaoIndexRoute
+  '/automedia': typeof AutomediaIndexRoute
   '/barberia': typeof BarberiaIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
   '/esmalteria': typeof EsmalteriaIndexRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
   '/automacao/': typeof AutomacaoIndexRoute
+  '/automedia/': typeof AutomediaIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/esmalteria/': typeof EsmalteriaIndexRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/parceiros'
     | '/automacao/'
+    | '/automedia/'
     | '/barberia/'
     | '/diagnostico/'
     | '/esmalteria/'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/parceiros'
     | '/automacao'
+    | '/automedia'
     | '/barberia'
     | '/diagnostico'
     | '/esmalteria'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/parceiros'
     | '/automacao/'
+    | '/automedia/'
     | '/barberia/'
     | '/diagnostico/'
     | '/esmalteria/'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ParceirosRoute: typeof ParceirosRoute
   AutomacaoIndexRoute: typeof AutomacaoIndexRoute
+  AutomediaIndexRoute: typeof AutomediaIndexRoute
   BarberiaIndexRoute: typeof BarberiaIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
   EsmalteriaIndexRoute: typeof EsmalteriaIndexRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/automacao'
       fullPath: '/automacao/'
       preLoaderRoute: typeof AutomacaoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/automedia/': {
+      id: '/automedia/'
+      path: '/automedia'
+      fullPath: '/automedia/'
+      preLoaderRoute: typeof AutomediaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/barberia/': {
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ParceirosRoute: ParceirosRoute,
   AutomacaoIndexRoute: AutomacaoIndexRoute,
+  AutomediaIndexRoute: AutomediaIndexRoute,
   BarberiaIndexRoute: BarberiaIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
   EsmalteriaIndexRoute: EsmalteriaIndexRoute,
