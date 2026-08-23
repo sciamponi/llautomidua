@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/automatiza/Header";
 import { Hero } from "@/components/automatiza/Hero";
 import { AboutSection } from "@/components/automatiza/AboutSection";

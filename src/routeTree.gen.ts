@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AutomacaoIndexRouteImport } from './routes/automacao/index'
+import { Route as BarberiaIndexRouteImport } from './routes/barberia/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutomacaoIndexRoute = AutomacaoIndexRouteImport.update({
+  id: '/automacao/',
+  path: '/automacao/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BarberiaIndexRoute = BarberiaIndexRouteImport.update({
+  id: '/barberia/',
+  path: '/barberia/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
@@ -25,27 +37,35 @@ const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/automacao/': typeof AutomacaoIndexRoute
+  '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/automacao': typeof AutomacaoIndexRoute
+  '/barberia': typeof BarberiaIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/automacao/': typeof AutomacaoIndexRoute
+  '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/diagnostico/'
+  fullPaths: '/' | '/automacao/' | '/barberia/' | '/diagnostico/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/diagnostico'
-  id: '__root__' | '/' | '/diagnostico/'
+  to: '/' | '/automacao' | '/barberia' | '/diagnostico'
+  id: '__root__' | '/' | '/automacao/' | '/barberia/' | '/diagnostico/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AutomacaoIndexRoute: typeof AutomacaoIndexRoute
+  BarberiaIndexRoute: typeof BarberiaIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
 }
 
@@ -56,6 +76,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/automacao/': {
+      id: '/automacao/'
+      path: '/automacao'
+      fullPath: '/automacao/'
+      preLoaderRoute: typeof AutomacaoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/barberia/': {
+      id: '/barberia/'
+      path: '/barberia'
+      fullPath: '/barberia/'
+      preLoaderRoute: typeof BarberiaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico/': {
@@ -70,6 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AutomacaoIndexRoute: AutomacaoIndexRoute,
+  BarberiaIndexRoute: BarberiaIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
 }
 export const routeTree = rootRouteImport
