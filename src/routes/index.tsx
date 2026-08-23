@@ -36,23 +36,32 @@ function Index() {
         <AboutSection />
 
         
-        <section className="py-24 bg-[#071A2F]">
+        <section className="py-32 bg-[#071A2F] border-t border-white/5">
           <div className="container px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-white font-sora mb-4">O que a Automatiza faz?</h2>
+            <div className="max-w-3xl mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold text-white font-sora mb-6">Uma empresa.<br/><span className="text-[#1E8CFF]">Várias soluções.</span></h2>
+              <p className="text-lg text-[#DCE3EA]/60">Tecnologia especializada para problemas reais. Cada ferramenta da Automatiza foi desenhada para resolver uma dor específica do seu negócio.</p>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { title: "Automação", desc: "Soluções para automatizar tarefas e processos repetitivos." },
-                { title: "WhatsApp e Atendimento", desc: "Ferramentas para melhorar comunicação, atendimento e vendas." },
-                { title: "CRM e Gestão", desc: "Organização de leads, clientes, equipes e processos." },
-                { title: "Mídia e Soluções Digitais", desc: "Tecnologia aplicada para criar novas oportunidades de negócio." },
-                { title: "Produtos SaaS", desc: "Sistemas desenvolvidos para resolver problemas reais." },
-                { title: "Programa de Parceiros", desc: "Uma oportunidade para transformar tecnologia em fonte de renda." }
+                { name: "Automatiza", cat: "WhatsApp & CRM", problem: "Tenho muitas mensagens e dificuldade para organizar.", path: "/automacao" },
+                { name: "BarberIA", cat: "Agendamento", problem: "Minha operação depende de agendamentos manuais.", path: "/barberia" },
+                { name: "Esmaltter-IA", cat: "Beleza", problem: "Preciso organizar clientes e histórico.", path: "/esmalteria" },
+                { name: "AutoMedia Indoor", cat: "Mídia", problem: "Quero criar novas oportunidades comerciais com mídia.", path: "/automedia" },
+                { name: "Solução Oficinas", cat: "Gestão", problem: "Preciso enxergar melhor minha operação.", path: "/oficinas" },
+                { name: "Programa de Parceiros", cat: "Negócio", problem: "Quero revender tecnologia e escalar ganhos.", path: "/parceiros" }
               ].map((item, i) => (
-                <div key={i} className="p-8 rounded-3xl bg-white/5 border border-white/5 hover:border-[#1E8CFF]/30 transition-all group">
-                  <h4 className="text-xl font-bold text-white mb-4 group-hover:text-[#1E8CFF] transition-colors">{item.title}</h4>
-                  <p className="text-[#DCE3EA]/70 leading-relaxed">{item.desc}</p>
+                <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-widest bg-[#1E8CFF]/10 px-3 py-1 rounded-full border border-[#1E8CFF]/20 mb-6 inline-block">
+                      {item.cat}
+                    </span>
+                    <h4 className="text-2xl font-bold text-white mb-4 font-sora">{item.name}</h4>
+                    <p className="text-[#DCE3EA]/60 text-sm mb-8 leading-relaxed italic">"{item.problem}"</p>
+                  </div>
+                  <Link to={item.path as any} className="w-full py-4 rounded-xl bg-white text-[#071A2F] font-bold text-xs uppercase tracking-widest text-center hover:bg-[#F7F8FA] transition-all">
+                    Conhecer Solução
+                  </Link>
                 </div>
               ))}
             </div>
