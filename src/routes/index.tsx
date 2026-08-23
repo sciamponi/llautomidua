@@ -8,6 +8,7 @@ import { PartnerPricing } from "@/components/automatiza/PartnerPricing";
 import { PartnerSignup } from "@/components/automatiza/PartnerSignup";
 import { RobotMessage } from "@/components/automatiza/RobotMessage";
 import { MembersPreview } from "@/components/automatiza/MembersPreview";
+import { FinalCTA } from "@/components/automatiza/FinalCTA";
 
 export const Route = createFileRoute("/")({
   component: Index,
