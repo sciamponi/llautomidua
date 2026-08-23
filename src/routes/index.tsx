@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header } from "@/components/automatiza/Header";
 import { Hero } from "@/components/automatiza/Hero";
+import { AboutSection } from "@/components/automatiza/AboutSection";
 import { DiagnosisSection } from "@/components/automatiza/DiagnosisSection";
 import { PartnerProgram } from "@/components/automatiza/PartnerProgram";
 import { PartnerPricing } from "@/components/automatiza/PartnerPricing";
