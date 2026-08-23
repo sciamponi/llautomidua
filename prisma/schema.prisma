@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductType {
+  SAAS
+  SERVICE
+  SOLUTION
+  MEDIA
+}
+
+enum LeadType {
+  GENERAL
+  DEMO
+  QUOTE
+  SCREEN_INSTALLATION
+  SCREEN_ADVERTISING
+  PARTNER
+}
+
+enum RevenueType {
+  SUBSCRIPTION
+  ONE_TIME
+  RECURRING_SERVICE
+  MEDIA
+}
+
+enum UserRole {
+  ADMIN
+  PARTNER
+  CUSTOMER
+  STUDENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  role          UserRole  @default(CUSTOMER)
+  partnerProfile PartnerProfile?
+  subscriptions Subscription[]
+  leads         Lead[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model PartnerProfile {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  commission    Float     @default(0.2)
+  clientsCount  Int       @default(0)
+  points        Int       @default(0)
+  status        String    @default("active")
+}
+
+model Product {
+  id                String    @id @default(cuid())
+  name              String
+  slug              String    @unique
+  type              ProductType
+  category          String
+  segment           String
+  subcategory       String?
+  shortDescription  String
+  description       String
+  audience          String?
+  problem           String?
+  solution          String?
+  features          Json?     // Array of {title, desc}
+  pricingType       RevenueType
+  pricing           String?
+  ctaType           String?
+  demoUrl           String?
+  landingUrl        String?
+  whatsappMessage   String?
+  status            String    @default("active")
+  featured          Boolean   @default(false)
+  sortOrder         Int       @default(0)
+  subscriptions     Subscription[]
+  recommendations   ProductRecommendation[] @relation("MainProduct")
+  recommendedBy     ProductRecommendation[] @relation("RecommendedProduct")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model ProductRecommendation {
+  id                  String    @id @default(cuid())
+  productId           String
+  product             Product   @relation("MainProduct", fields: [productId], references: [id])
+  recommendedProductId String
+  recommendedProduct  Product   @relation("RecommendedProduct", fields: [recommendedProductId], references: [id])
+  reason              String
+  priority            Int       @default(0)
+  status              String    @default("active")
+}
+
+model Lead {
+  id            String    @id @default(cuid())
+  name          String
+  email         String?
+  whatsapp      String
+  company       String?
+  city          String?
+  address       String?
+  establishmentType String?
+  screenCount   Int?
+  segment       String?
+  objective     String?
+  message       String?
+  type          LeadType  @default(GENERAL)
+  status        String    @default("new")
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Subscription {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id])
+  status        String    @default("pending") // pending, active, cancelled
+  startDate     DateTime?
+  endDate       DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Course {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  thumbnail     String?
+  lessons       Lesson[]
+  createdAt     DateTime  @default(now())
+}
+
+model Lesson {
+  id            String    @id @default(cuid())
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id])
+  title         String
+  videoUrl      String
+  duration      String?
+  order         Int
+  createdAt     DateTime  @default(now())
+}
