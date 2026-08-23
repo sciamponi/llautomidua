@@ -9,20 +9,27 @@ export function Header() {
           <Link to="/" className="flex items-center gap-2">
             <img src={logoAsset.url} alt="Automatiza Solução" className="h-10 w-auto" />
           </Link>
-          <nav className="hidden md:flex gap-6">
-            <Link to="/" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Início</Link>
-            <Link to="/solucoes" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Soluções</Link>
-            <Link to="/diagnostico" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Diagnóstico</Link>
-            <Link to="/parceiros" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Parceiros</Link>
-            <Link to="/membros" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Área de Membros</Link>
+          <nav className="hidden md:flex gap-8">
+            <Link to="/" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Início</Link>
+            <Link to="/solucoes" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Soluções</Link>
+            <Link to="/parceiros" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Parceiros</Link>
+            <Link to="/membros" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Área de Membros</Link>
           </nav>
         </div>
-        <Link 
-          to="/" 
-          className="rounded-full bg-[#1E8CFF] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#1E8CFF]/90 transition-all"
-        >
-          QUERO SER PARCEIRO
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link 
+            to="/diagnostico" 
+            className="hidden sm:block text-xs font-bold uppercase tracking-widest text-[#1E8CFF] hover:text-[#1E8CFF]/80 transition-all mr-4"
+          >
+            Fazer Diagnóstico
+          </Link>
+          <Link 
+            to="/parceiros" 
+            className="rounded-xl bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#071A2F] hover:bg-[#F7F8FA] transition-all"
+          >
+            QUERO SER PARCEIRO
+          </Link>
+        </div>
       </div>
     </header>
   );
