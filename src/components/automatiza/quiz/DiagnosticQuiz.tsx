@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RobotMessage } from "../RobotMessage";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 const questions = [
   {
@@ -115,12 +116,12 @@ export function DiagnosticQuiz() {
         <div className="max-w-md mx-auto p-8 rounded-3xl bg-white/5 border border-[#1E8CFF]/30 space-y-6">
           <h3 className="text-2xl font-bold text-[#4CDFF2]">{recommendation.name}</h3>
           <p className="text-[#DCE3EA]">{recommendation.desc}</p>
-          <a 
-            href={recommendation.path}
+          <Link 
+            to={recommendation.path as any}
             className="block w-full bg-[#1E8CFF] text-white py-4 rounded-xl font-bold hover:bg-[#1E8CFF]/90 transition-all uppercase tracking-wider"
           >
             CONHECER {recommendation.name}
-          </a>
+          </Link>
         </div>
       </motion.div>
     );
