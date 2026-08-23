@@ -10,13 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as AutomacaoIndexRouteImport } from './routes/automacao/index'
 import { Route as BarberiaIndexRouteImport } from './routes/barberia/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
+import { Route as MembrosIndexRouteImport } from './routes/membros/index'
+import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParceirosRoute = ParceirosRouteImport.update({
+  id: '/parceiros',
+  path: '/parceiros',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AutomacaoIndexRoute = AutomacaoIndexRouteImport.update({
@@ -34,39 +42,83 @@ const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
   path: '/diagnostico/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MembrosIndexRoute = MembrosIndexRouteImport.update({
+  id: '/membros/',
+  path: '/membros/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolucoesIndexRoute = SolucoesIndexRouteImport.update({
+  id: '/solucoes/',
+  path: '/solucoes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/parceiros': typeof ParceirosRoute
   '/automacao/': typeof AutomacaoIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
+  '/membros/': typeof MembrosIndexRoute
+  '/solucoes/': typeof SolucoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/parceiros': typeof ParceirosRoute
   '/automacao': typeof AutomacaoIndexRoute
   '/barberia': typeof BarberiaIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
+  '/membros': typeof MembrosIndexRoute
+  '/solucoes': typeof SolucoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/parceiros': typeof ParceirosRoute
   '/automacao/': typeof AutomacaoIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
+  '/membros/': typeof MembrosIndexRoute
+  '/solucoes/': typeof SolucoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/automacao/' | '/barberia/' | '/diagnostico/'
+  fullPaths:
+    | '/'
+    | '/parceiros'
+    | '/automacao/'
+    | '/barberia/'
+    | '/diagnostico/'
+    | '/membros/'
+    | '/solucoes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/automacao' | '/barberia' | '/diagnostico'
-  id: '__root__' | '/' | '/automacao/' | '/barberia/' | '/diagnostico/'
+  to:
+    | '/'
+    | '/parceiros'
+    | '/automacao'
+    | '/barberia'
+    | '/diagnostico'
+    | '/membros'
+    | '/solucoes'
+  id:
+    | '__root__'
+    | '/'
+    | '/parceiros'
+    | '/automacao/'
+    | '/barberia/'
+    | '/diagnostico/'
+    | '/membros/'
+    | '/solucoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ParceirosRoute: typeof ParceirosRoute
   AutomacaoIndexRoute: typeof AutomacaoIndexRoute
   BarberiaIndexRoute: typeof BarberiaIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
+  MembrosIndexRoute: typeof MembrosIndexRoute
+  SolucoesIndexRoute: typeof SolucoesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parceiros': {
+      id: '/parceiros'
+      path: '/parceiros'
+      fullPath: '/parceiros'
+      preLoaderRoute: typeof ParceirosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/automacao/': {
@@ -99,14 +158,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiagnosticoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/membros/': {
+      id: '/membros/'
+      path: '/membros'
+      fullPath: '/membros/'
+      preLoaderRoute: typeof MembrosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solucoes/': {
+      id: '/solucoes/'
+      path: '/solucoes'
+      fullPath: '/solucoes/'
+      preLoaderRoute: typeof SolucoesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ParceirosRoute: ParceirosRoute,
   AutomacaoIndexRoute: AutomacaoIndexRoute,
   BarberiaIndexRoute: BarberiaIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
+  MembrosIndexRoute: MembrosIndexRoute,
+  SolucoesIndexRoute: SolucoesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
