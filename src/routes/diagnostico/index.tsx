@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '@/components/automatiza/Header'
 import { DiagnosticQuiz } from '@/components/automatiza/quiz/DiagnosticQuiz'
 
-export const Route = createFileRoute('/diagnostico')({
+export const Route = createFileRoute('/diagnostico/')({
   component: () => (
     <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
       <Header />

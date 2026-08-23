@@ -10,11 +10,11 @@ export function Header() {
             <img src={logoAsset.url} alt="Automatiza Solução" className="h-10 w-auto" />
           </Link>
           <nav className="hidden md:flex gap-6">
-            {["Início", "A Automatiza", "Soluções", "Parceiros", "Área de Membros"].map((item) => (
-              <a key={item} href="#" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">
-                {item}
-              </a>
-            ))}
+            <Link to="/" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Início</Link>
+            <Link to="/solucoes" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Soluções</Link>
+            <Link to="/diagnostico" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Diagnóstico</Link>
+            <Link to="/parceiros" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Parceiros</Link>
+            <Link to="/membros" className="text-sm font-medium text-[#DCE3EA] hover:text-[#1E8CFF] transition-colors">Área de Membros</Link>
           </nav>
         </div>
         <Link 

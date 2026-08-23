@@ -23,11 +23,13 @@ function Index() {
         <Hero />
         
         <div className="container px-4 py-8">
-          <RobotMessage 
-            type="warning" 
-            message="Ei! Tem uma oportunidade aqui que você talvez não queira perder. 👀" 
-            className="max-w-fit mx-auto"
-          />
+          <Link to="/diagnostico" className="block max-w-fit mx-auto">
+            <RobotMessage 
+              type="warning" 
+              message="Não sabe por onde começar? Clique aqui para fazer o diagnóstico da sua empresa! 🤖✨" 
+              className="hover:scale-105 transition-transform cursor-pointer"
+            />
+          </Link>
         </div>
 
         <DiagnosisSection />
