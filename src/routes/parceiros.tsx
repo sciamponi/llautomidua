@@ -21,10 +21,19 @@ function ParceirosPage() {
             <p className="text-lg md:text-xl text-[#DCE3EA]/70 max-w-2xl mx-auto">
               Você não precisa saber programar para vender os SaaS da Automatiza. Nós entregamos a ferramenta, você entrega a solução.
             </p>
-            <div className="pt-8">
-              <button className="bg-[#1E8CFF] text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-[#1E8CFF]/90 transition-all shadow-xl shadow-[#1E8CFF]/20">
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link 
+                to="/membros"
+                className="bg-[#1E8CFF] text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-[#1E8CFF]/90 transition-all shadow-xl shadow-[#1E8CFF]/20"
+              >
                 QUERO SER UM PARCEIRO
-              </button>
+              </Link>
+              <Link 
+                to="/solucoes"
+                className="bg-white/5 border border-white/10 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all"
+              >
+                VER SOLUÇÕES
+              </Link>
             </div>
           </div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1E8CFF]/5 blur-[120px] rounded-full pointer-events-none" />
