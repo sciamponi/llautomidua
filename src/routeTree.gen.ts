@@ -19,6 +19,7 @@ import { Route as EsmalteriaIndexRouteImport } from './routes/esmalteria/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
 import { Route as OficinasIndexRouteImport } from './routes/oficinas/index'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
+import { Route as ApiPublicLeadsRouteImport } from './routes/api/public/leads'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const SolucoesIndexRoute = SolucoesIndexRouteImport.update({
   path: '/solucoes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicLeadsRoute = ApiPublicLeadsRouteImport.update({
+  id: '/api/public/leads',
+  path: '/api/public/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/membros/': typeof MembrosIndexRoute
   '/oficinas/': typeof OficinasIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/membros': typeof MembrosIndexRoute
   '/oficinas': typeof OficinasIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
+  '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/membros/': typeof MembrosIndexRoute
   '/oficinas/': typeof OficinasIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/membros/'
     | '/oficinas/'
     | '/solucoes/'
+    | '/api/public/leads'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/membros'
     | '/oficinas'
     | '/solucoes'
+    | '/api/public/leads'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/membros/'
     | '/oficinas/'
     | '/solucoes/'
+    | '/api/public/leads'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   MembrosIndexRoute: typeof MembrosIndexRoute
   OficinasIndexRoute: typeof OficinasIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
+  ApiPublicLeadsRoute: typeof ApiPublicLeadsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolucoesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/leads': {
+      id: '/api/public/leads'
+      path: '/api/public/leads'
+      fullPath: '/api/public/leads'
+      preLoaderRoute: typeof ApiPublicLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   MembrosIndexRoute: MembrosIndexRoute,
   OficinasIndexRoute: OficinasIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
+  ApiPublicLeadsRoute: ApiPublicLeadsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
