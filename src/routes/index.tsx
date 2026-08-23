@@ -30,6 +30,8 @@ function Index() {
         </div>
 
         <DiagnosisSection />
+        <AboutSection />
+
         
         <section className="py-24 bg-[#071A2F]">
           <div className="container px-4">
