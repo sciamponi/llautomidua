@@ -56,6 +56,8 @@ function Index() {
         <PartnerProgram />
         <PartnerPricing />
         <PartnerSignup />
+        <MembersPreview />
+
 
 
         <section className="py-24 border-t border-white/5">
