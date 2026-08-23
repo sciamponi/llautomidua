@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '@/components/automatiza/Header'
 import { ProductSalesTemplate } from '@/components/automatiza/products/ProductSalesTemplate'
 
-export const Route = createFileRoute('/esmalteria')({
+export const Route = createFileRoute('/esmalteria/')({
   component: () => (
     <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
       <Header />

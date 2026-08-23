@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '@/components/automatiza/Header'
 import { motion } from 'framer-motion'
 
-export const Route = createFileRoute('/membros')({
+export const Route = createFileRoute('/membros/')({
   component: MembersPage
 })
 
