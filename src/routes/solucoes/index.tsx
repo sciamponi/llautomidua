@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Header } from '@/components/automatiza/Header'
 import { RobotMessage } from '@/components/automatiza/RobotMessage'
 import { cn } from '@/lib/utils'
