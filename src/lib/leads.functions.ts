@@ -17,7 +17,7 @@ const LeadSchema = z.object({
 });
 
 export const captureLead = createServerFn({ method: "POST" })
-  .input(LeadSchema)
+  .validator((data: unknown) => LeadSchema.parse(data))
   .handler(async ({ data }) => {
     console.log('Server capturing lead:', data);
     

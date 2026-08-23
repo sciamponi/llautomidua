@@ -89,7 +89,7 @@ export const getProducts = createServerFn({ method: "GET" })
   });
 
 export const getProductBySlug = createServerFn({ method: "GET" })
-  .input(z.string())
-  .handler(async ({ input }) => {
-    return MOCK_PRODUCTS.find(p => p.slug === input) || null;
+  .validator((data: string) => data)
+  .handler(async ({ data }) => {
+    return MOCK_PRODUCTS.find(p => p.slug === data) || null;
   });

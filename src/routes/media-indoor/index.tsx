@@ -21,16 +21,18 @@ function MediaIndoorPage() {
     
     try {
       await captureLead({
-        name: data.name as string,
-        company: data.company as string,
-        whatsapp: data.whatsapp as string,
-        city: data.city as string,
-        address: data.address as string,
-        establishmentType: data.establishmentType as string,
-        screenCount: Number(data.screenCount) || 0,
-        segment: data.segment as string,
-        objective: data.objective as string,
-        type: selectedOffer === 'INSTALL' ? 'SCREEN_INSTALLATION' : 'SCREEN_ADVERTISING',
+        data: {
+          name: String(data['name']),
+          company: String(data['company']),
+          whatsapp: String(data['whatsapp']),
+          city: String(data['city']),
+          address: data['address'] ? String(data['address']) : undefined,
+          establishmentType: data['establishmentType'] ? String(data['establishmentType']) : undefined,
+          screenCount: data['screenCount'] ? Number(data['screenCount']) : undefined,
+          segment: data['segment'] ? String(data['segment']) : undefined,
+          objective: data['objective'] ? String(data['objective']) : undefined,
+          type: selectedOffer === 'INSTALL' ? 'SCREEN_INSTALLATION' : 'SCREEN_ADVERTISING',
+        }
       });
       toast.success("Solicitação enviada com sucesso! Entraremos em contato.");
       setSelectedOffer(null);
