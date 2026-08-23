@@ -1,100 +1,141 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useLoaderData } from '@tanstack/react-router'
 import { Header } from '@/components/automatiza/Header'
 import { RobotMessage } from '@/components/automatiza/RobotMessage'
-import { cn } from '@/lib/utils'
-
-const solutions = [
-  {
-    id: 'automacao',
-    name: 'Automatiza',
-    category: 'WhatsApp & CRM',
-    description: 'Transforme seu WhatsApp em uma operação organizada de atendimento e vendas.',
-    problem: 'Tenho muitas mensagens e dificuldade para organizar os atendimentos.',
-    path: '/automacao'
-  },
-  {
-    id: 'barberia',
-    name: 'BarberIA',
-    category: 'Agendamento & Gestão',
-    description: 'Agendamento e gestão para barbearias que querem parar de depender de mensagens manuais.',
-    problem: 'Minha operação depende de confirmações e agendamentos manuais.',
-    path: '/barberia'
-  },
-  {
-    id: 'esmalteria',
-    name: 'Esmaltter-IA',
-    category: 'Beleza & Estética',
-    description: 'Organize atendimento, clientes e agendamentos do seu negócio de beleza.',
-    problem: 'Preciso organizar clientes, histórico e relacionamento.',
-    path: '/esmalteria'
-  },
-  {
-    id: 'automedia',
-    name: 'AutoMedia Indoor',
-    category: 'Mídia & Oportunidades',
-    description: 'Tecnologia para transformar mídia indoor em oportunidade comercial.',
-    problem: 'Quero criar novas oportunidades comerciais através de mídia e tecnologia.',
-    path: '/automedia'
-  },
-  {
-    id: 'oficinas',
-    name: 'Solução para Oficinas',
-    category: 'Gestão Automotiva',
-    description: 'Organize a operação da oficina e o relacionamento com seus clientes.',
-    problem: 'Preciso enxergar melhor minha operação e organizar os leads.',
-    path: '/oficinas'
-  }
-];
+import { useState, useMemo } from 'react'
+import { getProducts } from '@/lib/products.functions'
+import { Search, Filter } from 'lucide-react'
 
 export const Route = createFileRoute('/solucoes/')({
+  loader: async () => {
+    const products = await getProducts();
+    return { products };
+  },
   component: SolucoesPage
 })
 
 function SolucoesPage() {
+  const { products } = useLoaderData({ from: '/solucoes/' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeFilter, setActiveFilter] = useState('TODOS');
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           p.problem?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesFilter = activeFilter === 'TODOS' || p.type === activeFilter;
+      
+      return matchesSearch && matchesFilter;
+    });
+  }, [products, searchTerm, activeFilter]);
+
+  const getCtaText = (type: string) => {
+    switch(type) {
+      case 'SAAS': return 'CONHECER';
+      case 'SERVICE': return 'SOLICITAR ORÇAMENTO';
+      case 'SOLUTION': return 'CONHECER SOLUÇÃO';
+      case 'MEDIA': return 'VER OPÇÕES';
+      default: return 'CONHECER';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
       <Header />
       <main className="container px-4 py-20">
         <div className="max-w-3xl mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-white font-sora mb-6">
-            Uma empresa.<br/>
-            <span className="text-[#1E8CFF]">Várias soluções.</span>
+            Qual solução sua<br/>
+            <span className="text-[#1E8CFF]">empresa precisa?</span>
           </h1>
           <p className="text-lg text-[#DCE3EA]/70">
-            Tecnologia especializada para problemas reais. Escolha a solução que sua empresa precisa hoje.
+            Da automação do WhatsApp ao site da sua empresa. Do agendamento à mídia indoor. Encontre a solução certa para sua operação.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {solutions.map((s) => (
-            <div key={s.id} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col">
-              <div className="mb-6">
-                <span className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-widest bg-[#1E8CFF]/10 px-3 py-1 rounded-full border border-[#1E8CFF]/20">
-                  {s.category}
-                </span>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4 font-sora">{s.name}</h3>
-              <div className="p-4 rounded-xl bg-[#071A2F]/50 border border-white/5 mb-6">
-                <p className="text-xs text-[#1E8CFF] font-bold uppercase mb-1">O Problema:</p>
-                <p className="text-sm text-[#DCE3EA]/80 italic">"{s.problem}"</p>
-              </div>
-              <p className="text-[#DCE3EA]/60 mb-8 flex-grow">{s.description}</p>
-              <Link 
-                to={s.path as any}
-                className="inline-flex items-center justify-center w-full bg-white text-[#071A2F] py-4 rounded-xl font-bold hover:bg-[#F7F8FA] transition-all uppercase text-sm tracking-wider"
+        {/* Busca e Filtros */}
+        <div className="mb-12 space-y-6">
+          <div className="relative max-w-xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#DCE3EA]/40" />
+            <input 
+              type="text"
+              placeholder="Busque por segmento ou problema..."
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-[#DCE3EA]/30 focus:border-[#1E8CFF]/50 outline-none transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {['TODOS', 'SAAS', 'SERVICE', 'SOLUTION', 'MEDIA'].map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-6 py-2 rounded-full text-xs font-bold transition-all border ${
+                  activeFilter === filter 
+                    ? 'bg-[#1E8CFF] border-[#1E8CFF] text-white shadow-lg shadow-[#1E8CFF]/20' 
+                    : 'bg-white/5 border-white/10 text-[#DCE3EA]/60 hover:border-white/20'
+                }`}
               >
-                Conhecer {s.name}
-              </Link>
-            </div>
-          ))}
+                {filter === 'SERVICE' ? 'SERVIÇOS' : filter === 'SOLUTION' ? 'SOLUÇÕES' : filter}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {filteredProducts.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProducts.map((p) => (
+              <div key={p.id} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col">
+                <div className="mb-6">
+                  <span className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-widest bg-[#1E8CFF]/10 px-3 py-1 rounded-full border border-[#1E8CFF]/20">
+                    {p.category}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4 font-sora">{p.name}</h3>
+                
+                {p.problem && (
+                  <div className="p-4 rounded-xl bg-[#071A2F]/50 border border-white/5 mb-6">
+                    <p className="text-xs text-[#1E8CFF] font-bold uppercase mb-1">O Problema:</p>
+                    <p className="text-sm text-[#DCE3EA]/80 italic">"{p.problem}"</p>
+                  </div>
+                )}
+                
+                <p className="text-[#DCE3EA]/60 mb-8 flex-grow">{p.shortDescription}</p>
+                
+                <Link 
+                  to={p.slug === 'media-indoor' ? '/media-indoor' : `/solucoes/${p.slug}` as any}
+                  className="inline-flex items-center justify-center w-full bg-white text-[#071A2F] py-4 rounded-xl font-bold hover:bg-[#F7F8FA] transition-all uppercase text-sm tracking-wider"
+                >
+                  {getCtaText(p.type)}
+                </Link>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center">
+            <RobotMessage 
+              type="warning"
+              message="Não encontramos uma solução exata para sua busca, mas podemos construir uma para você!"
+              className="max-w-2xl mx-auto justify-center"
+            />
+            <button className="mt-8 bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#1E8CFF]/90 transition-all">
+              FALAR COM A AUTOMATIZA
+            </button>
+          </div>
+        )}
+
         <div className="mt-20">
-          <RobotMessage 
-            type="success"
-            message="Não encontrou o que procurava? Estamos sempre desenvolvendo novas soluções baseadas nas dores do mercado."
-            className="max-w-2xl mx-auto justify-center"
-          />
+          <div className="p-12 rounded-[3rem] bg-gradient-to-br from-[#1E8CFF]/10 to-transparent border border-[#1E8CFF]/20 text-center">
+            <h2 className="text-3xl font-bold text-white font-sora mb-6">Não encontrou sua área?</h2>
+            <p className="text-[#DCE3EA]/70 mb-8 max-w-xl mx-auto">
+              Se sua empresa não aparece aqui, fale com a gente. Podemos encontrar ou construir uma solução para sua operação.
+            </p>
+            <button className="bg-white text-[#071A2F] px-10 py-5 rounded-2xl font-bold hover:bg-[#F7F8FA] transition-all uppercase tracking-widest text-sm">
+              FALAR COM A AUTOMATIZA
+            </button>
+          </div>
         </div>
       </main>
 
