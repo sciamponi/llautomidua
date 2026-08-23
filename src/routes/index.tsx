@@ -64,18 +64,9 @@ function Index() {
 
 
 
-        <section className="py-24 border-t border-white/5">
-          <div className="container px-4 text-center">
-            <h2 className="text-3xl md:text-5xl font-bold text-white font-sora mb-8">
-              Seu WhatsApp não precisa de mais correria. <br/>
-              <span className="text-[#1E8CFF]">Precisa de processo.</span>
-            </h2>
-            <div className="flex justify-center gap-4">
-              <button className="bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-bold">CONHECER A AUTOMATIZA</button>
-            </div>
-          </div>
-        </section>
+        <FinalCTA />
       </main>
+
 
       <footer className="py-12 border-t border-white/10 bg-[#071A2F]">
         <div className="container px-4 text-center">
