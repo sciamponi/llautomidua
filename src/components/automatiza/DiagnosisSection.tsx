@@ -1,18 +1,77 @@
+import { Link } from "@tanstack/react-router";
+
 export function DiagnosisSection() {
   return (
     <section className="py-24 bg-[#071A2F]/50">
       <div className="container px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white font-sora mb-6">
-            Seu WhatsApp está trabalhando para sua empresa? <br/>
-            <span className="text-[#F0A820]">Ou sua equipe está trabalhando para o WhatsApp?</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-white font-sora mb-6">
+            Qual problema você quer resolver?
           </h2>
+          <p className="text-lg text-[#DCE3EA]/60">
+            A Automatiza Solução existe para tirar empresas do operacional manual e colocar crescimento no sistema.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="p-8 rounded-3xl bg-red-950/20 border border-red-500/20 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 text-xs font-bold text-red-500 uppercase tracking-widest opacity-20">Caos</div>
-            <h3 className="text-xl font-bold text-white mb-6 font-sora">O Cenário Atual</h3>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { 
+              icon: "💬", 
+              title: "WHATSAPP E ATENDIMENTO", 
+              desc: "Tenho muitas mensagens e dificuldade para organizar os atendimentos.",
+              path: "/automacao"
+            },
+            { 
+              icon: "📅", 
+              title: "AGENDAMENTOS", 
+              desc: "Minha operação depende de confirmações e agendamentos manuais.",
+              path: "/barberia"
+            },
+            { 
+              icon: "👥", 
+              title: "CLIENTES", 
+              desc: "Preciso organizar clientes, histórico e relacionamento.",
+              path: "/esmalteria"
+            },
+            { 
+              icon: "💰", 
+              title: "VENDAS", 
+              desc: "Tenho leads, mas perco oportunidades no caminho.",
+              path: "/automacao"
+            },
+            { 
+              icon: "📊", 
+              title: "GESTÃO", 
+              desc: "Preciso enxergar melhor minha operação e organizar os processos.",
+              path: "/oficinas"
+            },
+            { 
+              icon: "📺", 
+              title: "MÍDIA E OPORTUNIDADES", 
+              desc: "Quero criar novas oportunidades comerciais através de mídia e tecnologia.",
+              path: "/automedia"
+            }
+          ].map((item, i) => (
+            <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col justify-between">
+              <div>
+                <span className="text-4xl mb-6 block">{item.icon}</span>
+                <h3 className="text-lg font-bold text-white mb-4 font-sora uppercase tracking-wider">{item.title}</h3>
+                <p className="text-[#DCE3EA]/60 text-sm mb-8 leading-relaxed">"{item.desc}"</p>
+              </div>
+              <Link 
+                to={item.path as any}
+                className="w-full py-3 rounded-xl border border-white/10 text-white text-xs font-bold uppercase tracking-widest text-center hover:bg-white/5 transition-all"
+              >
+                Ver Soluções
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-20 grid md:grid-cols-2 gap-8">
+          <div className="p-10 rounded-[2.5rem] bg-red-950/10 border border-red-500/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 text-[10px] font-bold text-red-500 uppercase tracking-[0.3em] opacity-30">Caos</div>
+            <h3 className="text-2xl font-bold text-white mb-8 font-sora">O Cenário Atual</h3>
             <ul className="space-y-4">
               {[
                 "Mensagens não respondidas acumuladas",
@@ -21,16 +80,16 @@ export function DiagnosisSection() {
                 "Equipe perdida em dezenas de janelas",
                 "Gestor sem visão do que está acontecendo"
               ].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-[#DCE3EA]">
+                <li key={i} className="flex items-center gap-3 text-[#DCE3EA]/70">
                   <span className="text-red-500">✕</span> {item}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="p-8 rounded-3xl bg-blue-950/20 border border-[#1E8CFF]/20 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 text-xs font-bold text-[#1E8CFF] uppercase tracking-widest opacity-20">Controle</div>
-            <h3 className="text-xl font-bold text-white mb-6 font-sora">Com Automatiza Solução</h3>
+          <div className="p-10 rounded-[2.5rem] bg-[#1E8CFF]/5 border border-[#1E8CFF]/10 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 text-[10px] font-bold text-[#4CDFF2] uppercase tracking-[0.3em] opacity-30">Controle</div>
+            <h3 className="text-2xl font-bold text-white mb-8 font-sora">Com Automatiza Solução</h3>
             <ul className="space-y-4">
               {[
                 "Triagem automática e distribuição de leads",
