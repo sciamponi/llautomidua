@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as AutomacaoIndexRouteImport } from './routes/automacao/index'
-import { Route as AutomediaIndexRouteImport } from './routes/automedia/index'
 import { Route as BarberiaIndexRouteImport } from './routes/barberia/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as EsmalteriaIndexRouteImport } from './routes/esmalteria/index'
+import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
 import { Route as OficinasIndexRouteImport } from './routes/oficinas/index'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
@@ -36,11 +36,6 @@ const AutomacaoIndexRoute = AutomacaoIndexRouteImport.update({
   path: '/automacao/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AutomediaIndexRoute = AutomediaIndexRouteImport.update({
-  id: '/automedia/',
-  path: '/automedia/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BarberiaIndexRoute = BarberiaIndexRouteImport.update({
   id: '/barberia/',
   path: '/barberia/',
@@ -54,6 +49,11 @@ const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
 const EsmalteriaIndexRoute = EsmalteriaIndexRouteImport.update({
   id: '/esmalteria/',
   path: '/esmalteria/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaIndoorIndexRoute = MediaIndoorIndexRouteImport.update({
+  id: '/media-indoor/',
+  path: '/media-indoor/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MembrosIndexRoute = MembrosIndexRouteImport.update({
@@ -81,10 +81,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
   '/automacao/': typeof AutomacaoIndexRoute
-  '/automedia/': typeof AutomediaIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/esmalteria/': typeof EsmalteriaIndexRoute
+  '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
   '/oficinas/': typeof OficinasIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
@@ -94,10 +94,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
   '/automacao': typeof AutomacaoIndexRoute
-  '/automedia': typeof AutomediaIndexRoute
   '/barberia': typeof BarberiaIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
   '/esmalteria': typeof EsmalteriaIndexRoute
+  '/media-indoor': typeof MediaIndoorIndexRoute
   '/membros': typeof MembrosIndexRoute
   '/oficinas': typeof OficinasIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
@@ -108,10 +108,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
   '/automacao/': typeof AutomacaoIndexRoute
-  '/automedia/': typeof AutomediaIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/esmalteria/': typeof EsmalteriaIndexRoute
+  '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
   '/oficinas/': typeof OficinasIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
@@ -123,10 +123,10 @@ export interface FileRouteTypes {
     | '/'
     | '/parceiros'
     | '/automacao/'
-    | '/automedia/'
     | '/barberia/'
     | '/diagnostico/'
     | '/esmalteria/'
+    | '/media-indoor/'
     | '/membros/'
     | '/oficinas/'
     | '/solucoes/'
@@ -136,10 +136,10 @@ export interface FileRouteTypes {
     | '/'
     | '/parceiros'
     | '/automacao'
-    | '/automedia'
     | '/barberia'
     | '/diagnostico'
     | '/esmalteria'
+    | '/media-indoor'
     | '/membros'
     | '/oficinas'
     | '/solucoes'
@@ -149,10 +149,10 @@ export interface FileRouteTypes {
     | '/'
     | '/parceiros'
     | '/automacao/'
-    | '/automedia/'
     | '/barberia/'
     | '/diagnostico/'
     | '/esmalteria/'
+    | '/media-indoor/'
     | '/membros/'
     | '/oficinas/'
     | '/solucoes/'
@@ -163,10 +163,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ParceirosRoute: typeof ParceirosRoute
   AutomacaoIndexRoute: typeof AutomacaoIndexRoute
-  AutomediaIndexRoute: typeof AutomediaIndexRoute
   BarberiaIndexRoute: typeof BarberiaIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
   EsmalteriaIndexRoute: typeof EsmalteriaIndexRoute
+  MediaIndoorIndexRoute: typeof MediaIndoorIndexRoute
   MembrosIndexRoute: typeof MembrosIndexRoute
   OficinasIndexRoute: typeof OficinasIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
@@ -196,13 +196,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AutomacaoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/automedia/': {
-      id: '/automedia/'
-      path: '/automedia'
-      fullPath: '/automedia/'
-      preLoaderRoute: typeof AutomediaIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/barberia/': {
       id: '/barberia/'
       path: '/barberia'
@@ -222,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/esmalteria'
       fullPath: '/esmalteria/'
       preLoaderRoute: typeof EsmalteriaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media-indoor/': {
+      id: '/media-indoor/'
+      path: '/media-indoor'
+      fullPath: '/media-indoor/'
+      preLoaderRoute: typeof MediaIndoorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/membros/': {
@@ -259,10 +259,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ParceirosRoute: ParceirosRoute,
   AutomacaoIndexRoute: AutomacaoIndexRoute,
-  AutomediaIndexRoute: AutomediaIndexRoute,
   BarberiaIndexRoute: BarberiaIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
   EsmalteriaIndexRoute: EsmalteriaIndexRoute,
+  MediaIndoorIndexRoute: MediaIndoorIndexRoute,
   MembrosIndexRoute: MembrosIndexRoute,
   OficinasIndexRoute: OficinasIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
