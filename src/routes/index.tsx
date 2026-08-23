@@ -47,7 +47,7 @@ function Index() {
                 { name: "Automatiza", cat: "WhatsApp & CRM", problem: "Tenho muitas mensagens e dificuldade para organizar.", path: "/automacao" },
                 { name: "BarberIA", cat: "Agendamento", problem: "Minha operação depende de agendamentos manuais.", path: "/barberia" },
                 { name: "Esmaltter-IA", cat: "Beleza", problem: "Preciso organizar clientes e histórico.", path: "/esmalteria" },
-                { name: "AutoMedia Indoor", cat: "Mídia", problem: "Quero criar novas oportunidades comerciais com mídia.", path: "/automedia" },
+                { name: "Media Indoor", cat: "Mídia", problem: "Quero criar novas oportunidades comerciais com mídia.", path: "/media-indoor" },
                 { name: "Solução Oficinas", cat: "Gestão", problem: "Preciso enxergar melhor minha operação.", path: "/oficinas" },
                 { name: "Programa de Parceiros", cat: "Negócio", problem: "Quero revender tecnologia e escalar ganhos.", path: "/parceiros" }
               ].map((item, i) => (

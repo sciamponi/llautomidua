@@ -49,7 +49,7 @@ export function DiagnosisSection() {
               icon: "📺", 
               title: "MÍDIA E OPORTUNIDADES", 
               desc: "Quero criar novas oportunidades comerciais através de mídia e tecnologia.",
-              path: "/automedia"
+              path: "/media-indoor"
             }
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col justify-between">
