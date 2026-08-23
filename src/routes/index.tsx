@@ -4,6 +4,7 @@ import { Hero } from "@/components/automatiza/Hero";
 import { DiagnosisSection } from "@/components/automatiza/DiagnosisSection";
 import { PartnerProgram } from "@/components/automatiza/PartnerProgram";
 import { PartnerPricing } from "@/components/automatiza/PartnerPricing";
+import { PartnerSignup } from "@/components/automatiza/PartnerSignup";
 import { RobotMessage } from "@/components/automatiza/RobotMessage";
 
 export const Route = createFileRoute("/")({
