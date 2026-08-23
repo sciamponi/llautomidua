@@ -81,8 +81,10 @@ export function DiagnosticQuiz() {
   const [isFinished, setIsFinished] = useState(false);
 
   const handleSelect = (value: string) => {
-    const newAnswers = { ...answers, [questions[currentStep].id]: value };
-    setAnswers(newAnswers);
+    const currentQuestion = questions[currentStep];
+    if (!currentQuestion) return;
+
+    const newAnswers = { ...answers, [currentQuestion.id]: value };
 
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -93,7 +95,7 @@ export function DiagnosticQuiz() {
 
   const getRecommendation = () => {
     const match = rules.find(rule => rule.condition(answers));
-    return match ? match.result : rules[2].result; // Default to Automatiza
+    return match ? match.result : rules[2]?.result || { name: "Automatiza", path: "/automacao", desc: "Transforme seu WhatsApp em uma máquina de vendas organizada." };
   };
 
   if (isFinished) {
@@ -151,10 +153,10 @@ export function DiagnosticQuiz() {
           className="space-y-8"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-white font-sora">
-            {questions[currentStep].question}
+            {questions[currentStep]?.question}
           </h2>
           <div className="grid gap-4">
-            {questions[currentStep].options.map((option) => (
+            {questions[currentStep]?.options.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleSelect(option.value)}
