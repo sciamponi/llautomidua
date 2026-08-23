@@ -79,12 +79,12 @@ function SolucoesPage() {
                 <p className="text-sm text-[#DCE3EA]/80 italic">"{s.problem}"</p>
               </div>
               <p className="text-[#DCE3EA]/60 mb-8 flex-grow">{s.description}</p>
-              <a 
-                href={s.path}
+              <Link 
+                to={s.path as any}
                 className="inline-flex items-center justify-center w-full bg-white text-[#071A2F] py-4 rounded-xl font-bold hover:bg-[#F7F8FA] transition-all uppercase text-sm tracking-wider"
               >
                 Conhecer {s.name}
-              </a>
+              </Link>
             </div>
           ))}
         </div>
