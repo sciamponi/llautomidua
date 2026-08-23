@@ -46,7 +46,7 @@ const solutions = [
   }
 ];
 
-export const Route = createFileRoute('/solucoes')({
+export const Route = createFileRoute('/solucoes/')({
   component: SolucoesPage
 })
 
