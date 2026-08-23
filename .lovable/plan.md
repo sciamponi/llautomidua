@@ -1,44 +1,38 @@
-# Plan: Ecosistema Comercial Automatiza Solução - Fase 2
+# Plan: Ecosistema Comercial e Arquitetura Independente (Fases 2 e 3)
 
-Transformar a landing page institucional atual em uma plataforma comercial completa e segmentada, seguindo a arquitetura de "Máquina Comercial" definida no documento `VOIDPRO-3.md`.
+Este plano abrange a transformação da Automatiza Solução em uma plataforma comercial completa ("Máquina Comercial") e a preparação da arquitetura para hospedagem independente em VPS (saída do ecossistema proprietário).
 
 ## User Review Required
 
 > [!IMPORTANT]
-> A implementação seguirá a lógica de segmentação por problema/dor antes da solução técnica. As novas rotas serão criadas de forma modular para permitir a expansão futura.
+> A implementação seguirá a lógica de segmentação por dor (WhatsApp, Agendamento, etc.) antes da solução técnica. Prepararemos o projeto para ser exportável, mas o deploy em VPS externo e a configuração do Nginx/Docker são passos que o usuário deverá realizar após a exportação do código.
 
-- **Dúvida**: O formulário de "Diagnóstico Interativo" deve salvar os dados em algum banco ou apenas redirecionar para o produto? (Assumirei redirecionamento via regras simples inicialmente).
-- **Dúvida**: Os vídeos de demonstração nas páginas de produto são links do YouTube/Vimeo ou apenas placeholders por enquanto?
+- **Dúvida**: O formulário de "Diagnóstico Interativo" deve salvar leads no banco de dados local (Prisma) ou apenas redirecionar? (Implementarei salvamento local + redirecionamento).
+- **Dúvida**: Para a migração da Fase 3, devo manter a compatibilidade com o ambiente atual ou focar 100% na estrutura de backend Node/Express independente? (Focarei na estrutura independente conforme VOIDPRO-4.md).
 
 ## Proposed Changes
 
-### 1. Reestruturação da Home (Central de Soluções)
-- Atualizar o `Hero` para focar na dor ("Escolha o problema. A Automatiza encontra a solução").
-- Implementar a nova seção **"Qual problema você quer resolver?"** com cards interativos (WhatsApp, Agendamento, Clientes, Vendas, Gestão, Mídia).
-- Criar a seção **"Uma empresa. Várias soluções."** com cards premium para cada SaaS.
+### 1. Reestruturação Comercial (Fase 2 - VOIDPRO-3)
+- **Home**: Nova seção "Qual problema você quer resolver?" com cards interativos.
+- **Diagnóstico**: Implementação da rota `/diagnostico` com o quiz de 4 perguntas para recomendação de SaaS.
+- **Catálogo**: Rota `/solucoes` com filtro dinâmico por tipo de dor.
+- **Páginas de Produto**: Criação das rotas individuais para cada SaaS (Automatiza, BarberIA, Esmaltter-IA, AutoMedia, Oficinas) usando um template comercial premium.
+- **Área de Membros**: Rota `/membros` com dashboard para parceiros e cursos.
 
-### 2. Novas Rotas e Páginas de Produto
-- `/solucoes`: Catálogo inteligente com filtros por tipo de dor.
-- `/diagnostico`: Quiz interativo (4 perguntas) para recomendação de produto.
-- `/automacao` (Automatiza): Página de vendas focada em WhatsApp CRM.
-- `/barberia` (BarberIA): Página de vendas focada em agendamento para barbearias.
-- `/esmalteria` (Esmaltter-IA): Página de vendas para o setor de beleza.
-- `/automedia` (AutoMedia Indoor): Página para soluções de mídia.
-- `/oficinas`: Solução específica para gestão de oficinas.
+### 2. Infraestrutura Independente (Fase 3 - VOIDPRO-4)
+- **Estrutura de Pastas**: Reorganização para separar `/frontend` e `/backend`.
+- **Backend Node.js/Express**: Criação do servidor backend em TypeScript com autenticação JWT e Refresh Tokens.
+- **Banco de Dados (Prisma)**: Definição do `schema.prisma` com as entidades User, Company, Lead, Product, Partner, Course, Lesson.
+- **Storage**: Abstração para armazenamento local de arquivos (compatível com VPS).
+- **Docker**: Adição de `Dockerfile` e `docker-compose.yml` para facilitar o deploy no VPS.
 
-### 3. Componentes Compartilhados (Padrão Comercial)
-- **`ProductSalesTemplate`**: Layout base para as páginas de produto (Hero, Problema, Funcionalidades, Pricing, FAQ).
-- **`DiagnosticQuiz`**: Componente de lógica de quiz com redirecionamento baseado em regras.
-- **`SolutionFilter`**: Filtro dinâmico para o catálogo de soluções.
-
-### 4. Refinamento de Conversão
-- Atualizar `/parceiros` para alinhar com a nova narrativa do ecossistema.
-- Implementar CTAs claros em todas as páginas ("ENCONTRAR MINHA SOLUÇÃO", "CONHECER OS SAAS").
-- Adicionar placeholders visuais para dashboards e interfaces reais (seguindo a regra de não inventar prints falsos).
+### 3. Funcionalidades de Negócio
+- **Parceiros**: Sistema de gestão de carteira ativa e simulador de ganhos persistente.
+- **Leads**: Captura e triagem automática de leads via formulários e quiz.
 
 ## Technical Details
 
-- **Routing**: Uso do `@tanstack/react-router` para as novas sub-rotas.
-- **State Management**: Local state (React `useState`) para o Quiz e Filtros.
-- **Styling**: Manutenção do tema dark navy (#071A2F) com acentos em Electric Blue (#1E8CFF) e Cyan (#4CDFF2).
-- **SEO**: Atualização do `head()` em cada rota para metadados específicos de cada solução.
+- **Frontend**: React + TanStack Router (SPA mode para facilitar exportação).
+- **Backend**: Express.js + Prisma ORM + PostgreSQL.
+- **Auth**: Cookie-based HttpOnly JWT (Segurança recomendada).
+- **Deployment**: Preparado para Nginx Reverse Proxy.
