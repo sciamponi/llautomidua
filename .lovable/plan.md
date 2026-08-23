@@ -1,38 +1,32 @@
-# Plan: Ecosistema Comercial e Arquitetura Independente (Fases 2 e 3)
+# Estratégia Comercial e Arquitetura Independente - Automatiza Solução
 
-Este plano abrange a transformação da Automatiza Solução em uma plataforma comercial completa ("Máquina Comercial") e a preparação da arquitetura para hospedagem independente em VPS (saída do ecossistema proprietário).
+Este plano detalha a transformação da Automatiza Solução em um ecossistema comercial completo e uma aplicação full-stack preparada para hospedagem independente (VPS).
 
-## User Review Required
+## Objetivos
+1. **Ecossistema Comercial**: Implementar todas as páginas de vendas, catálogo de soluções e diagnóstico interativo.
+2. **Área de Membros**: Criar o dashboard para parceiros com trilhas de treinamento e gestão de clientes.
+3. **Arquitetura Independente**: Configurar o backend Node.js/Express e a infraestrutura Docker para portabilidade total.
 
-> [!IMPORTANT]
-> A implementação seguirá a lógica de segmentação por dor (WhatsApp, Agendamento, etc.) antes da solução técnica. Prepararemos o projeto para ser exportável, mas o deploy em VPS externo e a configuração do Nginx/Docker são passos que o usuário deverá realizar após a exportação do código.
+## Implementação Técnica
 
-- **Dúvida**: O formulário de "Diagnóstico Interativo" deve salvar leads no banco de dados local (Prisma) ou apenas redirecionar? (Implementarei salvamento local + redirecionamento).
-- **Dúvida**: Para a migração da Fase 3, devo manter a compatibilidade com o ambiente atual ou focar 100% na estrutura de backend Node/Express independente? (Focarei na estrutura independente conforme VOIDPRO-4.md).
+### 1. Frontend (TanStack Start + Tailwind)
+- **Catálogo de Soluções**: Rota `/solucoes` com cards interativos baseados em problemas reais.
+- **Páginas de Vendas (SaaS)**: Implementação das páginas `/automacao`, `/barberia`, `/esmalteria`, `/automedia` e `/oficinas` usando o `ProductSalesTemplate`.
+- **Diagnóstico Interativo**: Finalização do `DiagnosticQuiz` para recomendação automática de produtos.
+- **Área de Membros**: Rota `/membros` com dashboard, módulos de curso e área financeira (simulada/integrada).
+- **Integração de Leads**: Conectar formulários à API pública `/api/public/leads`.
 
-## Proposed Changes
+### 2. Backend (Node.js/Express + Prisma)
+- **Servidor**: API RESTful em TypeScript com middlewares de segurança (Helmet, CORS).
+- **Autenticação**: Sistema de login via JWT para parceiros e administradores.
+- **Banco de Dados**: Schema Prisma completo cobrindo Usuários, Empresas, Produtos e Leads.
+- **API de Leads**: Endpoint para captura e armazenamento de potenciais clientes vindos do frontend.
 
-### 1. Reestruturação Comercial (Fase 2 - VOIDPRO-3)
-- **Home**: Nova seção "Qual problema você quer resolver?" com cards interativos.
-- **Diagnóstico**: Implementação da rota `/diagnostico` com o quiz de 4 perguntas para recomendação de SaaS.
-- **Catálogo**: Rota `/solucoes` com filtro dinâmico por tipo de dor.
-- **Páginas de Produto**: Criação das rotas individuais para cada SaaS (Automatiza, BarberIA, Esmaltter-IA, AutoMedia, Oficinas) usando um template comercial premium.
-- **Área de Membros**: Rota `/membros` com dashboard para parceiros e cursos.
+### 3. Infraestrutura (Docker + VPS)
+- **Containerização**: `Dockerfile` otimizado para produção e `docker-compose.yml` para orquestrar App + Banco Postgres.
+- **Variáveis de Ambiente**: Configuração centralizada para fácil deploy em qualquer provedor VPS.
 
-### 2. Infraestrutura Independente (Fase 3 - VOIDPRO-4)
-- **Estrutura de Pastas**: Reorganização para separar `/frontend` e `/backend`.
-- **Backend Node.js/Express**: Criação do servidor backend em TypeScript com autenticação JWT e Refresh Tokens.
-- **Banco de Dados (Prisma)**: Definição do `schema.prisma` com as entidades User, Company, Lead, Product, Partner, Course, Lesson.
-- **Storage**: Abstração para armazenamento local de arquivos (compatível com VPS).
-- **Docker**: Adição de `Dockerfile` e `docker-compose.yml` para facilitar o deploy no VPS.
-
-### 3. Funcionalidades de Negócio
-- **Parceiros**: Sistema de gestão de carteira ativa e simulador de ganhos persistente.
-- **Leads**: Captura e triagem automática de leads via formulários e quiz.
-
-## Technical Details
-
-- **Frontend**: React + TanStack Router (SPA mode para facilitar exportação).
-- **Backend**: Express.js + Prisma ORM + PostgreSQL.
-- **Auth**: Cookie-based HttpOnly JWT (Segurança recomendada).
-- **Deployment**: Preparado para Nginx Reverse Proxy.
+## Próximos Passos
+- Implementar as tabelas no banco de dados via Prisma.
+- Criar a lógica de cursos/aulas na área de membros.
+- Validar o fluxo completo de captura de lead -> recomendação -> checkout.
