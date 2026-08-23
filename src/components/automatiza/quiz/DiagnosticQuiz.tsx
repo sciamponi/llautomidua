@@ -72,7 +72,7 @@ const rules = [
   },
   {
     condition: (answers: Record<number, string>) => answers[2] === "divulgacao",
-    result: { name: "AutoMedia Indoor", path: "/automedia", desc: "Mídia inteligente para atrair e converter mais clientes." }
+    result: { name: "Media Indoor", path: "/media-indoor", desc: "Mídia inteligente para atrair e converter mais clientes." }
   }
 ];
 
