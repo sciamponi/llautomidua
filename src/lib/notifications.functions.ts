@@ -67,8 +67,16 @@ export const sendNotification = createServerFn({ method: "POST" })
 export const getNotificationLogs = createServerFn({ method: "GET" })
   .validator((data: unknown) => String(data))
   .handler(async ({ data: orderId }) => {
-    return await prisma.notificationLog.findMany({
-      where: { orderId },
-      orderBy: { sentAt: 'desc' }
-    });
+    if (!process.env['DATABASE_URL']) return [];
+    
+    const { prisma } = await import("@/lib/prisma.server");
+    try {
+      return await prisma.notificationLog.findMany({
+        where: { orderId },
+        orderBy: { sentAt: 'desc' }
+      });
+    } catch (error) {
+      console.error('getNotificationLogs failed:', error);
+      return [];
+    }
   });
