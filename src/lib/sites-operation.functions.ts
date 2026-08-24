@@ -48,8 +48,9 @@ export const getClientOrders = createServerFn({ method: "GET" })
 export const getSiteOrderDetails = createServerFn({ method: "GET" })
   .validator((data: unknown) => String(data))
   .middleware([authMiddleware])
-  .handler(async ({ data: orderId }) => {
+  .handler(async ({ data: orderId, context }) => {
     const { session } = context as any;
+
     const order = await prisma.siteOrder.findUnique({
       where: { id: orderId },
       include: {
