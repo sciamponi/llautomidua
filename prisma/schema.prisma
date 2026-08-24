@@ -325,6 +325,8 @@ model SiteOrder {
   files             SiteOrderFile[]
   internalNotes     InternalNote[]
   notifications     NotificationLog[]
+  payments          Payment[]
+
   
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
