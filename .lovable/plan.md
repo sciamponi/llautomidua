@@ -1,58 +1,48 @@
 # UX, Navigation, and Conversion Review (Phase 5.2)
 
-Complete overhaul of the navigation system and user experience to eliminate "dead ends" and ensure a consistent, professional journey across the entire application.
+Comprehensive overhaul of the application's architecture to eliminate "dead ends" and establish consistent layouts across public, customer, member, and admin zones.
 
-## 1. Global Navigation Infrastructure
+## 1. Architectural Layout Overhaul (VOIDPRO-19)
 
-### Global Header (`src/components/automatiza/Header.tsx`)
-- **New Structure**:
-    - **Logo**: Always leads to `/`.
-    - **Mega Menu (Soluções)**:
-        - **SaaS**: Automatiza, BarberIA, Esmaltter-IA, PetFlow, Solução Oficinas.
-        - **Serviços**: Sites Profissionais, Media Indoor.
-    - **Direct Links**: Sites, Media Indoor, Parceiros.
-    - **Primary CTA**: "ENCONTRAR MINHA SOLUÇÃO".
-- **Mobile Experience**: Implement a full-screen hamburger menu for consistent navigation on smaller devices.
-- **Visual Style**: Sticky navy background (#071A2F) with glassmorphism, white/ice text, and high-contrast blue CTAs.
+### Public Layout (Header + Footer)
+Applied to: Home, Solutions, Sites, Media Indoor, Diagnostic, Partners.
+- **Header**: Sticky, neon-navy themed with Mega Menu.
+- **Footer**: Full site map, social, and company info.
+- **Implementation**: Move to `src/routes/__root.tsx` wrapping general routes.
 
-### Global Footer (`src/components/automatiza/Footer.tsx`)
-- **Sections**:
-    - **Sobre**: Brief bio and logo.
-    - **Soluções**: Links to all SaaS products and services.
-    - **Empresa**: About, Partners, Contact.
-    - **Legal**: Privacy policy and terms (placeholders).
-- **Branding**: Dark navy background with technical gray accents.
+### Specialized Layouts (Isolated)
+- **Customer Approval**: Clean, mobile-first preview for sites (`/sites/aprovacao/$token`).
+- **Members Area**: Dashboard layout with sidebar navigation (`/membros/*`).
+- **Admin Panel**: Kanban and management view (`/admin/*`).
 
-### Root Layout Integration (`src/routes/__root.tsx`)
-- Move `Header` and `Footer` to the root route to ensure they wrap every page automatically.
-- Implement a logic to conditionally exclude them from specific routes if necessary (e.g., admin area, though the plan emphasizes consistency).
+## 2. Navigation & Conversion Rules (VOIDPRO-18)
 
-## 2. Journey Separation & Flow Improvements
-
-### Client vs. Partner Journeys
-- **Client Path**: Focused on identifying problems and finding the right SaaS/Service solution.
-- **Partner Path**: A dedicated landing page (`/parceiros`) and membership area (`/membros`) with its own context.
-- **Isolation**: Ensure the navigation menu doesn't mix "Partner" tools within the buyer's product funnel.
+### Mega Menu & Mobile Navigation
+- **Solutions Hub**: Categorized dropdown for SaaS (Automatiza, BarberIA, etc.) and Services (Sites, Media).
+- **Mobile Hamburger**: Full-screen overlay for consistent mobile UX.
+- **Brand Consistency**: Logo always returns to `/`.
 
 ### "No Dead Ends" Policy
-- **Breadcrumbs/Back Links**: Add consistent "Back to Catalog" or "Back to Home" links to all internal pages:
-    - `src/routes/solucoes/$productSlug.tsx`
-    - `src/routes/sites/$templateSlug.tsx`
-    - `src/routes/media-indoor/index.tsx`
-    - `src/routes/diagnostico/index.tsx`
-- **CTA Context**: Ensure every page ends with a clear call to action (Diagnostic Quiz, Specialist Contact, or Purchase).
+- **Breadcrumbs**: Implement a `Breadcrumbs` component for all internal pages.
+- **Back-links**: Every sub-page (product, template, or form) must have a clear "Back to [Category]" link.
+- **Contextual CTAs**: Final section of every page must drive to the next step in the funnel (e.g., Diagnostic Quiz or Order Form).
 
-## 3. Implementation Plan
+## 3. Implementation Steps
 
-1. **Create Footer**: Implement `src/components/automatiza/Footer.tsx`.
-2. **Update Header**: Redesign `src/components/automatiza/Header.tsx` with Mega Menu and mobile menu.
-3. **Refactor Root**: Wrap `<Outlet />` in `src/routes/__root.tsx` with the new Header and Footer.
-4. **Cleanup Routes**: Remove manual Header/Footer imports from all existing route files.
-5. **Enhanced Sub-pages**: Add breadcrumbs and consistent back-navigation to all product and service detail pages.
-6. **Conversion Optimization**: Update `FinalCTA` and all page footers to drive users towards the "Cérebro Comercial" (Diagnostic Quiz).
+1. **Global Components**:
+   - Create `src/components/automatiza/Footer.tsx`.
+   - Overhaul `src/components/automatiza/Header.tsx` with Mega Menu and Mobile Menu.
+   - Create `src/components/automatiza/Breadcrumbs.tsx`.
+2. **Layout Routing**:
+   - Refactor `src/routes/__root.tsx` to handle layout switching (Public vs. App zones).
+3. **Route Cleanup**:
+   - Remove duplicate Header/Footer calls from leaf routes.
+   - Inject Breadcrumbs into `src/routes/solucoes/$productSlug.tsx` and `src/routes/sites/$templateSlug.tsx`.
+4. **Partner Separation**:
+   - Ensure `/parceiros` leads to a unique journey distinct from the consumer SaaS catalog.
 
 ## Technical Details
 
-- **Components**: `Header`, `Footer`, `MegaMenu`, `Breadcrumbs`.
-- **Framework**: TanStack Start + Tailwind CSS + Framer Motion.
-- **Data Source**: Uses `src/lib/products.functions.ts` to dynamically populate the solutions menu.
+- **Tech Stack**: TanStack Start, Tailwind CSS v4, Framer Motion for animations.
+- **State**: Use `products.functions.ts` to populate menus dynamically based on database/mock status.
+- **Styling**: Unified Navy (#071A2F) / Electric Blue (#1E8CFF) / Technical Gray palette.
