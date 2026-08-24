@@ -1,41 +1,41 @@
 # Plano de Implementação: Fechamento Sites Operation 2.0 (Fase 5.2)
 
-Finalização da operação de sites com persistência real em banco de dados, motor de notificações operacional e portal do cliente integrado.
+Finalização da operação de sites com persistência real no Prisma, motor de notificações operacional, Kanban administrativo seguro e Portal do Cliente funcional.
 
-## 1. Persistência de Dados e Lógica de Negócio
+## 1. Persistência e Backend (Prisma)
 - **Sites Operation Functions (`src/lib/sites-operation.functions.ts`)**:
-  - Implementar lógica real no Prisma para `updateOrderStatus`, garantindo o registro de histórico em `SiteOrderHistory` dentro de uma transação.
-  - Finalizar `processApproval` para validar tokens de aprovação via `ApprovalRequest`, expiração e ownership.
-  - Implementar `getSiteOrderDetails` para retornar todos os relacionamentos necessários (histórico, versões, notificações, arquivos).
-  - Adicionar validações de ownership em todas as funções acessadas pelo cliente.
+  - Implementar lógica real no Prisma para `updateOrderStatus`, garantindo o registro de histórico em `SiteOrderHistory` e disparo de notificações.
+  - Finalizar `processApproval` para validar tokens de `ApprovalRequest`, expiração e ownership.
+  - Implementar `getSiteOrderDetails` para retornar todos os relacionamentos (histórico, versões, notificações, arquivos, pagamentos).
+  - **Segurança**: Aplicar validação de ownership server-side em todas as funções (Cliente A nunca acessa Cliente B).
 - **Notificações (`src/lib/notifications.functions.ts`)**:
-  - Persistir cada tentativa de envio no banco de dados (`NotificationLog`).
-  - Implementar lógica de fallback para o estado `SIMULATED` quando providers reais não estiverem configurados.
+  - Persistir cada tentativa de envio em `NotificationLog` com estados `SIMULATED`, `SENT` ou `FAILED`.
+  - Garantir fallback para `SIMULATED` quando providers reais não estiverem configurados.
 
-## 2. Interface Administrativa (Admin Kanban)
-- **Refatoração do Kanban (`src/routes/admin/sites/index.tsx`)**:
-  - Substituir o estado local (`useState`) por dados reais do banco usando `useSuspenseQuery`.
-  - Implementar persistência imediata do drag-and-drop chamando `updateOrderStatus` no servidor com rollback visual em caso de erro.
-  - Adicionar totalizadores dinâmicos (quantidade e valor) por coluna baseados nos dados do banco.
-- **OrderModal (`src/components/admin/sites/OrderModal.tsx`)**:
-  - Popular as abas `RESUMO`, `DADOS`, `CONTEÚDO`, `ARQUIVOS`, `VERSÕES` e `HISTÓRICO` com dados reais do Prisma.
-  - Implementar a listagem de arquivos com suporte a download e visualização.
-  - Exibir a timeline real no histórico e o log de comunicações na aba correspondente.
+## 2. Interface Administrativa (Kanban & Operação)
+- **Kanban Real (`src/routes/admin/sites/index.tsx`)**:
+  - Substituir `useState` por `useSuspenseQuery` para dados do banco.
+  - Implementar drag-and-drop persistente com rollback visual em caso de erro.
+  - **Financeiro**: Exibir totalizadores por coluna. Adicionar controle "MOSTRAR/OCULTAR VALORES" e restringir visibilidade por permissão de usuário.
+- **OrderModal Completo (`src/components/admin/sites/OrderModal.tsx`)**:
+  - Popular abas `RESUMO`, `DADOS`, `CONTEÚDO`, `ARQUIVOS`, `VERSÕES`, `HISTÓRICO` e `COMUNICAÇÕES` com dados reais.
+  - **Arquivos**: Listar, permitir visualizar e baixar, com validação de permissão.
+  - **Comunicações**: Preview de mensagem antes do disparo manual e logs de envio.
 
-## 3. Portal do Cliente (`/cliente/*`)
-- **Visualização Segura**:
-  - Refatorar a listagem em `/cliente/sites/index.tsx` para filtrar pedidos pelo `userId` autenticado.
-  - Criar a rota de detalhes `/cliente/sites/$orderId.tsx` com timeline de progresso real.
+## 3. Portal do Cliente & Aprovação
+- **Área do Cliente (`/cliente/*`)**:
+  - Refatorar listagem para filtrar pedidos por `userId`.
+  - Criar rota de detalhes `/cliente/sites/$orderId` com timeline de progresso real baseada no histórico do banco.
 - **Fluxo de Aprovação**:
-  - Vincular o token de aprovação à versão específica do site.
-  - Garantir que a aprovação ou solicitação de ajustes atualize o status do pedido no Kanban e notifique a equipe.
+  - Implementar aprovação ou solicitação de ajustes (com comentário obrigatório).
+  - Atualizar status para `CHANGES_REQUESTED` ou `APPROVED` e notificar a equipe.
 
 ## 4. Versionamento Imutável
-- **Snapshots**: Garantir que cada envio para aprovação (`WAITING_APPROVAL`) gere uma nova entrada em `SiteOrderVersion` com o `contentSnapshot` atual, garantindo que o que o cliente aprovou não mude.
+- **Snapshots Imutáveis**: Toda vez que uma versão for enviada para aprovação, criar um `SiteOrderVersion` com `contentSnapshot`. Uma vez enviada, a versão é imutável. Alterações subsequentes devem gerar uma nova versão (V2, V3, etc.).
 
 ## Detalhes do Usuário (Não Técnico)
-Esta atualização remove todos os "dados de exemplo" do sistema:
-1. **Histórico Verdadeiro**: Tudo o que for alterado em um projeto ficará gravado para sempre no banco de dados.
-2. **Segurança Máxima**: Cada cliente só conseguirá ver os seus próprios projetos e arquivos.
-3. **Notificações Operacionais**: O sistema registrará cada mensagem enviada ao cliente, permitindo saber se ele foi notificado.
-4. **Painel de Produção**: A equipe terá uma visão exata de quanto dinheiro está em cada etapa da produção através do Kanban.
+Esta atualização transforma o sistema em uma ferramenta de produção real:
+1. **Histórico Completo**: Cada mudança de status ou mensagem enviada fica gravada no banco de dados.
+2. **Segurança de Dados**: O portal do cliente é totalmente isolado e seguro.
+3. **Controle Financeiro**: O Kanban agora mostra o valor total da produção, com opção de ocultar valores sensíveis.
+4. **Provas de Produção**: O versionamento garante que o que o cliente aprova é exatamente o que será publicado, sem alterações acidentais.
