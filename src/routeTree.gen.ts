@@ -11,15 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
-import { Route as AutomacaoIndexRouteImport } from './routes/automacao/index'
-import { Route as AutomediaIndexRouteImport } from './routes/automedia/index'
-import { Route as BarberiaIndexRouteImport } from './routes/barberia/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
-import { Route as EsmalteriaIndexRouteImport } from './routes/esmalteria/index'
+import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
-import { Route as OficinasIndexRouteImport } from './routes/oficinas/index'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
-import { Route as ApiPublicLeadsRouteImport } from './routes/api/public/leads'
+import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,29 +27,14 @@ const ParceirosRoute = ParceirosRouteImport.update({
   path: '/parceiros',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AutomacaoIndexRoute = AutomacaoIndexRouteImport.update({
-  id: '/automacao/',
-  path: '/automacao/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AutomediaIndexRoute = AutomediaIndexRouteImport.update({
-  id: '/automedia/',
-  path: '/automedia/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BarberiaIndexRoute = BarberiaIndexRouteImport.update({
-  id: '/barberia/',
-  path: '/barberia/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
   id: '/diagnostico/',
   path: '/diagnostico/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EsmalteriaIndexRoute = EsmalteriaIndexRouteImport.update({
-  id: '/esmalteria/',
-  path: '/esmalteria/',
+const MediaIndoorIndexRoute = MediaIndoorIndexRouteImport.update({
+  id: '/media-indoor/',
+  path: '/media-indoor/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MembrosIndexRoute = MembrosIndexRouteImport.update({
@@ -61,116 +42,83 @@ const MembrosIndexRoute = MembrosIndexRouteImport.update({
   path: '/membros/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OficinasIndexRoute = OficinasIndexRouteImport.update({
-  id: '/oficinas/',
-  path: '/oficinas/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SolucoesIndexRoute = SolucoesIndexRouteImport.update({
   id: '/solucoes/',
   path: '/solucoes/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicLeadsRoute = ApiPublicLeadsRouteImport.update({
-  id: '/api/public/leads',
-  path: '/api/public/leads',
+const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
+  id: '/solucoes/$productSlug',
+  path: '/solucoes/$productSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
-  '/automacao/': typeof AutomacaoIndexRoute
-  '/automedia/': typeof AutomediaIndexRoute
-  '/barberia/': typeof BarberiaIndexRoute
+  '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
-  '/esmalteria/': typeof EsmalteriaIndexRoute
+  '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
-  '/oficinas/': typeof OficinasIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
-  '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
-  '/automacao': typeof AutomacaoIndexRoute
-  '/automedia': typeof AutomediaIndexRoute
-  '/barberia': typeof BarberiaIndexRoute
+  '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
-  '/esmalteria': typeof EsmalteriaIndexRoute
+  '/media-indoor': typeof MediaIndoorIndexRoute
   '/membros': typeof MembrosIndexRoute
-  '/oficinas': typeof OficinasIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
-  '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
-  '/automacao/': typeof AutomacaoIndexRoute
-  '/automedia/': typeof AutomediaIndexRoute
-  '/barberia/': typeof BarberiaIndexRoute
+  '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
-  '/esmalteria/': typeof EsmalteriaIndexRoute
+  '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
-  '/oficinas/': typeof OficinasIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
-  '/api/public/leads': typeof ApiPublicLeadsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/parceiros'
-    | '/automacao/'
-    | '/automedia/'
-    | '/barberia/'
+    | '/solucoes/$productSlug'
     | '/diagnostico/'
-    | '/esmalteria/'
+    | '/media-indoor/'
     | '/membros/'
-    | '/oficinas/'
     | '/solucoes/'
-    | '/api/public/leads'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/parceiros'
-    | '/automacao'
-    | '/automedia'
-    | '/barberia'
+    | '/solucoes/$productSlug'
     | '/diagnostico'
-    | '/esmalteria'
+    | '/media-indoor'
     | '/membros'
-    | '/oficinas'
     | '/solucoes'
-    | '/api/public/leads'
   id:
     | '__root__'
     | '/'
     | '/parceiros'
-    | '/automacao/'
-    | '/automedia/'
-    | '/barberia/'
+    | '/solucoes/$productSlug'
     | '/diagnostico/'
-    | '/esmalteria/'
+    | '/media-indoor/'
     | '/membros/'
-    | '/oficinas/'
     | '/solucoes/'
-    | '/api/public/leads'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ParceirosRoute: typeof ParceirosRoute
-  AutomacaoIndexRoute: typeof AutomacaoIndexRoute
-  AutomediaIndexRoute: typeof AutomediaIndexRoute
-  BarberiaIndexRoute: typeof BarberiaIndexRoute
+  SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
-  EsmalteriaIndexRoute: typeof EsmalteriaIndexRoute
+  MediaIndoorIndexRoute: typeof MediaIndoorIndexRoute
   MembrosIndexRoute: typeof MembrosIndexRoute
-  OficinasIndexRoute: typeof OficinasIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
-  ApiPublicLeadsRoute: typeof ApiPublicLeadsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -189,27 +137,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParceirosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/automacao/': {
-      id: '/automacao/'
-      path: '/automacao'
-      fullPath: '/automacao/'
-      preLoaderRoute: typeof AutomacaoIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/automedia/': {
-      id: '/automedia/'
-      path: '/automedia'
-      fullPath: '/automedia/'
-      preLoaderRoute: typeof AutomediaIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/barberia/': {
-      id: '/barberia/'
-      path: '/barberia'
-      fullPath: '/barberia/'
-      preLoaderRoute: typeof BarberiaIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/diagnostico/': {
       id: '/diagnostico/'
       path: '/diagnostico'
@@ -217,11 +144,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiagnosticoIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/esmalteria/': {
-      id: '/esmalteria/'
-      path: '/esmalteria'
-      fullPath: '/esmalteria/'
-      preLoaderRoute: typeof EsmalteriaIndexRouteImport
+    '/media-indoor/': {
+      id: '/media-indoor/'
+      path: '/media-indoor'
+      fullPath: '/media-indoor/'
+      preLoaderRoute: typeof MediaIndoorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/membros/': {
@@ -231,13 +158,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MembrosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/oficinas/': {
-      id: '/oficinas/'
-      path: '/oficinas'
-      fullPath: '/oficinas/'
-      preLoaderRoute: typeof OficinasIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/solucoes/': {
       id: '/solucoes/'
       path: '/solucoes'
@@ -245,11 +165,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolucoesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/leads': {
-      id: '/api/public/leads'
-      path: '/api/public/leads'
-      fullPath: '/api/public/leads'
-      preLoaderRoute: typeof ApiPublicLeadsRouteImport
+    '/solucoes/$productSlug': {
+      id: '/solucoes/$productSlug'
+      path: '/solucoes/$productSlug'
+      fullPath: '/solucoes/$productSlug'
+      preLoaderRoute: typeof SolucoesProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -258,15 +178,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ParceirosRoute: ParceirosRoute,
-  AutomacaoIndexRoute: AutomacaoIndexRoute,
-  AutomediaIndexRoute: AutomediaIndexRoute,
-  BarberiaIndexRoute: BarberiaIndexRoute,
+  SolucoesProductSlugRoute: SolucoesProductSlugRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
-  EsmalteriaIndexRoute: EsmalteriaIndexRoute,
+  MediaIndoorIndexRoute: MediaIndoorIndexRoute,
   MembrosIndexRoute: MembrosIndexRoute,
-  OficinasIndexRoute: OficinasIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
-  ApiPublicLeadsRoute: ApiPublicLeadsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

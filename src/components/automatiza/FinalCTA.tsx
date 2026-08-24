@@ -26,10 +26,16 @@ export function FinalCTA() {
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-            <button className="bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#1E8CFF]/90 transition-all uppercase tracking-wider">
-              CONHECER A AUTOMATIZA
+            <button 
+              onClick={() => window.location.href = '/solucoes'}
+              className="bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#1E8CFF]/90 transition-all uppercase tracking-wider"
+            >
+              ENCONTRAR MINHA SOLUÇÃO
             </button>
-            <button className="border border-white/20 text-white px-8 py-4 rounded-xl font-bold hover:bg-white/5 transition-all uppercase tracking-wider">
+            <button 
+              onClick={() => window.location.href = '/parceiros'}
+              className="border border-white/20 text-white px-8 py-4 rounded-xl font-bold hover:bg-white/5 transition-all uppercase tracking-wider"
+            >
               QUERO SER PARCEIRO
             </button>
           </div>

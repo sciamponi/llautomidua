@@ -19,37 +19,37 @@ export function DiagnosisSection() {
               icon: "💬", 
               title: "WHATSAPP E ATENDIMENTO", 
               desc: "Tenho muitas mensagens e dificuldade para organizar os atendimentos.",
-              path: "/automacao"
+              path: "/solucoes/automacao"
             },
             { 
               icon: "📅", 
               title: "AGENDAMENTOS", 
               desc: "Minha operação depende de confirmações e agendamentos manuais.",
-              path: "/barberia"
+              path: "/solucoes/barberia"
             },
             { 
               icon: "👥", 
               title: "CLIENTES", 
               desc: "Preciso organizar clientes, histórico e relacionamento.",
-              path: "/esmalteria"
+              path: "/solucoes/esmalteria"
             },
             { 
               icon: "💰", 
               title: "VENDAS", 
               desc: "Tenho leads, mas perco oportunidades no caminho.",
-              path: "/automacao"
+              path: "/solucoes/automacao"
             },
             { 
               icon: "📊", 
               title: "GESTÃO", 
               desc: "Preciso enxergar melhor minha operação e organizar os processos.",
-              path: "/oficinas"
+              path: "/solucoes/oficinas"
             },
             { 
               icon: "📺", 
               title: "MÍDIA E OPORTUNIDADES", 
               desc: "Quero criar novas oportunidades comerciais através de mídia e tecnologia.",
-              path: "/automedia"
+              path: "/media-indoor"
             }
           ].map((item, i) => (
             <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col justify-between">

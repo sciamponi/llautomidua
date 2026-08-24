@@ -56,23 +56,23 @@ const questions = [
 const rules = [
   {
     condition: (answers: Record<number, string>) => answers[1] === "barbearia" || (answers[1] === "servicos" && answers[2] === "agendamento"),
-    result: { name: "BarberIA", path: "/barberia", desc: "Agendamento e gestão inteligente para barbearias." }
+    result: { name: "BarberIA", path: "/solucoes/barberia", desc: "Agendamento e gestão inteligente para barbearias." }
   },
   {
     condition: (answers: Record<number, string>) => answers[1] === "salao" || answers[1] === "clinica",
-    result: { name: "Esmaltter-IA", path: "/esmalteria", desc: "Organização completa para negócios de beleza e estética." }
+    result: { name: "Esmaltter-IA", path: "/solucoes/esmalteria", desc: "Organização completa para negócios de beleza e estética." }
   },
   {
     condition: (answers: Record<number, string>) => answers[2] === "whatsapp" || answers[2] === "vendas",
-    result: { name: "Automatiza", path: "/automacao", desc: "Transforme seu WhatsApp em uma máquina de vendas organizada." }
+    result: { name: "Automatiza", path: "/solucoes/automacao", desc: "Transforme seu WhatsApp em uma máquina de vendas organizada." }
   },
   {
     condition: (answers: Record<number, string>) => answers[1] === "oficina",
-    result: { name: "Solução Oficinas", path: "/oficinas", desc: "Gestão especializada para o setor automotivo." }
+    result: { name: "Solução Oficinas", path: "/solucoes/oficinas", desc: "Gestão especializada para o setor automotivo." }
   },
   {
     condition: (answers: Record<number, string>) => answers[2] === "divulgacao",
-    result: { name: "AutoMedia Indoor", path: "/automedia", desc: "Mídia inteligente para atrair e converter mais clientes." }
+    result: { name: "Media Indoor", path: "/media-indoor", desc: "Mídia inteligente para atrair e converter mais clientes." }
   }
 ];
 
@@ -96,7 +96,7 @@ export function DiagnosticQuiz() {
 
   const getRecommendation = () => {
     const match = rules.find(rule => rule.condition(answers));
-    return match ? match.result : rules[2]?.result || { name: "Automatiza", path: "/automacao", desc: "Transforme seu WhatsApp em uma máquina de vendas organizada." };
+    return match ? match.result : rules[2]?.result || { name: "Automatiza", path: "/solucoes/automacao", desc: "Transforme seu WhatsApp em uma máquina de vendas organizada." };
   };
 
   if (isFinished) {

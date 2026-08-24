@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '@/components/automatiza/Header'
 import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/membros/')({
   component: MembersPage
@@ -100,8 +101,4 @@ function MembersPage() {
       </main>
     </div>
   )
-}
-
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }

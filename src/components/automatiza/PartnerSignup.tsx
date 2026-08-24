@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { RobotMessage } from "./RobotMessage";
 import { toast } from "sonner";
+import { captureLead } from "@/lib/leads.functions";
 
 export function PartnerSignup() {
   const [submitted, setSubmitted] = useState(false);
@@ -19,20 +20,22 @@ export function PartnerSignup() {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/public/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      await captureLead({
+        data: {
+          name: formData.nome,
+          email: formData.email,
+          whatsapp: formData.whatsapp,
+          company: formData.empresa,
+          city: formData.cidade,
+          type: 'PARTNER',
+          message: `Origem: ${formData.origem}`
+        }
       });
       
-      if (response.ok) {
-        setSubmitted(true);
-        toast.success("Cadastro realizado com sucesso!");
-      } else {
-        toast.error("Erro ao realizar cadastro. Tente novamente.");
-      }
+      setSubmitted(true);
+      toast.success("Cadastro realizado com sucesso!");
     } catch (error) {
-      toast.error("Erro de conexão. Tente novamente.");
+      toast.error("Erro ao realizar cadastro. Tente novamente.");
     } finally {
       setLoading(false);
     }
