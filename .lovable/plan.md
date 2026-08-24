@@ -5,7 +5,7 @@ Evolve the site production ecosystem into a professional workflow connecting Adm
 ## User Review Required
 
 > [!IMPORTANT]
-> - **Simulation vs Real Notifications**: All WhatsApp and Email notifications will be implemented with a "Simulation" status by default. They will only be marked as "Sent" once a real provider (Twilio/Resend) is connected. A `NotificationPreview` will allow manual verification before "sending".
+> - **Simulation vs Real Notifications**: All WhatsApp and Email notifications will be implemented with a "Simulated" status by default. They will only be marked as "Sent" once a real provider (Twilio/Resend) is connected. A `NotificationPreview` will allow manual verification before "sending".
 > - **Token-Based Access**: The client portal will use secure, expiring tokens linked to each order for access, serving as a bridge to a full Auth system (Phase 6).
 > - **Structured Editor**: The initial editor for clients will focus on structured data (Name, Contact, Services, Logo, Photos) with a real-time preview, rather than arbitrary code editing.
 
@@ -14,8 +14,8 @@ Evolve the site production ecosystem into a professional workflow connecting Adm
 ### 1. Database & Server Logic (TanStack Start & Prisma)
 - **Schema Enhancements**: 
     - Update `SiteOrder` to include `responsibleUserId` and `slaDeadline`.
-    - Enhance `SiteOrderVersion` to be immutable, storing full content snapshots.
-    - Expand `SiteOrderHistory` to log every status change with actor details.
+    - Enhance `SiteOrderVersion` to be immutable, storing full content snapshots (Json `contentSnapshot`).
+    - Expand `SiteOrderHistory` to log every status change with actor details and `responsibleUserId`.
     - Implement `ApprovalRequest` with hashed tokens (SHA-256) and expiration.
 - **Server Functions (`src/lib/`)**:
     - `sites-operation.functions.ts`: Detailed status management, version creation, and approval processing.
@@ -30,7 +30,7 @@ Evolve the site production ecosystem into a professional workflow connecting Adm
         - **Arquivos**: Asset management (Logos, Photos).
         - **Preview & Versões**: Version history, generate preview links, and trigger approval requests.
         - **Histórico**: Full audit trail of the order.
-        - **Comunicações**: Manual notification preview before simulated/real delivery.
+        - **Comunicações**: Manual notification preview before simulated delivery.
 - **Kanban Board**: Maintain existing board but integrate the new modal and status update flow.
 
 ### 3. Client Portal (`/cliente/sites/$orderId`)
