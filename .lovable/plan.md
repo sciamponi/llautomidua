@@ -1,53 +1,58 @@
-# Plan: Phase 5.2 - Sites Operation 2.0
+# Plan: Phase 5.2 - Sites Operation 2.0 (Producão + Cliente + Aprovacão + Versões)
 
-Evolve the current site production operation into a complete system with an admin order manager, client portal, automated notifications, and version control.
+Evolve the site production ecosystem into a professional workflow connecting Admin (Operations) and Client (Approval & Maintenance).
 
 ## User Review Required
 
 > [!IMPORTANT]
-> - **Authentication**: The plan includes a secure token-based access mechanism for clients. Full user account integration will be prepared but marked as pending (Phase 6).
-> - **Automation**: Notifications will be logged and simulated. Real WhatsApp/Email delivery requires external API integration (e.g., Twilio/Resend) in a future step.
-> - **Editor**: The first stage of the editor will focus on structured data (texts, images, links) rather than direct visual manipulation of the code.
+> - **Simulation vs Real Notifications**: All WhatsApp and Email notifications will be implemented with a "Simulation" status by default. They will only be marked as "Sent" once a real provider (Twilio/Resend) is connected. A `NotificationPreview` will allow manual verification before "sending".
+> - **Token-Based Access**: The client portal will use secure, expiring tokens linked to each order for access, serving as a bridge to a full Auth system (Phase 6).
+> - **Structured Editor**: The initial editor for clients will focus on structured data (Name, Contact, Services, Logo, Photos) with a real-time preview, rather than arbitrary code editing.
 
 ## Proposed Changes
 
-### 1. Database & Backend (Server-Side)
-- **Schema Update**: Enhance `SiteOrder`, `SiteOrderVersion`, and `SiteOrderHistory` models to support more granular statuses and metadata.
-- **Server Functions**:
-    - Update `src/lib/sites-operation.functions.ts` to include detailed status history and responsible user tracking.
-    - Expand `src/lib/notifications.functions.ts` with template support for WhatsApp/Email previews.
-    - Implement `src/lib/sites-editor.functions.ts` for managing site content rascunhos and versions.
+### 1. Database & Server Logic (TanStack Start & Prisma)
+- **Schema Enhancements**: 
+    - Update `SiteOrder` to include `responsibleUserId` and `slaDeadline`.
+    - Enhance `SiteOrderVersion` to be immutable, storing full content snapshots.
+    - Expand `SiteOrderHistory` to log every status change with actor details.
+    - Implement `ApprovalRequest` with hashed tokens (SHA-256) and expiration.
+- **Server Functions (`src/lib/`)**:
+    - `sites-operation.functions.ts`: Detailed status management, version creation, and approval processing.
+    - `notifications.functions.ts`: Logic for simulating/sending notifications with template support and manual preview logging.
+    - `sites-editor.functions.ts`: Handle "Draft -> Preview -> Published" workflow for site content.
 
-### 2. Admin Interface (`/admin/sites`)
-- **Order Modal**: Create `OrderModal.tsx` in `src/components/admin/sites/` with tabs:
-    - **Summary**: Key business info, status, and SLA.
-    - **Content**: Data provided by the client.
-    - **Preview & Versions**: Version history with "visualize" and "request approval" actions.
-    - **History**: Detailed audit log of every status change and internal note.
-    - **Communications**: Log of sent notifications and manual preview before sending.
-- **Kanban Evolution**: Enhance the board with drag-and-drop feedback and quick status updates.
+### 2. Admin Operations (`/admin/sites`)
+- **Order Modal (`OrderModal.tsx`)**:
+    - Central management hub for each order with tabs:
+        - **Resumo**: Quick status, SLA, and business basics.
+        - **Dados/Conteúdo**: View/Edit client-provided information.
+        - **Arquivos**: Asset management (Logos, Photos).
+        - **Preview & Versões**: Version history, generate preview links, and trigger approval requests.
+        - **Histórico**: Full audit trail of the order.
+        - **Comunicações**: Manual notification preview before simulated/real delivery.
+- **Kanban Board**: Maintain existing board but integrate the new modal and status update flow.
 
 ### 3. Client Portal (`/cliente/sites/$orderId`)
-- **Secure Access**: Implement token-based authentication for specific orders.
-- **Dashboard**:
-    - **Status Timeline**: Visual progress tracker (Submitted -> Analysis -> Production -> Approval -> Published).
-    - **Approval Center**: Improved interface to approve or request changes with detailed feedback.
-    - **Site Preview**: Integrated preview of the current version.
-- **Content Editor (Post-Launch)**:
-    - Dedicated interface to edit business name, contact info, services, and logo once the site is `PUBLISHED`.
+- **Secure Dashboard**:
+    - Visual **Status Timeline** (Submitted -> Review -> Production -> Approval -> Published).
+    - **Integrated Preview**: Live view of the current site version.
+    - **Approval Action**: Modal for "Approve" or "Request Changes" (with mandatory feedback).
+- **Client Editor (`/cliente/sites/$orderId/editor`)**:
+    - Dual-pane interface: Structured fields on the left, real-time preview on the right.
+    - Workflow: Save Draft -> Visualize -> Publish (creates new version).
+    - Restricted fields: Content-only, no code editing.
 
-### 4. Site Architecture (Versioning)
-- Implement a "Draft -> Preview -> Published" workflow.
-- Ensure every publication creates a new immutable version in the database.
+### 4. Cross-Sell & Upsell
+- **RelatedSolutions Component**: Contextual recommendations for other ecosystem products (e.g., Automatiza, Media Indoor) based on the current site status and niche.
 
-## Technical Details
-- **Stack**: TanStack Start (Router + Server Functions), Prisma (Postgres), Tailwind CSS v4, Framer Motion.
-- **Z-Index**: Header (1000), Order Modal (2000), Toasts (3000).
-- **Security**: Token hashes stored using SHA-256 for secure approval links.
-- **Environment**: Environment-aware logic for Health Checks (already implemented).
+## Technical Strategy
+- **Z-Index Hierarchy**: Header (1000), Mega Menu (1100), Modal (2000), Toast (3000).
+- **Stack**: React 19, TanStack Router/Start, Tailwind CSS v4, Framer Motion for smooth modal/timeline transitions.
+- **Modularity**: Prepare the editor architecture for future inline editing without rebuilding the core logic.
 
 ## Next Steps
-1. Create directories for Admin and Client components.
-2. Implement the `OrderModal` base structure.
-3. Build the Client Dashboard and Approval interface.
-4. Integrate the notification preview system.
+1. Create `src/components/admin/sites/OrderModal.tsx` and sub-components.
+2. Build the `/cliente/sites/$orderId` route and dashboard.
+3. Implement the `NotificationPreview` logic in the admin flow.
+4. Develop the structured content editor for clients.
