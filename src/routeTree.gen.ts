@@ -20,6 +20,7 @@ import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ClienteSitesIndexRouteImport } from './routes/cliente/sites/index'
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
 import { Route as SitesAprovacaoTokenRouteImport } from './routes/sites/aprovacao/$token'
 
@@ -78,6 +79,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteSitesIndexRoute = ClienteSitesIndexRouteImport.update({
+  id: '/cliente/sites/',
+  path: '/cliente/sites/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
   id: '/pedido',
   path: '/pedido',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
+  '/cliente/sites/': typeof ClienteSitesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites': typeof AdminSitesIndexRoute
+  '/cliente/sites': typeof ClienteSitesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
+  '/cliente/sites/': typeof ClienteSitesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
+    | '/cliente/sites/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites'
+    | '/cliente/sites'
   id:
     | '__root__'
     | '/'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
+    | '/cliente/sites/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
   AdminSitesIndexRoute: typeof AdminSitesIndexRoute
+  ClienteSitesIndexRoute: typeof ClienteSitesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cliente/sites/': {
+      id: '/cliente/sites/'
+      path: '/cliente/sites'
+      fullPath: '/cliente/sites/'
+      preLoaderRoute: typeof ClienteSitesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sites/$templateSlug/pedido': {
       id: '/sites/$templateSlug/pedido'
       path: '/pedido'
@@ -318,6 +338,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
   AdminSitesIndexRoute: AdminSitesIndexRoute,
+  ClienteSitesIndexRoute: ClienteSitesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
