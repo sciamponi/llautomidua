@@ -99,7 +99,20 @@
   }
 }
 
+/*
+ * Escala de camadas (z-index) do projeto:
+ *  conteúdo normal ......... 0 - 100
+ *  header fixo ............. 1000
+ *  mega menu (desktop) ..... 1100
+ *  dropdowns / popovers .... 1200  (tooltip 1250)
+ *  menu mobile ............. 1500
+ *  overlay de modal ........ 1800
+ *  modal / dialog / sheet .. 1900
+ *  toasts .................. acima via Sonner portal
+ */
+
 @layer utilities {
+
   .section-padding {
     @apply py-24 md:py-32;
   }
