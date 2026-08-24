@@ -19,15 +19,18 @@ export const recommendProduct = createServerFn({ method: "POST" })
   });
 
 export const completeDiagnostic = createServerFn({ method: "POST" })
-  .validator((data: any) => z.object({
-    sessionId: z.string(),
-    answers: z.record(z.any()),
-    leadData: z.object({
-      name: z.string(),
-      whatsapp: z.string(),
-      email: z.string().optional().nullable(),
-    }).optional().nullable()
-  }).parse(data))
+  .validator((data: any) => {
+    const schema = z.object({
+      sessionId: z.string(),
+      answers: z.record(z.any()),
+      leadData: z.object({
+        name: z.string(),
+        whatsapp: z.string(),
+        email: z.string().optional().nullable(),
+      }).optional().nullable()
+    });
+    return schema.parse(data);
+  })
   .handler(async ({ data }) => {
     const result = await recommendProductLogic({
       businessSegment: String(data.answers['businessSegment'] || ""),
@@ -51,11 +54,14 @@ export const createDiagnosticSession = createServerFn({ method: "POST" })
   });
 
 export const updateDiagnosticSession = createServerFn({ method: "POST" })
-  .validator((data: any) => z.object({
-    sessionId: z.string(),
-    step: z.number(),
-    data: z.record(z.any()),
-  }).parse(data))
+  .validator((data: any) => {
+    const schema = z.object({
+      sessionId: z.string(),
+      step: z.number(),
+      data: z.record(z.any()),
+    });
+    return schema.parse(data);
+  })
   .handler(async ({ data }) => {
     console.log(`Updating session ${data.sessionId} at step ${data.step}`, data.data);
     return { success: true };
