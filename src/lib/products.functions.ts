@@ -116,6 +116,29 @@ const MOCK_PRODUCTS = [
   },
   {
     id: "prod_6",
+    name: "PetFlow",
+    slug: "petflow",
+    type: "SAAS",
+    category: "Gestão Pet",
+    segment: "Pet Shop",
+    shortDescription: "O controle total para o seu Pet Shop e Banho & Tosa.",
+    description: "Sistema completo de agendamento e gestão para o mercado pet.",
+    problem: "Dificuldade em organizar horários de banho e tosa.",
+    pricingType: "SUBSCRIPTION",
+    pricing: "147",
+    status: "active",
+    featured: true,
+    sortOrder: 6,
+    features: [
+      { title: "Agenda Inteligente", desc: "Controle de horários por tosquiador e tipo de serviço pet." },
+      { title: "Ficha do Pet", desc: "Histórico completo de saúde, vacinas e preferências de cada animalzinho." },
+      { title: "Lembretes Automáticos", desc: "Envio de lembretes via WhatsApp para os tutores não esquecerem o horário." },
+      { title: "Controle de Leva e Traz", desc: "Gestão logística completa para transporte dos animais com segurança." },
+      { title: "Financeiro Pet", desc: "Controle de pacotes de banho, revenda de produtos e fluxo de caixa." }
+    ]
+  },
+  {
+    id: "prod_7",
     name: "Sites Profissionais",
     slug: "sites",
     type: "SERVICE",
@@ -127,7 +150,7 @@ const MOCK_PRODUCTS = [
     pricingType: "ONE_TIME",
     status: "active",
     featured: true,
-    sortOrder: 6
+    sortOrder: 7
   }
 ];
 
