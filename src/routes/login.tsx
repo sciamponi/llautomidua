@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/lib/auth.functions";
-import { useNavigate, createFileRoute, Link } from "@tanstack/react-router";
+import { useNavigate, createFileRoute, Link, redirect } from "@tanstack/react-router";
 import logoAsset from "@/assets/logo.png.asset.json";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
