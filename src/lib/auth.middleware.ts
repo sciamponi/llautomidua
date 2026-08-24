@@ -1,6 +1,6 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { getSession } from "./auth.functions";
-import { UserRole, AuthScope } from "@prisma/client";
+import { UserRole, AuthScope } from "./prisma-enums";
 
 export const authMiddleware = createMiddleware().server(async ({ next }) => {
   const session = await getSession();
