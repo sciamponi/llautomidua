@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
@@ -45,6 +46,11 @@ const LoginRoute = LoginRouteImport.update({
 const ParceirosRoute = ParceirosRouteImport.update({
   id: '/parceiros',
   path: '/parceiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
   '/media-indoor': typeof MediaIndoorIndexRoute
   '/membros': typeof MembrosIndexRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
@@ -181,6 +190,7 @@ export interface FileRouteTypes {
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin/'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin'
     | '/diagnostico'
     | '/media-indoor'
     | '/membros'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin/'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   ParceirosRoute: typeof ParceirosRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
   MediaIndoorIndexRoute: typeof MediaIndoorIndexRoute
   MembrosIndexRoute: typeof MembrosIndexRoute
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       path: '/parceiros'
       fullPath: '/parceiros'
       preLoaderRoute: typeof ParceirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico/': {
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   ParceirosRoute: ParceirosRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
+  AdminIndexRoute: AdminIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
   MediaIndoorIndexRoute: MediaIndoorIndexRoute,
   MembrosIndexRoute: MembrosIndexRoute,

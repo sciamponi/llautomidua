@@ -1,10 +1,9 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { getSession } from '@/lib/auth.functions';
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute('/admin/')({
   beforeLoad: async ({ context }) => {
-    // getSession is already called in __root beforeLoad, but we can verify here or just use context.
-    // However, loaders run after beforeLoad, and we want to ensure only admins get here.
     const session = context.session;
     
     if (!session) {
@@ -136,5 +135,3 @@ function DashboardCard({
   if (disabled) return content;
   return <Link to={to as any}>{content}</Link>;
 }
-
-import { cn } from "@/lib/utils";
