@@ -49,7 +49,7 @@ export const getSiteOrderDetails = createServerFn({ method: "GET" })
   .validator((data: unknown) => String(data))
   .middleware([authMiddleware])
   .handler(async ({ data: orderId }) => {
-    if (!process.env['DATABASE_URL']) return null;
+    const { session } = context as any;
     const order = await prisma.siteOrder.findUnique({
       where: { id: orderId },
       include: {
@@ -60,8 +60,21 @@ export const getSiteOrderDetails = createServerFn({ method: "GET" })
         notes: { orderBy: { createdAt: 'desc' } }
       }
     });
+
+    if (!order) return null;
+
+    // Se não for admin, só pode ver o próprio pedido
+    const isAdmin = session.user.roles.some((r: any) => 
+      ['MASTER_ADMIN', 'ADMIN', 'OPERATOR'].includes(r.role)
+    );
+    
+    if (!isAdmin && order.userId !== session.user.id) {
+      throw new Error("Forbidden");
+    }
+
     return JSON.parse(JSON.stringify(order));
   });
+
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .validator((data: unknown) => z.object({

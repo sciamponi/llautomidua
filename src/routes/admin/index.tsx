@@ -83,8 +83,8 @@ function AdminDashboardPage() {
             description="Controle de acessos, papéis (Roles) e permissões do ecossistema."
             icon={<Users className="w-8 h-8" />}
             to="/admin/usuarios"
-            disabled
           />
+
           <DashboardCard 
             title="Catálogo de Produtos" 
             description="Gerencie as soluções disponíveis, preços e configurações de recomendação."
