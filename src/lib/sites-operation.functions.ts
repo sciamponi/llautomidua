@@ -142,7 +142,50 @@ export const processApproval = createServerFn({ method: "POST" })
      feedback: z.string().optional()
   }).parse(data))
   .handler(async ({ data }) => {
-     return { success: true };
+     if (!process.env['DATABASE_URL']) {
+       return { success: true, simulated: true };
+     }
+
+     const { prisma } = await import("@/lib/prisma.server");
+
+     try {
+       const approval = await prisma.approvalRequest.findUnique({
+         where: { tokenHash: data.token },
+         include: { orderVersion: true }
+       });
+
+       if (!approval) throw new Error("Approval request not found");
+
+       const status = data.approved ? ApprovalRequestStatus.APPROVED : ApprovalRequestStatus.CHANGES_REQUESTED;
+
+       await prisma.$transaction([
+         prisma.approvalRequest.update({
+           where: { id: approval.id },
+           data: { 
+             status,
+             feedback: data.feedback,
+             respondedAt: new Date()
+           }
+         }),
+         prisma.siteOrderVersion.update({
+           where: { id: approval.orderVersionId },
+           data: { 
+             status: data.approved ? SiteOrderVersionStatus.APPROVED : SiteOrderVersionStatus.REJECTED 
+           }
+         }),
+         prisma.siteOrder.update({
+           where: { id: approval.orderId },
+           data: { 
+             status: data.approved ? SiteOrderStatus.WAITING_APPROVAL : SiteOrderStatus.CHANGES_REQUESTED 
+           }
+         })
+       ]);
+
+       return { success: true };
+     } catch (error) {
+       console.error('processApproval failed:', error);
+       throw error;
+     }
   });
 
-export { SiteOrderStatus, PaymentStatus, UserRole };
+export { SiteOrderStatus, PaymentStatus, UserRole, ApprovalRequestStatus, SiteOrderVersionStatus };
