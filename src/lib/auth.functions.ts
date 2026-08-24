@@ -149,8 +149,7 @@ export const login = createServerFn({ method: "POST" })
 
 export const logout = createServerFn({ method: "POST" })
   .handler(async () => {
-    const cookies = parseCookies();
-    const token = cookies[SESSION_COOKIE_NAME];
+    const token = getCookie(SESSION_COOKIE_NAME);
 
     if (token && process.env['DATABASE_URL']) {
       const { prisma } = await import("@/lib/prisma.server");
@@ -166,8 +165,7 @@ export const logout = createServerFn({ method: "POST" })
 
 export const getSession = createServerFn({ method: "GET" })
   .handler(async () => {
-    const cookies = parseCookies();
-    const token = cookies[SESSION_COOKIE_NAME];
+    const token = getCookie(SESSION_COOKIE_NAME);
 
     if (!token || !process.env['DATABASE_URL']) return null;
 
