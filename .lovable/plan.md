@@ -1,35 +1,43 @@
-# Plan: Vitrine Interativa de Produtos + Demo com Lead
+# Plan: Vitrine Interativa & Controle de Demo (Fase 6)
 
-This plan focuses on evolving the product cards into a premium interactive showcase, featuring a standardized card system, an immersive presentation modal with a photo gallery, and a lead capture flow for accessing demonstrations.
+This plan implements a premium product showcase with an interactive gallery and a controlled demo access system, as specified in `VOIDPRO-58.md` and `VOIDPRO-59.md`.
 
 ## User-facing changes
-
-- **Interactive Showcase**: A new visual layout for product cards on the solutions page and homepage.
-- **Product Details Modal**: Clicking "Conhecer" will open a premium modal with detailed information ("For whom it is", "How it works", "Key benefits") instead of immediate navigation.
-- **Photo Gallery**: An interactive gallery within the modal to browse product screenshots.
-- **Lead Capture for Demo**: Accessing product demonstrations will now require a briefly submitted lead form (name, WhatsApp) to unlock the link.
+- **Premium Product Cards**: Standardized cards on the solutions page and homepage featuring availability indicators and a "CONHECER" button.
+- **Interactive Presentation Modal**: Instead of navigating away, "CONHECER" opens a modal with detailed product benefits, "how it works", and target audience info.
+- **Photo Gallery**: A configurable image gallery within the modal to showcase product screenshots.
+- **Controlled Demo Flow**: "ACESSAR DEMO" triggers a lead capture modal. After submission, the system generates a secure access token and unlocks the demo link.
+- **Automatic Context**: The demo system automatically identifies the product being viewed, ensuring a seamless experience without asking the user to re-select.
 
 ## Technical details
 
-- **Data Model**:
-  - Update `prisma/schema.prisma` to add `ProductImage` model (url, alt, order, productId) and fields to `Product` (audience, howItWorks, benefits).
-  - Seed initial product data with these new fields.
-- **Components**:
-  - `src/components/automatiza/catalog/ProductCard.tsx`: Standardized card with hover effects and availability indicators.
-  - `src/components/automatiza/catalog/ProductModal.tsx`: Comprehensive modal using `Dialog` from shadcn/ui.
-  - `src/components/automatiza/catalog/Gallery.tsx`: Image slider/carousel with thumbnails.
-  - `src/components/automatiza/catalog/DemoLeadForm.tsx`: Specialized lead capture component.
-- **Server Logic**:
-  - Update `src/lib/products.functions.ts` to fetch images and the new descriptive fields.
-  - Update `src/lib/leads.functions.ts` to support 'DEMO' lead types and handle demonstration link unlocking logic.
-- **Routing**:
-  - Refactor `src/routes/solucoes/index.tsx` to use the new `ProductCard` and manage modal state.
-  - Keep `src/routes/solucoes/$productSlug.tsx` as a fallback or deep-link "Sales Page", but prioritize the modal for the initial discovery.
+### 1. Database Schema (`prisma/schema.prisma`)
+- **Product Enhancement**: Add `howItWorks`, `benefits` (Json/String), and `coverImage` fields.
+- **New Model: `ProductImage`**: For gallery management (url, alt, sortOrder).
+- **New Model: `DemoAccess`**: To track and secure demo access (tokenHash, expiresAt, status).
+- **Enum: `DemoAccessStatus`**: `ACTIVE`, `EXPIRED`, `REVOKED`.
+
+### 2. Server Logic & API
+- **`src/lib/products.functions.ts`**: Update `getProducts` and `getProductBySlug` to include gallery images and new commercial fields.
+- **`src/lib/demo.functions.ts` (New)**:
+  - `createDemoAccess`: Validates lead, generates a secure random token (Web Crypto API), hashes it, and saves it in `DemoAccess`.
+  - `validateDemoToken`: Verifies token validity and updates `accessCount`/`lastAccessAt`.
+- **Environment Variables**: Add `DEMO_ACCESS_EXPIRATION_HOURS` support.
+
+### 3. Frontend Components
+- **`src/components/automatiza/catalog/ProductCard.tsx`**: The new standardized card component.
+- **`src/components/automatiza/catalog/ProductModal.tsx`**: Premium presentation modal using Radix UI (shadcn).
+- **`src/components/automatiza/catalog/Gallery.tsx`**: Responsive image slider/viewer.
+- **`src/components/automatiza/catalog/DemoRequestModal.tsx`**: Lead capture form integrated with the `DemoAccess` flow.
+
+### 4. Integration & Routing
+- **`src/routes/solucoes/index.tsx`**: Refactor to a state-managed gallery view using the new modals.
+- **`src/routes/index.tsx`**: Update the homepage product section to use the new card architecture.
+- **Demo Unlocking**: The UI will transition from "Solicitar Acesso" to "Acessar Demo" immediately after successful lead capture and token generation.
 
 ## Strategy
-
-1.  **Phase 1: Database & Seed**: Update Prisma schema and migration to support rich product content (images, benefits).
-2.  **Phase 2: Core Components**: Build the `ProductCard` and the base `ProductModal`.
-3.  **Phase 3: Interactive Gallery**: Implement the photo gallery within the modal.
-4.  **Phase 4: Lead/Demo Flow**: Connect the "Acessar Demo" button to a lead capture form that unlocks the URL upon submission.
-5.  **Phase 5: Integration**: Refactor the main solutions page and home page to use this new architecture.
+1. **Migrations & Seeding**: Update Prisma schema and seed the database with rich product content and images.
+2. **Operational Infrastructure**: Implement the `DemoAccess` server functions and token logic.
+3. **UI Foundations**: Build the `ProductCard` and `ProductModal` components.
+4. **Interactive Features**: Implement the `Gallery` and `DemoRequestModal`.
+5. **Final Hookup**: Wire the components into the solutions and home pages, ensuring the multi-step flow (Card -> Modal -> Lead -> Demo) works perfectly.
