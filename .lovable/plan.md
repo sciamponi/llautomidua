@@ -1,6 +1,6 @@
 # Plano: FASE 7 — CONEXÃO REAL COM VPS / POSTGRESQL (APROVAÇÃO FINAL)
 
-Este plano estabelece a base definitiva para a operação da Automatiza Solução em produção, garantindo integridade de dados, segurança de segredos e automação de infraestrutura conforme os requisitos do `VOIDPRO-64.md`.
+Este plano estabelece a base definitiva para a operação da Automatiza Solução em produção, garantindo integridade de dados, segurança de segredos e automação de infraestrutura conforme os requisitos do `VOIDPRO-65.md`.
 
 ## Auditoria de Prontidão
 
@@ -17,20 +17,24 @@ Este plano estabelece a base definitiva para a operação da Automatiza Soluçã
 
 ### 1. Infraestrutura e Persistência (Docker)
 - **Volumes**: Mapear `storage-data:/data/storage` no `docker-compose.yml`.
-- **Entrypoint**: Atualizar `docker-entrypoint.sh` para criar as pastas obrigatórias (`logos`, `previews`, `uploads`, `documents`, `proofs`) e garantir permissões de escrita antes de iniciar a app.
+- **Entrypoint**: Atualizar `docker-entrypoint.sh` para:
+    1. Aguardar o banco de dados.
+    2. Criar as pastas obrigatórias (`logos`, `previews`, `uploads`, `documents`, `proofs`).
+    3. Garantir permissões de escrita em `/data/storage`.
+    4. Executar `npx prisma migrate deploy`.
 - **Rede**: Confirmar que `DATABASE_URL` utiliza `db:5432` para comunicação interna segura.
 
 ### 2. Migrations e Dados (Prisma)
-- **Baseline de Produção**: Gerar arquivos de migração iniciais para que o `npx prisma migrate deploy` funcione no VPS sem tentar recriar tabelas existentes (se houver).
+- **Baseline de Produção**: Preparar as migrations para que o `npx prisma migrate deploy` funcione no VPS sem tentar recriar tabelas existentes (baselining).
 - **Proteção de Dados**: Reforçar em toda a lógica server-side que o `DATABASE_URL` é a única fonte da verdade em produção, desativando mocks completamente.
 
 ### 3. Setup do Master Admin (Bootstrap)
 - **Endpoint Seguro**: Criar `src/routes/api/public/bootstrap.ts` que chama a função `bootstrapMaster` interna.
-- **Segurança**: Validar contra `BOOTSTRAP_SECRET` e garantir que a operação seja idempotente (falha se já existir um Master).
+- **Segurança**: Validar contra `BOOTSTRAP_SECRET` e credenciais do `.env`. Garantir que a operação seja idempotente (falha se já existir um Master).
 - **Hash de Senha**: Utilizar `PBKDF2` (já implementado) para armazenamento seguro.
 
 ### 4. Autenticação e Sessões
-- **Cookies**: Configurar cookies de sessão como `HttpOnly`, `Secure` (em prod), `SameSite=Lax`.
+- **Cookies**: Configurar cookies de sessão como `HttpOnly`, `Secure` (em prod), `SameSite=Lax`, `Path=/`.
 - **Persistência**: Garantir que as sessões sejam gravadas na tabela `Session` do PostgreSQL.
 
 ### 5. Documentação de Operação
