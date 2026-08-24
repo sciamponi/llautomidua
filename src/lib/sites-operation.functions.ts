@@ -24,7 +24,7 @@ export const getOrdersForKanban = createServerFn({ method: "GET" })
   });
 
 export const getSiteOrderDetails = createServerFn({ method: "GET" })
-  .validator((data: string) => data)
+  .validator((data: unknown) => String(data))
   .middleware([authMiddleware])
   .handler(async ({ data: orderId }) => {
     if (!process.env['DATABASE_URL']) return null;
@@ -42,7 +42,7 @@ export const getSiteOrderDetails = createServerFn({ method: "GET" })
   });
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .validator((data: any) => z.object({
+  .validator((data: unknown) => z.object({
     orderId: z.string(),
     status: z.nativeEnum(SiteOrderStatus),
     comment: z.string().optional()
@@ -71,7 +71,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   });
 
 export const updatePaymentStatus = createServerFn({ method: "POST" })
-  .validator((data: any) => z.object({
+  .validator((data: unknown) => z.object({
     paymentId: z.string(),
     status: z.nativeEnum(PaymentStatus),
     rejectionReason: z.string().optional()
@@ -100,7 +100,7 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
   });
 
 export const processApproval = createServerFn({ method: "POST" })
-  .validator((data: any) => z.object({
+  .validator((data: unknown) => z.object({
      token: z.string(),
      approved: z.boolean(),
      feedback: z.string().optional()

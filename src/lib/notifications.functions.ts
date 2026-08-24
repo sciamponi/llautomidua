@@ -16,14 +16,13 @@ const notificationSchema = z.object({
 });
 
 export const prepareNotification = createServerFn({ method: "POST" })
-  .validator((data: z.infer<typeof notificationSchema>) => data)
+  .validator((data: unknown) => notificationSchema.parse(data))
   .handler(async ({ data }) => {
     console.log(`[NotificationEngine] Preparing ${data.channel} to ${data.recipient} for event ${data.event}`);
     
-    // In production, templates would be rendered here
     const preview = {
       ...data,
-      renderedMessage: data.message, // Template logic would go here
+      renderedMessage: data.message,
       status: data.isSimulation ? 'SIMULATED' : 'PENDING'
     };
 
@@ -31,11 +30,10 @@ export const prepareNotification = createServerFn({ method: "POST" })
   });
 
 export const sendNotification = createServerFn({ method: "POST" })
-  .validator((data: z.infer<typeof notificationSchema> & { status: NotificationStatus }) => data)
+  .validator((data: unknown) => z.intersection(notificationSchema, z.object({ status: z.string() })).parse(data))
   .handler(async ({ data }) => {
     console.log(`[NotificationEngine] Executing ${data.channel} to ${data.recipient}`);
     
-    // Simulação de delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
     const finalStatus = data.isSimulation ? 'SIMULATED' : 'SENT';
@@ -56,11 +54,10 @@ export const sendNotification = createServerFn({ method: "POST" })
   });
 
 export const getNotificationLogs = createServerFn({ method: "GET" })
-  .validator((orderId: string) => orderId)
+  .validator((data: unknown) => String(data))
   .handler(async ({ data: orderId }) => {
     return await prisma.notificationLog.findMany({
       where: { orderId },
       orderBy: { sentAt: 'desc' }
     });
   });
-
