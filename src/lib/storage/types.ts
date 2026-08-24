@@ -1,4 +1,4 @@
-export type StorageCategory = 'logos' | 'previews' | 'uploads' | 'documents';
+export type StorageCategory = 'logos' | 'previews' | 'uploads' | 'documents' | 'proofs';
 
 export interface StorageFile {
   name: string;
