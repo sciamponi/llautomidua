@@ -31,7 +31,11 @@ export function OrderModal({ order: initialOrder, isOpen, onClose }: OrderModalP
 
   const statusMutation = useMutation({
     mutationFn: (vars: { status: SiteOrderStatus, comment?: string }) => 
-      updateStatus({ data: { orderId: order.id, status: vars.status, comment: vars.comment } }),
+      updateStatus({ data: { 
+        orderId: order.id, 
+        status: vars.status, 
+        comment: vars.comment ?? undefined 
+      } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', order.id] });
       queryClient.invalidateQueries({ queryKey: ['orders-kanban'] });
@@ -41,13 +45,18 @@ export function OrderModal({ order: initialOrder, isOpen, onClose }: OrderModalP
 
   const paymentMutation = useMutation({
     mutationFn: (vars: { paymentId: string, status: PaymentStatus, reason?: string }) => 
-      updatePayStatus({ data: { paymentId: vars.paymentId, status: vars.status, rejectionReason: vars.reason } }),
+      updatePayStatus({ data: { 
+        paymentId: vars.paymentId, 
+        status: vars.status, 
+        rejectionReason: vars.reason ?? undefined 
+      } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', order.id] });
       queryClient.invalidateQueries({ queryKey: ['orders-kanban'] });
       toast.success('Pagamento atualizado');
     }
   });
+
 
   if (!isOpen) return null;
 
