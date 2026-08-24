@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { prisma } from "@/lib/prisma.server";
 import { MOCK_PRODUCTS } from "@/lib/products.data";
 
 export const getProducts = createServerFn({ method: "GET" })
   .handler(async () => {
     if (!process.env['DATABASE_URL']) return MOCK_PRODUCTS;
     try {
+      const { prisma } = await import("@/lib/prisma.server");
       const products = await prisma.product.findMany({
         where: { status: 'active' },
         include: {
@@ -24,6 +24,7 @@ export const getProductBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     if (!process.env['DATABASE_URL']) return MOCK_PRODUCTS.find(p => p.slug === data) || null;
     try {
+      const { prisma } = await import("@/lib/prisma.server");
       const product = await prisma.product.findUnique({
         where: { slug: data },
         include: {
