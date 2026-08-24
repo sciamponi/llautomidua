@@ -13,47 +13,47 @@ Implement real server-side authentication and a centralized permission system fo
 
 ### 1. Database & Security
 - **Prisma Schema Updates**:
-  - Enhance `User` model with `UserRole` (MASTER_ADMIN, ADMIN, OPERATOR, CUSTOMER, PARTNER).
-  - Add `Session` model for database-backed session tracking (id, userId, tokenHash, expiresAt, ipAddress, userAgent).
-  - Add `AuditLog` for tracking critical administrative actions (LOGIN, LOGOUT, CREATE_USER, CHANGE_ROLE, etc.).
+  - Update `UserRole` enum: `MASTER_ADMIN`, `ADMIN`, `OPERATOR`, `CUSTOMER`, `PARTNER`.
+  - Add `Session` model: `id`, `userId`, `tokenHash` (unique), `expiresAt`, `createdAt`, `lastUsedAt`, `ipAddress`, `userAgent`.
+  - Add `AuditLog` model: `id`, `actorId`, `action` (Enum: LOGIN, LOGOUT, CREATE_USER, etc.), `targetId`, `metadata` (Json), `ipAddress`, `createdAt`.
 - **Security Middleware**:
-  - Implement `requireAuth(roles?: UserRole[])` and `requirePermission(permission: string)` to protect server functions.
-  - Implement route-level guards in `src/router.tsx` to handle redirects (e.g., non-admin trying to access `/admin`).
+  - Implement `requireAuth(roles?: UserRole[])` and `requirePermission(permission: string)` using `tanstack-start` middleware.
+  - Implement route-level guards in `src/router.tsx` to handle redirects.
 
 ### 2. Authentication System
+- **Backend Logic (`src/lib/auth.functions.ts`)**:
+  - `login`: Validates credentials, creates a session in DB, and sets an `auth_token` HttpOnly cookie.
+  - `logout`: Deletes the session from DB and clears the cookie.
+  - `getSession`: Server function to retrieve the current user and roles from the token.
+  - **Password Hashing**: Implement secure hashing using `crypto` (Web Crypto API) for edge compatibility.
 - **Login Flow (`/login`)**:
   - Create a premium login interface following the brand identity.
-  - Implement `auth.functions.ts` for `login`, `logout`, and `getSession`.
-  - Use `crypto.subtle` or `node:crypto` for secure password hashing (PBKDF2 or similar compatible with the runtime).
-  - Set secure HttpOnly cookies for session management.
-- **Hierarchical Access**:
-  - Redirect users to their specific zones based on roles after login.
-  - Strict isolation: Customers and Partners can never access Admin areas.
+  - Automatic redirection: `MASTER_ADMIN/ADMIN/OPERATOR` -> `/admin`, `CUSTOMER` -> `/cliente`, `PARTNER` -> `/membros`.
 
 ### 3. Centralized Admin Panel (`/admin`)
 - **New Layout**:
-  - Isolated Sidebar navigation for Master/Admin/Operator users.
-  - Real-time Dashboard with indicators from Prisma (Leads, Sites, Payments, Partners).
+  - Dedicated layout for `/admin` routes with a sidebar.
+  - Remove public Header/Footer from this zone.
 - **User Management (`/admin/usuarios`)**:
-  - Interface for MASTER_ADMIN to manage users, roles, and status.
-  - Only MASTER_ADMIN can manage other MASTER_ADMINs.
+  - CRUD for users, roles, and status.
+  - Strict rule: Only `MASTER_ADMIN` can manage other `MASTER_ADMIN`s.
 
-### 4. System Refinement
-- **Root Layout (`src/routes/__root.tsx`)**: Refactor to dynamically wrap components based on authentication state and route zone.
-- **Zone Isolation**: Remove public headers/footers from `/admin`, `/cliente`, and `/membros` completely.
-- **Audit Logging**: Persist all sensitive operations in `AuditLog`.
+### 4. Zone Isolation & Refinement
+- **Root Layout (`src/routes/__root.tsx`)**: Update `isIsolatedPath` logic and integrate `useAuth` to handle conditional rendering and zone protection.
+- **Client Portal & Members Area**: Refactor to use the real session instead of any remaining mock/local storage state.
 
 ## Technical Details
 
-- **Technology**: TanStack Start `createServerFn` for all server-side logic.
-- **Hashing**: Secure implementation using standard Web Crypto or Node.js `crypto`.
-- **Session**: Database-backed sessions with rotation and expiration.
-- **Roles**: Strong typing via Zod and Prisma Enums.
+- **Technology**: TanStack Start `createServerFn` and `middleware`.
+- **Hashing**: PBKDF2 or similar secure algorithm implemented via `crypto`.
+- **Session**: UUID-based tokens hashed in the database.
+- **Cookie Policy**: `HttpOnly`, `Secure` (in prod), `SameSite=Lax`, `Path=/`.
 
 ## Steps to Execute
-1. Update `prisma/schema.prisma` with `Session`, `AuditLog`, and expanded `UserRole`.
-2. Implement `src/lib/auth.functions.ts` and core security middleware.
-3. Create the `/login` route and the centralized `/admin` layout.
-4. Refactor existing zones (Admin Kanban, Client Portal) to use the new session context.
-5. Implement the `MASTER_ADMIN` bootstrap mechanism.
+1. Update `prisma/schema.prisma` with new models and enum values.
+2. Implement `src/lib/auth.functions.ts` core logic and password utility.
+3. Create the `/login` route and the `/admin` layout wrapper.
+4. Implement the `MASTER_ADMIN` bootstrap tool.
+5. Refactor existing modules (Kanban, Client Portal) to enforce real auth.
+
 
