@@ -138,7 +138,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col min-h-screen">
         {!isIsolatedPath && <Header />}
-        <main className="flex-grow">
+        <main 
+          className={cn(
+            "flex-grow",
+            !isIsolatedPath && "pt-[var(--header-height-mobile)] lg:pt-[var(--header-height)]"
+          )}
+        >
           <Outlet />
         </main>
         {!isIsolatedPath && <Footer />}
