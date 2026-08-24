@@ -12,7 +12,7 @@ export const getOrdersForKanban = createServerFn({ method: "GET" })
       const orders = await prisma.siteOrder.findMany({
         include: {
           template: true,
-          user: { select: { name: true, email: true } }
+          user: { select: { id: true, name: true, email: true } }
         },
         orderBy: { updatedAt: 'desc' }
       });
@@ -22,6 +22,27 @@ export const getOrdersForKanban = createServerFn({ method: "GET" })
       return [];
     }
   });
+
+export const getClientOrders = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    if (!process.env['DATABASE_URL']) return [];
+    const { session } = context as any;
+    try {
+      const orders = await prisma.siteOrder.findMany({
+        where: { userId: session.user.id },
+        include: {
+          template: true
+        },
+        orderBy: { updatedAt: 'desc' }
+      });
+      return JSON.parse(JSON.stringify(orders));
+    } catch (error) {
+      console.error('getClientOrders failed:', error);
+      return [];
+    }
+  });
+
 
 export const getSiteOrderDetails = createServerFn({ method: "GET" })
   .validator((data: unknown) => String(data))
