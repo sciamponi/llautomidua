@@ -1,34 +1,47 @@
-# Plan: Fix Header Z-Index and Layout Conflicts
+# Plan: Definitive Header and Mega Menu Correction (VOIDPRO-38)
 
-The goal is to fix the header menu appearing behind page content and ensure proper visual hierarchy across all layouts.
+Fix the header menu visibility (stacking context issue) and standardize the layout height management across the application, moving away from hardcoded top padding.
 
 ## Proposed Changes
 
-### 1. Global Styles and Layout Constants
-- Add a CSS utility for `z-index` management to ensure consistency across components.
-- Standardize the `pt-20` (header offset) across all public pages to prevent overlapping issues.
+### 1. Global CSS & Design Tokens
+- Update `src/styles.css`:
+    - Define CSS variables for header height: `--header-height: 80px` (desktop) and `--header-height-mobile: 72px`.
+    - Create semantic z-index tokens:
+        ```css
+        --z-header: 1000;
+        --z-mega-menu: 1100;
+        --z-mobile-menu: 1500;
+        --z-modal: 2000;
+        --z-toast: 3000;
+        ```
+    - Add a reset/normalization for stacking contexts on `body` and `#root` to ensure fixed elements behave predictably.
 
-### 2. Header Component Fixes
-- Update `src/components/automatiza/Header.tsx`:
-    - Ensure the header container has `z-[1000]`.
-    - Fix the Mega Menu (Solutions dropdown) to have a higher `z-index` than the header background but still below any potential global overlays (like modals).
-    - Refine the mobile menu overlay to use `z-[1500]`.
-
-### 3. Root Layout Refinement
+### 2. Global Layout Refactoring
 - Update `src/routes/__root.tsx`:
-    - Ensure the global `Header` is correctly layered within the main application tree.
-    - Check and fix any `overflow` settings that might be clipping the header dropdowns.
+    - Wrap the `main` content in a container that automatically applies the header offset using `padding-top: var(--header-height)`.
+    - Ensure only one instance of `Header` and `Footer` exists in the public layout.
+- Clean up `src/routes/index.tsx`, `src/routes/solucoes/$productSlug.tsx`, and other public routes:
+    - Remove hardcoded `pt-20`, `mt-20`, etc., from `<main>` or root divs.
 
-### 4. Component Hierarchy Review
-- Review `Hero.tsx` and `DiagnosisSection.tsx` for any absolute/relative positioning that might be fighting for the same `z-index` space.
+### 3. Header & Mega Menu Stacking Fixes
+- Update `src/components/automatiza/Header.tsx`:
+    - Apply `z-[var(--z-header)]` to the `<header>` tag.
+    - Apply `z-[var(--z-mega-menu)]` to the solutions dropdown container.
+    - Refactor the backdrop to use `fixed` positioning with `z-[-1]` relative to the dropdown, or a global backdrop if necessary.
+    - Ensure the mobile menu uses `fixed` with `z-[var(--z-mobile-menu)]` and occupies `100vh`.
+    - Audit and remove any `overflow-hidden` or `transform` properties on parent elements that might be clipping the dropdown.
+
+### 4. Component Audit (Hero & Sections)
+- Update `src/components/automatiza/Hero.tsx` and `src/components/automatiza/DiagnosisSection.tsx`:
+    - Ensure no element within these sections has a `z-index` higher than `1000`.
+    - Check for `isolation: isolate` if specific sections need their own stacking context without affecting the global header.
 
 ## Technical Details
-- Use `z-1000` for the fixed header.
-- Use `z-[1100]` for the Mega Menu dropdown.
-- Use `z-[1500]` for the Mobile Menu overlay.
-- Ensure `body` and `main` don't have conflicting `overflow` or `transform` properties that create new stacking contexts.
+- **Stacking Context**: We will avoid using `transform` or `filter` on the `Header` or its immediate parents unless necessary, as these create new stacking contexts that can trap `z-index`.
+- **Backdrop**: Implement a proper backdrop for the Mega Menu that prevents interaction with the background while open.
 
 ## Verification
-- Open the "Soluções" menu on desktop and verify it displays above the Hero section.
-- Open the mobile menu and verify it covers the entire screen.
-- Verify that other sections (Diagnosis, Partners) do not overlap the header when scrolling.
+- **Visual Audit**: Open the "Soluções" menu on Home and Product pages; verify it is 100% visible and above all Hero content.
+- **Mobile Audit**: Verify the mobile menu covers the entire screen (tested at 375px, 768px).
+- **Functional Audit**: Verify "Click outside", "Escape key", and "Route change" all close the menu.
