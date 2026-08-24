@@ -15,6 +15,30 @@ const generateToken = () => {
   return { token, hash };
 };
 
+// Auxiliar para serializar Decimal do Prisma
+function serializeDecimal(value: any) {
+  if (value && typeof value === 'object' && 'toNumber' in value) {
+    return value.toNumber();
+  }
+  return value;
+}
+
+function serializeOrder(order: any) {
+  if (!order) return null;
+  return {
+    ...order,
+    price: serializeDecimal(order.price),
+    history: order.history?.map((h: any) => ({
+      ...h,
+      priceAtMoment: serializeDecimal(h.priceAtMoment)
+    })),
+    payments: order.payments?.map((p: any) => ({
+      ...p,
+      amount: serializeDecimal(p.amount)
+    }))
+  };
+}
+
 export const updateOrderStatus = createServerFn({ method: "POST" })
   .validator((data: { 
     orderId: string, 
@@ -56,9 +80,9 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
           fromPaymentStatus: order.paymentStatus,
           toPaymentStatus: data.paymentStatus || order.paymentStatus,
           priceAtMoment: data.price !== undefined ? data.price : order.price,
-          changedBy: data.actorId,
-          responsibleUserId: data.responsibleUserId,
-          comment: data.comment
+          changedBy: data.actorId ?? null,
+          responsibleUserId: data.responsibleUserId ?? null,
+          comment: data.comment ?? null
         }
       });
 
@@ -84,9 +108,9 @@ export const createImmutableVersion = createServerFn({ method: "POST" })
         versionNumber: data.versionNumber,
         contentSnapshot: data.contentSnapshot,
         previewUrl: data.previewUrl,
-        notes: data.notes,
+        notes: data.notes ?? null,
         status: data.publish ? 'APPROVED' : 'DRAFT',
-        createdBy: data.createdBy,
+        createdBy: data.createdBy ?? null,
         publishedAt: data.publish ? new Date() : null
       }
     });
@@ -189,18 +213,19 @@ export const getSiteOrderDetails = createServerFn({ method: "GET" })
 
     if (!order) throw new Error("Order not found");
 
-    return order;
+    return serializeOrder(order);
   });
 
 export const getOrdersForKanban = createServerFn({ method: "GET" })
   .handler(async () => {
-    return await prisma.siteOrder.findMany({
+    const orders = await prisma.siteOrder.findMany({
       include: {
         template: true,
         user: { select: { name: true, email: true } }
       },
       orderBy: { updatedAt: 'desc' }
     });
+    return orders.map(serializeOrder);
   });
 
 export const updatePaymentStatus = createServerFn({ method: "POST" })
@@ -211,7 +236,7 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
     actorId?: string 
   }) => data)
   .handler(async ({ data }) => {
-    return await prisma.payment.update({
+    const payment = await prisma.payment.update({
       where: { id: data.paymentId },
       data: { 
         status: data.status,
@@ -219,6 +244,10 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
         updatedAt: new Date()
       }
     });
+    return {
+      ...payment,
+      amount: serializeDecimal(payment.amount)
+    };
   });
 
 export const createPayment = createServerFn({ method: "POST" })
@@ -229,7 +258,7 @@ export const createPayment = createServerFn({ method: "POST" })
     proofUrl?: string 
   }) => data)
   .handler(async ({ data }) => {
-    return await prisma.payment.create({
+    const payment = await prisma.payment.create({
       data: {
         orderId: data.orderId,
         amount: data.amount,
@@ -238,6 +267,10 @@ export const createPayment = createServerFn({ method: "POST" })
         proofUrl: data.proofUrl ?? null
       }
     });
+    return {
+      ...payment,
+      amount: serializeDecimal(payment.amount)
+    };
   });
 
 export const getPaymentConfig = createServerFn({ method: "GET" })
@@ -250,6 +283,7 @@ export const getPaymentConfig = createServerFn({ method: "GET" })
       qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=automatiza-pix-payload"
     };
   });
+
 
 
 
