@@ -60,3 +60,8 @@ Resposta esperada (JSON):
   "database": "ok"
 }
 ```
+
+Estados possíveis (database):
+- `not_configured`: Preview / Dev (200 OK)
+- `ok`: Produção estável (200 OK)
+- `unavailable`: Produção indisponível (503 Service Unavailable)
