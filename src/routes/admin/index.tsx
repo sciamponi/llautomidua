@@ -1,6 +1,9 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
-import { getSession } from '@/lib/auth.functions';
+import { getSession, logout } from '@/lib/auth.functions';
 import { cn } from "@/lib/utils";
+import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "@tanstack/react-router";
+import { LogOut, LayoutDashboard, Users, Package, DollarSign, Brain, ClipboardList, Globe } from "lucide-react";
 
 export const Route = createFileRoute('/admin/')({
   beforeLoad: async ({ context }) => {
@@ -23,22 +26,44 @@ export const Route = createFileRoute('/admin/')({
 
 function AdminDashboardPage() {
   const { session } = Route.useRouteContext();
+  const performLogout = useServerFn(logout);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const result = await performLogout();
+    if (result.success) {
+      navigate({ to: (result.redirect as any) || '/login' });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#071A2F] text-[#DCE3EA] font-inter">
       <header className="border-b border-white/10 bg-[#071A2F]/50 backdrop-blur-md sticky top-0 z-50">
         <div className="container px-4 h-20 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-white font-sora">Painel Administrativo</h1>
-            <p className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-[0.2em]">Automatiza Solução</p>
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-2">
+              <h1 className="text-xl font-bold text-white font-sora">Painel Administrativo</h1>
+            </Link>
+            <nav className="hidden md:flex items-center gap-6">
+               <Link to="/" className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest hover:text-white transition-colors">Site Público</Link>
+            </nav>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-white">{session?.user.name}</p>
               <p className="text-[9px] text-[#DCE3EA]/40 uppercase tracking-widest">{session?.user.roles[0]?.role}</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-[#1E8CFF]/20 border border-[#1E8CFF]/30 flex items-center justify-center text-[#1E8CFF] font-bold">
-              {session?.user.name?.[0]}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#1E8CFF]/20 border border-[#1E8CFF]/30 flex items-center justify-center text-[#1E8CFF] font-bold">
+                {session?.user.name?.[0]}
+              </div>
+              <button 
+                onClick={handleLogout}
+                className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl transition-all"
+                title="Sair"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -49,42 +74,42 @@ function AdminDashboardPage() {
           <DashboardCard 
             title="Operação de Sites" 
             description="Gerenciamento do pipeline de produção, aprovações e pagamentos de sites."
-            icon="🌐"
+            icon={<Globe className="w-8 h-8" />}
             to="/admin/sites"
             stats="12 Ativos"
           />
           <DashboardCard 
             title="Gestão de Usuários" 
             description="Controle de acessos, papéis (Roles) e permissões do ecossistema."
-            icon="👥"
+            icon={<Users className="w-8 h-8" />}
             to="/admin/usuarios"
             disabled
           />
           <DashboardCard 
             title="Catálogo de Produtos" 
             description="Gerencie as soluções disponíveis, preços e configurações de recomendação."
-            icon="📦"
+            icon={<Package className="w-8 h-8" />}
             to="/admin/produtos"
             disabled
           />
           <DashboardCard 
             title="Financeiro Global" 
             description="Visão consolidada de recebimentos, assinaturas e comissões de parceiros."
-            icon="💰"
+            icon={<DollarSign className="w-8 h-8" />}
             to="/admin/financeiro"
             disabled
           />
           <DashboardCard 
             title="Configurações de IA" 
             description="Ajuste os prompts e motores do Cérebro Comercial e assistentes."
-            icon="🧠"
+            icon={<Brain className="w-8 h-8" />}
             to="/admin/ia"
             disabled
           />
           <DashboardCard 
             title="Logs e Auditoria" 
             description="Rastreabilidade completa de ações realizadas no sistema."
-            icon="📋"
+            icon={<ClipboardList className="w-8 h-8" />}
             to="/admin/logs"
             disabled
           />
@@ -104,7 +129,7 @@ function DashboardCard({
 }: { 
   title: string; 
   description: string; 
-  icon: string; 
+  icon: React.ReactNode; 
   to: string; 
   stats?: string;
   disabled?: boolean;
@@ -117,7 +142,9 @@ function DashboardCard({
         : "bg-white/5 border-white/10 hover:border-[#1E8CFF]/30 cursor-pointer"
     )}>
       <div className="mb-6 flex justify-between items-start">
-        <span className="text-4xl">{icon}</span>
+        <div className="text-[#1E8CFF] group-hover:scale-110 transition-transform">
+          {icon}
+        </div>
         {stats && <span className="text-[10px] font-bold text-[#1E8CFF] bg-[#1E8CFF]/10 px-2 py-1 rounded-lg uppercase tracking-widest">{stats}</span>}
       </div>
       <h3 className="text-xl font-bold text-white mb-3 font-sora group-hover:text-[#1E8CFF] transition-colors">{title}</h3>
