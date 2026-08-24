@@ -2,10 +2,7 @@ import { createMiddleware } from "@tanstack/react-start";
 import { getSession } from "./auth.functions";
 import { UserRole, AuthScope } from "@prisma/client";
 
-/**
- * Middleware to require authentication
- */
-export const authMiddleware = createMiddleware().handler(async ({ next }) => {
+export const authMiddleware = createMiddleware().server(async ({ next }) => {
   const session = await getSession();
   if (!session) {
     throw new Error("Unauthorized");
@@ -13,16 +10,13 @@ export const authMiddleware = createMiddleware().handler(async ({ next }) => {
   return next({ context: { session } });
 });
 
-/**
- * Middleware to require a specific role/scope
- */
 export const roleMiddleware = (allowedRoles: UserRole[], scope?: AuthScope) => 
   createMiddleware()
     .middleware([authMiddleware])
-    .handler(async ({ context, next }) => {
-      const { session } = context;
+    .server(async ({ context, next }) => {
+      const { session } = context as any;
       
-      const hasPermission = session.user.roles.some(r => {
+      const hasPermission = session.user.roles.some((r: any) => {
         const roleMatches = allowedRoles.includes(r.role);
         const scopeMatches = !scope || r.scope === scope || r.scope === "GLOBAL";
         return roleMatches && scopeMatches;
@@ -35,7 +29,4 @@ export const roleMiddleware = (allowedRoles: UserRole[], scope?: AuthScope) =>
       return next();
     });
 
-/**
- * MASTER_ADMIN only middleware
- */
-export const masterOnlyMiddleware = roleMiddleware(["MASTER_ADMIN"], "GLOBAL");
+export const masterOnlyMiddleware = roleMiddleware(["MASTER_ADMIN"], AuthScope.GLOBAL);

@@ -1,17 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import { parseCookies, setCookie, deleteCookie } from "vinxi/http";
-
-// Security Note: In a real environment, use a robust library like @noble/hashes or similar.
-// For compatibility with Workerd/Edge, we use Web Crypto API.
 
 const SESSION_COOKIE_NAME = "auth_token";
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-/**
- * Securely hashes a password using PBKDF2 (Web Crypto)
- */
 export async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -46,9 +40,6 @@ export async function hashPassword(password: string): Promise<string> {
   }));
 }
 
-/**
- * Verifies a password against a hash
- */
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
   try {
     const { salt, hash } = JSON.parse(atob(storedHash));
@@ -83,16 +74,10 @@ export async function verifyPassword(password: string, storedHash: string): Prom
   }
 }
 
-/**
- * Generates a random session token
- */
 function generateToken(): string {
   return crypto.randomUUID();
 }
 
-/**
- * Hashes a token for DB storage
- */
 async function hashToken(token: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(token);
@@ -102,18 +87,15 @@ async function hashToken(token: string): Promise<string> {
     .join("");
 }
 
-// Server Functions
-
 export const login = createServerFn({ method: "POST" })
-  .input(z.object({
+  .validator(z.object({
     email: z.string().email(),
     password: z.string().min(6),
   }))
   .handler(async ({ data }) => {
     const { email, password } = data;
     
-    // Check if DATABASE_URL is available
-    if (!process.env.DATABASE_URL) {
+    if (!process.env['DATABASE_URL']) {
       throw new Error("Database not configured");
     }
 
@@ -121,7 +103,14 @@ export const login = createServerFn({ method: "POST" })
     
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { roles: true }
+      include: { 
+        roles: {
+          include: {
+            company: true,
+            product: true
+          }
+        } 
+      }
     });
 
     if (!user || !(await verifyPassword(password, user.passwordHash))) {
@@ -140,16 +129,15 @@ export const login = createServerFn({ method: "POST" })
       }
     });
 
-    const event = getWebRequest();
+    const request = getRequest();
     setCookie(SESSION_COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env['NODE_ENV'] === "production",
       sameSite: "strict",
       path: "/",
       maxAge: SESSION_DURATION / 1000,
     });
 
-    // Simple role-based redirect logic
     const primaryRole = user.roles[0]?.role || "CUSTOMER";
     let redirect = "/";
     if (["MASTER_ADMIN", "ADMIN", "OPERATOR"].includes(primaryRole)) redirect = "/admin";
@@ -164,7 +152,7 @@ export const logout = createServerFn({ method: "POST" })
     const cookies = parseCookies();
     const token = cookies[SESSION_COOKIE_NAME];
 
-    if (token && process.env.DATABASE_URL) {
+    if (token && process.env['DATABASE_URL']) {
       const { prisma } = await import("@/lib/prisma.server");
       const tokenHash = await hashToken(token);
       await prisma.session.deleteMany({
@@ -181,7 +169,7 @@ export const getSession = createServerFn({ method: "GET" })
     const cookies = parseCookies();
     const token = cookies[SESSION_COOKIE_NAME];
 
-    if (!token || !process.env.DATABASE_URL) return null;
+    if (!token || !process.env['DATABASE_URL']) return null;
 
     const { prisma } = await import("@/lib/prisma.server");
     const tokenHash = await hashToken(token);
@@ -203,15 +191,14 @@ export const getSession = createServerFn({ method: "GET" })
     });
 
     if (!session || session.expiresAt < new Date()) {
-      if (session) await prisma.session.delete({ where: { id: session.id } });
+      if (session) await prisma.session.delete({ where: { id: session.id } }).catch(() => {});
       return null;
     }
 
-    // Update lastUsedAt in background
     prisma.session.update({
       where: { id: session.id },
       data: { lastUsedAt: new Date() }
-    }).catch(console.error);
+    }).catch(() => {});
 
     return {
       user: {
@@ -225,19 +212,15 @@ export const getSession = createServerFn({ method: "GET" })
     };
   });
 
-/**
- * Bootstrap function to create the first MASTER_ADMIN
- * Use this only once via a controlled environment variable or local run
- */
 export const bootstrapMaster = createServerFn({ method: "POST" })
-  .input(z.object({
-    secret: z.string(), // Must match a server-side secret
+  .validator(z.object({
+    secret: z.string(),
     name: z.string(),
     email: z.string().email(),
     password: z.string().min(12),
   }))
   .handler(async ({ data }) => {
-    const BOOTSTRAP_SECRET = process.env.BOOTSTRAP_SECRET;
+    const BOOTSTRAP_SECRET = process.env['BOOTSTRAP_SECRET'];
     if (!BOOTSTRAP_SECRET || data.secret !== BOOTSTRAP_SECRET) {
       throw new Error("Unauthorized bootstrap attempt");
     }
