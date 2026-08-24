@@ -62,9 +62,6 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
         }
       });
 
-      // Aqui dispararíamos notificações reais baseadas no novo status
-      // await sendNotificationForStatus(data.orderId, data.status);
-
       return { success: true };
     });
   });
@@ -112,7 +109,6 @@ export const requestApproval = createServerFn({ method: "POST" })
       }
     });
     
-    // Em produção, a URL usaria o domínio real do VPS
     const approvalUrl = `/sites/aprovacao/${token}`;
     
     return { success: true, approvalUrl, token };
@@ -148,7 +144,7 @@ export const processApproval = createServerFn({ method: "POST" })
         where: { id: request.id },
         data: { 
           status: newStatus as any, 
-          feedback: data.feedback,
+          feedback: data.feedback ?? null,
           usedAt: new Date()
         }
       });
@@ -219,6 +215,7 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
       where: { id: data.paymentId },
       data: { 
         status: data.status,
+        rejectionReason: data.rejectionReason ?? null,
         updatedAt: new Date()
       }
     });
@@ -238,14 +235,13 @@ export const createPayment = createServerFn({ method: "POST" })
         amount: data.amount,
         method: data.method,
         status: data.proofUrl ? 'PROOF_SUBMITTED' : 'PENDING',
-        proofUrl: data.proofUrl
+        proofUrl: data.proofUrl ?? null
       }
     });
   });
 
 export const getPaymentConfig = createServerFn({ method: "GET" })
   .handler(async () => {
-    // Em produção, isso viria de uma tabela de configuração
     return {
       pixEnabled: true,
       pixKey: "000.000.000-00",
@@ -254,5 +250,6 @@ export const getPaymentConfig = createServerFn({ method: "GET" })
       qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=automatiza-pix-payload"
     };
   });
+
 
 
