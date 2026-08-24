@@ -19,6 +19,7 @@ import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/inde
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
 import { Route as OficinasIndexRouteImport } from './routes/oficinas/index'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
+import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,10 +71,16 @@ const SolucoesIndexRoute = SolucoesIndexRouteImport.update({
   path: '/solucoes/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
+  id: '/solucoes/$productSlug',
+  path: '/solucoes/$productSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/automacao/': typeof AutomacaoIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/automacao': typeof AutomacaoIndexRoute
   '/barberia': typeof BarberiaIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/automacao/': typeof AutomacaoIndexRoute
   '/barberia/': typeof BarberiaIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/parceiros'
+    | '/solucoes/$productSlug'
     | '/automacao/'
     | '/barberia/'
     | '/diagnostico/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/parceiros'
+    | '/solucoes/$productSlug'
     | '/automacao'
     | '/barberia'
     | '/diagnostico'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/parceiros'
+    | '/solucoes/$productSlug'
     | '/automacao/'
     | '/barberia/'
     | '/diagnostico/'
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ParceirosRoute: typeof ParceirosRoute
+  SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
   AutomacaoIndexRoute: typeof AutomacaoIndexRoute
   BarberiaIndexRoute: typeof BarberiaIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
@@ -232,12 +245,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolucoesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solucoes/$productSlug': {
+      id: '/solucoes/$productSlug'
+      path: '/solucoes/$productSlug'
+      fullPath: '/solucoes/$productSlug'
+      preLoaderRoute: typeof SolucoesProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ParceirosRoute: ParceirosRoute,
+  SolucoesProductSlugRoute: SolucoesProductSlugRoute,
   AutomacaoIndexRoute: AutomacaoIndexRoute,
   BarberiaIndexRoute: BarberiaIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
