@@ -110,7 +110,7 @@ export function Header() {
                             <Link 
                               key={p.slug}
                               to="/solucoes/$productSlug"
-                              params={{ productSlug: p.slug as string }}
+                              params={{ productSlug: p.slug }}
                               className="block text-sm font-medium text-[#DCE3EA]/60 hover:text-white transition-colors"
                             >
                               {p.name}
@@ -168,7 +168,7 @@ export function Header() {
                   {session.user.name?.[0] || 'U'}
                 </div>
                 <span className="hidden sm:inline text-[10px] font-bold text-white uppercase tracking-widest">
-                  {session.user.name?.split(' ')[0] || 'Usuário'}
+                  {(session.user.name || 'Usuário').split(' ')[0]}
                 </span>
                 <ChevronDown className={`w-3 h-3 text-[#DCE3EA]/40 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -247,7 +247,7 @@ export function Header() {
                 <p className="text-[10px] uppercase tracking-[0.4em] text-[#DCE3EA]/40">SaaS</p>
                 <div className="grid grid-cols-1 gap-5 text-lg font-medium">
                   {activeSaas.map((p: any) => (
-                    <Link key={p.slug} to="/solucoes/$productSlug" params={{ productSlug: p.slug as string }}>{p.name}</Link>
+                    <Link key={p.slug} to="/solucoes/$productSlug" params={{ productSlug: p.slug }}>{p.name}</Link>
                   ))}
                 </div>
               </div>
