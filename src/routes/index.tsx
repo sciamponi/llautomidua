@@ -66,6 +66,7 @@ function Index() {
                     params={item.type === 'SAAS' ? { productSlug: item.slug } : undefined}
                     className="w-full py-4 rounded-xl bg-white text-[#071A2F] font-bold text-xs uppercase tracking-widest text-center hover:bg-[#F7F8FA] transition-all"
                   >
+
                     Conhecer Solução
                   </Link>
                 </div>
