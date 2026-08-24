@@ -21,9 +21,34 @@ export const captureLead = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     console.log('Server capturing lead:', data);
     
-    // Simulating database latency
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (!process.env['DATABASE_URL']) {
+      // Preview mode simulated response
+      return { success: true, simulated: true, message: "Lead capturado com sucesso (Modo Simulado)!" };
+    }
 
-    // In production: return await prisma.lead.create({ data });
-    return { success: true, message: "Lead capturado com sucesso!" };
+    const { prisma } = await import("@/lib/prisma.server");
+    
+    try {
+      await prisma.lead.create({
+        data: {
+          name: data.name,
+          email: data.email || null,
+          whatsapp: data.whatsapp,
+          company: data.company,
+          city: data.city,
+          address: data.address,
+          establishmentType: data.establishmentType,
+          screenCount: data.screenCount,
+          segment: data.segment,
+          objective: data.objective,
+          message: data.message,
+          type: data.type,
+          source: "DIRECT_FORM"
+        }
+      });
+      return { success: true, simulated: false, message: "Lead capturado com sucesso!" };
+    } catch (error) {
+      console.error('Lead capture failed:', error);
+      throw new Error("Não foi possível salvar o lead no momento.");
+    }
   });
