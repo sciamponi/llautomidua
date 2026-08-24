@@ -23,19 +23,19 @@ export function Footer() {
             <h4 className="text-white font-bold font-sora mb-6 text-sm uppercase tracking-widest">Soluções SaaS</h4>
             <ul className="space-y-4">
               <li>
-                <Link to="/solucoes/automacao" className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">Automatiza (WhatsApp)</Link>
+                <Link to="/solucoes/$productSlug" params={{ productSlug: "automacao" }} className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">Automatiza (WhatsApp)</Link>
               </li>
               <li>
-                <Link to="/solucoes/barberia" className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">BarberIA</Link>
+                <Link to="/solucoes/$productSlug" params={{ productSlug: "barberia" }} className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">BarberIA</Link>
               </li>
               <li>
-                <Link to="/solucoes/esmalteria" className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">Esmaltter-IA</Link>
+                <Link to="/solucoes/$productSlug" params={{ productSlug: "esmalteria" }} className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">Esmaltter-IA</Link>
               </li>
               <li>
-                <Link to="/solucoes/petflow" className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">PetFlow</Link>
+                <Link to="/solucoes/$productSlug" params={{ productSlug: "petflow" }} className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">PetFlow</Link>
               </li>
               <li>
-                <Link to="/solucoes/oficinas" className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">Solução Oficinas</Link>
+                <Link to="/solucoes/$productSlug" params={{ productSlug: "oficinas" }} className="text-[#DCE3EA]/60 hover:text-[#1E8CFF] text-sm transition-colors">Solução Oficinas</Link>
               </li>
             </ul>
           </div>
