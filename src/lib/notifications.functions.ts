@@ -20,6 +20,7 @@ export const prepareNotification = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     console.log(`[NotificationEngine] Preparing ${data.channel} to ${data.recipient} for event ${data.event}`);
     
+    // In production, we might fetch actual templates from DB here
     const preview = {
       ...data,
       renderedMessage: data.message,
@@ -34,23 +35,33 @@ export const sendNotification = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     console.log(`[NotificationEngine] Executing ${data.channel} to ${data.recipient}`);
     
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
     const finalStatus = data.isSimulation ? 'SIMULATED' : 'SENT';
 
-    await prisma.notificationLog.create({
-      data: {
-        orderId: data.orderId,
-        event: data.event,
-        channel: data.channel as any,
-        recipient: data.recipient,
-        message: data.message,
-        status: finalStatus as any,
-        sentAt: new Date()
-      }
-    });
+    if (!process.env['DATABASE_URL']) {
+      return { success: true, status: finalStatus, simulated: true };
+    }
 
-    return { success: true, status: finalStatus };
+    const { prisma } = await import("@/lib/prisma.server");
+
+    try {
+      await prisma.notificationLog.create({
+        data: {
+          orderId: data.orderId,
+          event: data.event,
+          channel: data.channel as any,
+          recipient: data.recipient,
+          message: data.message,
+          status: finalStatus as any,
+          sentAt: new Date()
+        }
+      });
+
+      return { success: true, status: finalStatus, simulated: false };
+    } catch (error) {
+      console.error('Failed to log notification:', error);
+      // We return success anyway if it was "sent" to external service, but logging failed
+      return { success: true, status: finalStatus, logError: true };
+    }
   });
 
 export const getNotificationLogs = createServerFn({ method: "GET" })
