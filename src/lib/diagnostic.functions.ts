@@ -84,6 +84,39 @@ export const recommendProduct = createServerFn({ method: "POST" })
     };
   });
 
+
+export const completeDiagnostic = createServerFn({ method: "POST" })
+  .validator((data: any) => z.object({
+    sessionId: z.string(),
+    answers: z.record(z.any()),
+    leadData: z.object({
+      name: z.string(),
+      whatsapp: z.string(),
+      email: z.string().optional(),
+    }).optional()
+  }).parse(data))
+  .handler(async ({ data }) => {
+    // 1. Calculate Recommendation
+    const result = await recommendProduct({
+      data: {
+        businessSegment: data.answers.businessSegment,
+        mainProblem: data.answers.mainProblem,
+        specificNeed: data.answers.specificNeed,
+        currentOperation: data.answers.currentOperation,
+      }
+    });
+
+    // 2. In a real scenario, we would persist this to DiagnosticSession, DiagnosticResult, etc.
+    // 3. If leadData is provided, create a Lead linked to the session
+    console.log(`Completing session ${data.sessionId}`, { result, leadData: data.leadData });
+    
+    return {
+      success: true,
+      result,
+      sessionId: data.sessionId
+    };
+  });
+
 export const createDiagnosticSession = createServerFn({ method: "POST" })
   .handler(async () => {
     return { id: `sess_${Math.random().toString(36).substr(2, 9)}` };

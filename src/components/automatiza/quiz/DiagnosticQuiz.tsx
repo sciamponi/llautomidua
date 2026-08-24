@@ -4,7 +4,7 @@ import { RobotMessage } from "../RobotMessage";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { recommendProduct, createDiagnosticSession, updateDiagnosticSession } from "@/lib/diagnostic.functions";
+import { recommendProduct, createDiagnosticSession, updateDiagnosticSession, completeDiagnostic } from "@/lib/diagnostic.functions";
 import { CheckCircle2, ArrowRight, MessageSquare, Info } from "lucide-react";
 
 type Question = {
@@ -108,6 +108,7 @@ export function DiagnosticQuiz() {
   const [loading, setLoading] = useState(false);
 
   const getRec = useServerFn(recommendProduct);
+  const completeDiag = useServerFn(completeDiagnostic);
   const startSess = useServerFn(createDiagnosticSession);
   const updateSess = useServerFn(updateDiagnosticSession);
 
@@ -131,15 +132,13 @@ export function DiagnosticQuiz() {
     } else {
       setLoading(true);
       try {
-        const res = await getRec({
+        const res = await completeDiag({
           data: {
-            businessSegment: newAnswers['businessSegment'] || "",
-            mainProblem: newAnswers['mainProblem'] || "",
-            specificNeed: newAnswers['specificNeed'],
-            currentOperation: newAnswers['currentOperation'],
+            sessionId: sessionId || "temp",
+            answers: newAnswers
           }
         });
-        setResult(res);
+        setResult(res.result);
       } catch (err) {
         console.error(err);
       } finally {
