@@ -42,6 +42,17 @@
 
   --font-sora: "Sora", sans-serif;
   --font-inter: "Inter", sans-serif;
+
+  /* Stacking Context Tokens */
+  --z-header: 1000;
+  --z-mega-menu: 1100;
+  --z-mobile-menu: 1500;
+  --z-modal: 2000;
+  --z-toast: 3000;
+
+  /* Layout Tokens */
+  --header-height: 80px;
+  --header-height-mobile: 72px;
 }
 
 :root {
