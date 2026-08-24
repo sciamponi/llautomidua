@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getRequest } from "@tanstack/react-start/server";
-import { parseCookies, setCookie, deleteCookie } from "vinxi/http";
+import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
 import { roleMiddleware } from "./auth.middleware";
 
 
@@ -131,7 +130,6 @@ export const login = createServerFn({ method: "POST" })
       }
     });
 
-    const request = getRequest();
     setCookie(SESSION_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env['NODE_ENV'] === "production",
@@ -151,8 +149,7 @@ export const login = createServerFn({ method: "POST" })
 
 export const logout = createServerFn({ method: "POST" })
   .handler(async () => {
-    const cookies = parseCookies();
-    const token = cookies[SESSION_COOKIE_NAME];
+    const token = getCookie(SESSION_COOKIE_NAME);
 
     if (token && process.env['DATABASE_URL']) {
       const { prisma } = await import("@/lib/prisma.server");
@@ -168,8 +165,7 @@ export const logout = createServerFn({ method: "POST" })
 
 export const getSession = createServerFn({ method: "GET" })
   .handler(async () => {
-    const cookies = parseCookies();
-    const token = cookies[SESSION_COOKIE_NAME];
+    const token = getCookie(SESSION_COOKIE_NAME);
 
     if (!token || !process.env['DATABASE_URL']) return null;
 
