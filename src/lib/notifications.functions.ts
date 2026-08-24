@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma.server";
 
 export type NotificationChannel = 'WHATSAPP' | 'EMAIL';
 export type NotificationStatus = 'PENDING' | 'SENT' | 'FAILED' | 'SIMULATED';
@@ -39,19 +40,17 @@ export const sendNotification = createServerFn({ method: "POST" })
     
     const finalStatus = data.isSimulation ? 'SIMULATED' : 'SENT';
 
-    // In production:
-    // const { prisma } = await import('@/lib/prisma.server');
-    // await prisma.notificationLog.create({
-    //   data: {
-    //     orderId: data.orderId,
-    //     event: data.event,
-    //     channel: data.channel,
-    //     recipient: data.recipient,
-    //     message: data.message,
-    //     status: finalStatus as any,
-    //     sentAt: new Date()
-    //   }
-    // });
+    await prisma.notificationLog.create({
+      data: {
+        orderId: data.orderId,
+        event: data.event,
+        channel: data.channel as any,
+        recipient: data.recipient,
+        message: data.message,
+        status: finalStatus as any,
+        sentAt: new Date()
+      }
+    });
 
     return { success: true, status: finalStatus };
   });
@@ -59,6 +58,9 @@ export const sendNotification = createServerFn({ method: "POST" })
 export const getNotificationLogs = createServerFn({ method: "GET" })
   .validator((orderId: string) => orderId)
   .handler(async ({ data: orderId }) => {
-    // Return logs from Prisma
-    return []; 
+    return await prisma.notificationLog.findMany({
+      where: { orderId },
+      orderBy: { sentAt: 'desc' }
+    });
   });
+
