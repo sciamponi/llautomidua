@@ -24,6 +24,7 @@ import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateS
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 import { Route as AdminDemosIndexRouteImport } from './routes/admin/demos/index'
+import { Route as AdminProdutosIndexRouteImport } from './routes/admin/produtos/index'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
 import { Route as AdminUsuariosIndexRouteImport } from './routes/admin/usuarios/index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
@@ -107,6 +108,11 @@ const AdminDemosIndexRoute = AdminDemosIndexRouteImport.update({
   path: '/admin/demos/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProdutosIndexRoute = AdminProdutosIndexRouteImport.update({
+  id: '/admin/produtos/',
+  path: '/admin/produtos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSitesIndexRoute = AdminSitesIndexRouteImport.update({
   id: '/admin/sites/',
   path: '/admin/sites/',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/demos/': typeof AdminDemosIndexRoute
+  '/admin/produtos/': typeof AdminProdutosIndexRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
   '/admin/usuarios/': typeof AdminUsuariosIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/demos': typeof AdminDemosIndexRoute
+  '/admin/produtos': typeof AdminProdutosIndexRoute
   '/admin/sites': typeof AdminSitesIndexRoute
   '/admin/usuarios': typeof AdminUsuariosIndexRoute
   '/cliente/sites': typeof ClienteSitesIndexRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/demos/': typeof AdminDemosIndexRoute
+  '/admin/produtos/': typeof AdminProdutosIndexRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
   '/admin/usuarios/': typeof AdminUsuariosIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/demos/'
+    | '/admin/produtos/'
     | '/admin/sites/'
     | '/admin/usuarios/'
     | '/cliente/sites/'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/demos'
+    | '/admin/produtos'
     | '/admin/sites'
     | '/admin/usuarios'
     | '/cliente/sites'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/demos/'
+    | '/admin/produtos/'
     | '/admin/sites/'
     | '/admin/usuarios/'
     | '/cliente/sites/'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
   AdminDemosIndexRoute: typeof AdminDemosIndexRoute
+  AdminProdutosIndexRoute: typeof AdminProdutosIndexRoute
   AdminSitesIndexRoute: typeof AdminSitesIndexRoute
   AdminUsuariosIndexRoute: typeof AdminUsuariosIndexRoute
 }
@@ -421,6 +434,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDemosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/produtos/': {
+      id: '/admin/produtos/'
+      path: '/admin/produtos'
+      fullPath: '/admin/produtos/'
+      preLoaderRoute: typeof AdminProdutosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/sites/': {
       id: '/admin/sites/'
       path: '/admin/sites'
@@ -516,6 +536,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
   AdminDemosIndexRoute: AdminDemosIndexRoute,
+  AdminProdutosIndexRoute: AdminProdutosIndexRoute,
   AdminSitesIndexRoute: AdminSitesIndexRoute,
   AdminUsuariosIndexRoute: AdminUsuariosIndexRoute,
 }
