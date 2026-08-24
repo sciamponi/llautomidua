@@ -24,6 +24,7 @@ import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ClienteSitesIndexRouteImport } from './routes/cliente/sites/index'
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
 import { Route as SitesAprovacaoTokenRouteImport } from './routes/sites/aprovacao/$token'
+import { Route as ClienteSitesPagamentoOrderIdRouteImport } from './routes/cliente/sites/pagamento/$orderId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,12 @@ const SitesAprovacaoTokenRoute = SitesAprovacaoTokenRouteImport.update({
   path: '/sites/aprovacao/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteSitesPagamentoOrderIdRoute =
+  ClienteSitesPagamentoOrderIdRouteImport.update({
+    id: '/sites/pagamento/$orderId',
+    path: '/sites/pagamento/$orderId',
+    getParentRoute: () => ClienteRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
+  '/cliente/sites/pagamento/$orderId': typeof ClienteSitesPagamentoOrderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites': typeof AdminSitesIndexRoute
   '/cliente/sites': typeof ClienteSitesIndexRoute
+  '/cliente/sites/pagamento/$orderId': typeof ClienteSitesPagamentoOrderIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
+  '/cliente/sites/pagamento/$orderId': typeof ClienteSitesPagamentoOrderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
     | '/cliente/sites/'
+    | '/cliente/sites/pagamento/$orderId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/sites/aprovacao/$token'
     | '/admin/sites'
     | '/cliente/sites'
+    | '/cliente/sites/pagamento/$orderId'
   id:
     | '__root__'
     | '/'
@@ -205,6 +217,7 @@ export interface FileRouteTypes {
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
     | '/cliente/sites/'
+    | '/cliente/sites/pagamento/$orderId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -330,15 +343,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitesAprovacaoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cliente/sites/pagamento/$orderId': {
+      id: '/cliente/sites/pagamento/$orderId'
+      path: '/sites/pagamento/$orderId'
+      fullPath: '/cliente/sites/pagamento/$orderId'
+      preLoaderRoute: typeof ClienteSitesPagamentoOrderIdRouteImport
+      parentRoute: typeof ClienteRouteRoute
+    }
   }
 }
 
 interface ClienteRouteRouteChildren {
   ClienteSitesIndexRoute: typeof ClienteSitesIndexRoute
+  ClienteSitesPagamentoOrderIdRoute: typeof ClienteSitesPagamentoOrderIdRoute
 }
 
 const ClienteRouteRouteChildren: ClienteRouteRouteChildren = {
   ClienteSitesIndexRoute: ClienteSitesIndexRoute,
+  ClienteSitesPagamentoOrderIdRoute: ClienteSitesPagamentoOrderIdRoute,
 }
 
 const ClienteRouteRouteWithChildren = ClienteRouteRoute._addFileChildren(
