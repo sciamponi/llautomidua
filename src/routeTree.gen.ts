@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
@@ -27,6 +28,11 @@ import { Route as SitesAprovacaoTokenRouteImport } from './routes/sites/aprovaca
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteRouteRoute = ClienteRouteRouteImport.update({
+  id: '/cliente',
+  path: '/cliente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceirosRoute = ParceirosRouteImport.update({
@@ -80,9 +86,9 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClienteSitesIndexRoute = ClienteSitesIndexRouteImport.update({
-  id: '/cliente/sites/',
-  path: '/cliente/sites/',
-  getParentRoute: () => rootRouteImport,
+  id: '/sites/',
+  path: '/sites/',
+  getParentRoute: () => ClienteRouteRoute,
 } as any)
 const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
   id: '/pedido',
@@ -97,6 +103,7 @@ const SitesAprovacaoTokenRoute = SitesAprovacaoTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRouteRouteWithChildren
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRouteRouteWithChildren
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -130,6 +138,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRouteRouteWithChildren
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cliente'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cliente'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/cliente'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -197,6 +209,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
   ParceirosRoute: typeof ParceirosRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
@@ -208,7 +221,6 @@ export interface RootRouteChildren {
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
   AdminSitesIndexRoute: typeof AdminSitesIndexRoute
-  ClienteSitesIndexRoute: typeof ClienteSitesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -218,6 +230,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente': {
+      id: '/cliente'
+      path: '/cliente'
+      fullPath: '/cliente'
+      preLoaderRoute: typeof ClienteRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiros': {
@@ -292,10 +311,10 @@ declare module '@tanstack/react-router' {
     }
     '/cliente/sites/': {
       id: '/cliente/sites/'
-      path: '/cliente/sites'
+      path: '/sites'
       fullPath: '/cliente/sites/'
       preLoaderRoute: typeof ClienteSitesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ClienteRouteRoute
     }
     '/sites/$templateSlug/pedido': {
       id: '/sites/$templateSlug/pedido'
@@ -314,6 +333,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ClienteRouteRouteChildren {
+  ClienteSitesIndexRoute: typeof ClienteSitesIndexRoute
+}
+
+const ClienteRouteRouteChildren: ClienteRouteRouteChildren = {
+  ClienteSitesIndexRoute: ClienteSitesIndexRoute,
+}
+
+const ClienteRouteRouteWithChildren = ClienteRouteRoute._addFileChildren(
+  ClienteRouteRouteChildren,
+)
+
 interface SitesTemplateSlugRouteChildren {
   SitesTemplateSlugPedidoRoute: typeof SitesTemplateSlugPedidoRoute
 }
@@ -327,6 +358,7 @@ const SitesTemplateSlugRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClienteRouteRoute: ClienteRouteRouteWithChildren,
   ParceirosRoute: ParceirosRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
@@ -338,7 +370,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
   AdminSitesIndexRoute: AdminSitesIndexRoute,
-  ClienteSitesIndexRoute: ClienteSitesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
