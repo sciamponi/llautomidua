@@ -39,6 +39,7 @@ function OrderFormPage() {
     city: '',
     state: '',
     instagram: '',
+    segment: '',
     description: '',
     services: '',
     differentials: '',
@@ -46,6 +47,7 @@ function OrderFormPage() {
     openingHours: '',
     closingHours: ''
   });
+
 
   const { data: template } = useQuery({
     queryKey: ['site-template', templateSlug],
