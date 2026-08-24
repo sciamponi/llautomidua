@@ -118,7 +118,7 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
     
     const updateData: any = {
       status: data.status,
-      rejectionReason: data.rejectionReason || "",
+      rejectionReason: data.rejectionReason || null,
     };
 
     if (data.status === PaymentStatus.PAID) {
@@ -163,7 +163,7 @@ export const processApproval = createServerFn({ method: "POST" })
            where: { id: approval.id },
            data: { 
              status,
-             feedback: data.feedback,
+             feedback: data.feedback || null
            }
          }),
          prisma.siteOrderVersion.update({
