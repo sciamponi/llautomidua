@@ -119,19 +119,63 @@ model Lead {
   userId        String?
   user          User?     @relation(fields: [userId], references: [id])
   createdAt     DateTime  @default(now())
+  diagnosticSessionId String? @unique
+  diagnosticSession   DiagnosticSession? @relation(fields: [diagnosticSessionId], references: [id])
 }
 
-model Subscription {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  productId     String
-  product       Product   @relation(fields: [productId], references: [id])
-  status        String    @default("pending") // pending, active, cancelled
-  startDate     DateTime?
-  endDate       DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model DiagnosticSession {
+  id                String    @id @default(cuid())
+  leadId            String?
+  sessionId         String?
+  currentStep       Int       @default(1)
+  status            String    @default("started") // started, in_progress, completed, abandoned
+  businessSegment   String?
+  mainProblem       String?
+  specificNeed      String?
+  currentOperation  String?
+  startedAt         DateTime  @default(now())
+  completedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lead              Lead?     
+  result            DiagnosticResult?
+}
+
+model DiagnosticResult {
+  id                  String    @id @default(cuid())
+  diagnosticSessionId String    @unique
+  diagnosticSession   DiagnosticSession @relation(fields: [diagnosticSessionId], references: [id])
+  recommendedProductId String?
+  confidence          String?   // HIGH, MEDIUM, LOW
+  score               Int       @default(0)
+  reason              String?
+  recommendations     DiagnosticRecommendation[]
+  createdAt           DateTime  @default(now())
+}
+
+model DiagnosticRecommendation {
+  id                  String    @id @default(cuid())
+  diagnosticResultId  String
+  diagnosticResult    DiagnosticResult @relation(fields: [diagnosticResultId], references: [id])
+  productId           String
+  score               Int
+  position            Int       @default(0)
+  reason              String?
+}
+
+model DiagnosticRule {
+  id          String    @id @default(cuid())
+  segment     String?
+  problem     String?
+  need        String?
+  operation   String?
+  productId   String
+  score       Int
+  priority    Int       @default(0)
+  message     String?
+  status      String    @default("active")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Course {
