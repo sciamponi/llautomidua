@@ -25,25 +25,25 @@ export function DiagnosisSection() {
               icon: "📅", 
               title: "AGENDAMENTOS", 
               desc: "Minha operação depende de confirmações e agendamentos manuais.",
-              path: "/barberia"
+              path: "/solucoes/barberia"
             },
             { 
               icon: "👥", 
               title: "CLIENTES", 
               desc: "Preciso organizar clientes, histórico e relacionamento.",
-              path: "/esmalteria"
+              path: "/solucoes/esmalteria"
             },
             { 
               icon: "💰", 
               title: "VENDAS", 
               desc: "Tenho leads, mas perco oportunidades no caminho.",
-              path: "/automacao"
+              path: "/solucoes/automacao"
             },
             { 
               icon: "📊", 
               title: "GESTÃO", 
               desc: "Preciso enxergar melhor minha operação e organizar os processos.",
-              path: "/oficinas"
+              path: "/solucoes/oficinas"
             },
             { 
               icon: "📺", 
