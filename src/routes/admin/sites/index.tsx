@@ -9,12 +9,6 @@ import { getOrdersForKanban, updateOrderStatus } from '@/lib/sites-operation.fun
 import type { SiteOrderStatus } from '@/lib/sites-operation.functions';
 
 export const Route = createFileRoute('/admin/sites/')({
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData({
-      queryKey: ['orders-kanban'],
-      queryFn: () => getOrdersForKanban(),
-    });
-  },
   component: SitesKanbanPage,
 });
 
