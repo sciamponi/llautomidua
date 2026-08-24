@@ -29,7 +29,7 @@ export function ProductSalesTemplate({
   return (
     <div className="space-y-32 pb-32">
       {/* Hero Section */}
-      <section className="relative pt-20 overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="container px-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <span className="inline-block px-4 py-1.5 rounded-full bg-[#1E8CFF]/10 border border-[#1E8CFF]/20 text-[#1E8CFF] text-xs font-bold uppercase tracking-widest">

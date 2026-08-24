@@ -36,7 +36,7 @@ export function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[1000] w-full border-b border-white/10 bg-[#071A2F]/90 backdrop-blur-lg">
+    <header className="fixed top-0 left-0 right-0 z-[var(--z-header)] w-full border-b border-white/10 bg-[#071A2F]/90 backdrop-blur-lg">
       <div className="container flex h-20 items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export function Header() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 w-[520px] bg-[#071A2F] border border-white/10 rounded-2xl shadow-2xl p-8 grid grid-cols-2 gap-10 z-[1100]"
+                      className="absolute top-full left-0 w-[520px] bg-[#071A2F] border border-white/10 rounded-2xl shadow-2xl p-8 grid grid-cols-2 gap-10 z-[var(--z-mega-menu)]"
                     >
                       <div>
                         <h4 className="text-[9px] font-bold text-[#1E8CFF] uppercase tracking-[0.3em] mb-6">SaaS</h4>
@@ -152,7 +152,7 @@ export function Header() {
             initial={{ opacity: 0, x: "100%" }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
-            className="fixed inset-0 z-[1500] bg-[#071A2F] flex flex-col p-8 lg:hidden overflow-y-auto"
+            className="fixed inset-0 z-[var(--z-mobile-menu)] bg-[#071A2F] flex flex-col p-8 lg:hidden overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-12">
               <Link to="/">
