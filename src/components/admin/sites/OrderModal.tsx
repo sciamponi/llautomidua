@@ -30,12 +30,14 @@ export function OrderModal({ order: initialOrder, isOpen, onClose }: OrderModalP
   });
 
   const statusMutation = useMutation({
-    mutationFn: (vars: { status: SiteOrderStatus, comment?: string }) => 
-      updateStatus({ data: { 
+    mutationFn: (vars: { status: SiteOrderStatus, comment?: string }) => {
+      const data: any = { 
         orderId: order.id, 
-        status: vars.status, 
-        comment: vars.comment ?? undefined 
-      } }),
+        status: vars.status
+      };
+      if (vars.comment) data.comment = vars.comment;
+      return updateStatus({ data });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', order.id] });
       queryClient.invalidateQueries({ queryKey: ['orders-kanban'] });
@@ -44,12 +46,15 @@ export function OrderModal({ order: initialOrder, isOpen, onClose }: OrderModalP
   });
 
   const paymentMutation = useMutation({
-    mutationFn: (vars: { paymentId: string, status: PaymentStatus, reason?: string }) => 
-      updatePayStatus({ data: { 
+    mutationFn: (vars: { paymentId: string, status: PaymentStatus, reason?: string }) => {
+      const data: any = { 
         paymentId: vars.paymentId, 
-        status: vars.status, 
-        rejectionReason: vars.reason ?? undefined 
-      } }),
+        status: vars.status
+      };
+      if (vars.reason) data.rejectionReason = vars.reason;
+      return updatePayStatus({ data });
+    },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order-details', order.id] });
       queryClient.invalidateQueries({ queryKey: ['orders-kanban'] });
