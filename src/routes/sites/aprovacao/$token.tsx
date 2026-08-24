@@ -46,18 +46,29 @@ function ClientApprovalPage() {
   if (view === 'success') {
     return (
       <div className="min-h-screen bg-[#071A2F] flex items-center justify-center p-6 text-center">
-        <div className="max-w-md w-full space-y-6">
+        <div className="max-w-md w-full space-y-8">
           <div className="w-20 h-20 bg-green-500/20 border border-green-500/30 rounded-full flex items-center justify-center mx-auto">
             <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold font-sora text-white">Solicitação Recebida!</h1>
-          <p className="text-gray-400">Obrigado pelo seu retorno. Nossa equipe será notificada e dará continuidade ao processo.</p>
+          <div className="space-y-4">
+            <h1 className="text-2xl font-bold font-sora text-white">Site Aprovado!</h1>
+            <p className="text-gray-400">Excelente! Agora só falta o pagamento para iniciarmos a publicação oficial do seu projeto.</p>
+          </div>
+          
+          <Link 
+            to="/cliente/sites/pagamento/$orderId"
+            params={{ orderId: 'current-order-id' }} // In production, this would come from the order object
+            className="block w-full py-5 bg-[#1E8CFF] text-white rounded-2xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-[#1E8CFF]/90 transition-all shadow-lg shadow-[#1E8CFF]/20"
+          >
+            Ir para Pagamento →
+          </Link>
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="bg-[#071A2F] text-[#DCE3EA] font-inter min-h-screen">

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Globe, MessageSquare, Settings, LogOut, ChevronRight, Clock, AlertCircle } from 'lucide-react';
+import { LayoutDashboard, Globe, MessageSquare, Settings, LogOut, ChevronRight, Clock, AlertCircle, CreditCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/cliente/sites/')({
@@ -12,13 +12,15 @@ function ClientDashboardPage() {
     {
       id: '1',
       businessName: 'Ar-Condicionado Central',
-      status: 'IN_PRODUCTION',
-      statusLabel: 'Em Produção',
-      progress: 65,
+      status: 'WAITING_APPROVAL',
+      statusLabel: 'Aguardando Pagamento',
+      progress: 90,
       lastUpdate: '2 horas atrás',
       slaDeadline: 'Amanhã, 14:00',
+      paymentStatus: 'PENDING',
     }
   ];
+
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -60,10 +62,16 @@ function ClientDashboardPage() {
                   </div>
                   
                   <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-bold uppercase tracking-wider">
+                    <div className={cn(
+                      "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                      order.status === 'WAITING_APPROVAL' 
+                        ? "bg-yellow-500/10 border border-yellow-500/20 text-yellow-500" 
+                        : "bg-[#1E8CFF]/10 border border-[#1E8CFF]/20 text-[#1E8CFF]"
+                    )}>
                       <Clock className="w-3 h-3" />
                       {order.statusLabel}
                     </div>
+
                     <div className="flex items-center gap-2 text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">
                       <AlertCircle className="w-3 h-3" />
                       Prazo: {order.slaDeadline}
@@ -86,12 +94,23 @@ function ClientDashboardPage() {
                       />
                     </div>
                   </div>
-                  <Link 
-                    to="/cliente/sites" 
-                    className="flex items-center gap-2 text-[10px] font-bold text-white uppercase tracking-widest hover:text-[#1E8CFF] transition-colors group/link"
-                  >
-                    Ver Detalhes <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-                  </Link>
+                  {order.status === 'WAITING_APPROVAL' ? (
+                    <Link 
+                      to="/cliente/sites/pagamento/$orderId" 
+                      params={{ orderId: order.id }}
+                      className="flex items-center gap-2 px-6 py-3 bg-[#1E8CFF] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_15px_rgba(30,140,255,0.4)] transition-all group/link"
+                    >
+                      Realizar Pagamento <CreditCard className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                    </Link>
+                  ) : (
+                    <Link 
+                      to="/cliente/sites" 
+                      className="flex items-center gap-2 text-[10px] font-bold text-white uppercase tracking-widest hover:text-[#1E8CFF] transition-colors group/link"
+                    >
+                      Ver Detalhes <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+                    </Link>
+                  )}
+
                 </div>
               </div>
             </div>

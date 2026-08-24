@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, User, Globe, FileText, History, MessageSquare, ShieldCheck, Send } from 'lucide-react';
+import { X, Clock, User, Globe, FileText, History, MessageSquare, ShieldCheck, Send, CreditCard, Receipt, AlertCircle, CheckCircle, Download, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ interface OrderModalProps {
   onClose: () => void;
 }
 
-type Tab = 'RESUMO' | 'DADOS' | 'CONTEUDO' | 'ARQUIVOS' | 'PREVIEW' | 'VERSOES' | 'HISTORICO' | 'COMUNICACOES';
+type Tab = 'RESUMO' | 'DADOS' | 'CONTEUDO' | 'ARQUIVOS' | 'PREVIEW' | 'VERSOES' | 'HISTORICO' | 'COMUNICACOES' | 'FINANCEIRO';
 
 export function OrderModal({ order, isOpen, onClose }: OrderModalProps) {
   const [activeTab, setActiveTab] = useState<Tab>('RESUMO');
@@ -26,7 +26,9 @@ export function OrderModal({ order, isOpen, onClose }: OrderModalProps) {
     { id: 'VERSOES', label: 'Versões', icon: History },
     { id: 'HISTORICO', label: 'Histórico', icon: History },
     { id: 'COMUNICACOES', label: 'Comunicações', icon: MessageSquare },
+    { id: 'FINANCEIRO', label: 'Financeiro', icon: CreditCard },
   ];
+
 
   return (
     <AnimatePresence>
@@ -57,10 +59,13 @@ export function OrderModal({ order, isOpen, onClose }: OrderModalProps) {
                    <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Pedido #{order?.id}</span>
                    <span className={cn(
                      "text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider",
-                     order?.status === 'PUBLISHED' ? "bg-green-500/20 text-green-500" : "bg-[#1E8CFF]/20 text-[#1E8CFF]"
+                      order?.status === 'PUBLISHED' ? "bg-green-500/20 text-green-500" : 
+                      order?.status === 'APPROVED' ? "bg-yellow-500/20 text-yellow-500" :
+                      "bg-[#1E8CFF]/20 text-[#1E8CFF]"
                    )}>
-                     {order?.status}
+                     {order?.status === 'APPROVED' ? 'APROVADO (PAGAMENTO PENDENTE)' : order?.status}
                    </span>
+
                 </div>
               </div>
             </div>
@@ -173,8 +178,90 @@ export function OrderModal({ order, isOpen, onClose }: OrderModalProps) {
                 </div>
               )}
               
+              {activeTab === 'FINANCEIRO' && (
+                <div className="space-y-8 animate-in fade-in duration-300">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-[#4CDFF2] uppercase tracking-[0.2em]">Detalhes da Cobrança</h4>
+                        <Receipt className="w-4 h-4 text-[#DCE3EA]/40" />
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Valor do Projeto</span>
+                          <span className="text-lg font-bold text-white">R$ {order?.price?.toLocaleString('pt-BR') || '0,00'}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Status de Pagamento</span>
+                          <span className={cn(
+                            "text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider",
+                            order?.paymentStatus === 'PAID' ? "bg-green-500/20 text-green-500" : "bg-yellow-500/20 text-yellow-500"
+                          )}>
+                            {order?.paymentStatus || 'PENDING'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-white/5 space-y-4">
+                         <div className="flex items-center justify-between p-4 bg-black/40 rounded-2xl border border-white/5">
+                           <div>
+                             <p className="text-[10px] font-bold text-white uppercase tracking-widest">Manual PIX</p>
+                             <p className="text-[9px] text-[#DCE3EA]/40 mt-0.5 uppercase">Aguardando comprovante</p>
+                           </div>
+                           <AlertCircle className="w-4 h-4 text-yellow-500" />
+                         </div>
+                         
+                         <button className="w-full py-4 bg-white/5 border border-white/10 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all">
+                           Alterar Valor Comercial
+                         </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-6">
+                      <h4 className="text-xs font-bold text-[#4CDFF2] uppercase tracking-[0.2em]">Comprovante</h4>
+                      
+                      <div className="aspect-video bg-black/40 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-4 text-center p-8">
+                         <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-[#DCE3EA]/20">
+                           <FileText className="w-6 h-6" />
+                         </div>
+                         <div>
+                           <p className="text-xs font-bold text-white uppercase tracking-widest">Nenhum arquivo enviado</p>
+                           <p className="text-[9px] text-[#DCE3EA]/40 mt-1 uppercase">O cliente ainda não anexou o comprovante</p>
+                         </div>
+                      </div>
+
+                      <div className="flex gap-4">
+                        <button disabled className="flex-grow py-4 bg-green-500/20 text-green-500/50 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                          Aprovar Pagamento
+                        </button>
+                        <button disabled className="px-4 py-4 bg-red-500/20 text-red-500/50 rounded-xl font-bold text-xs uppercase tracking-widest cursor-not-allowed">
+                          Rejeitar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+                    <h4 className="text-xs font-bold text-[#4CDFF2] uppercase tracking-[0.2em] mb-6">Histórico Financeiro</h4>
+                    <div className="space-y-4">
+                      <div className="flex gap-4 items-start">
+                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0">
+                          <History className="w-4 h-4 text-[#DCE3EA]/40" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-white"><span className="font-bold">Sistema</span> definiu o valor para <span className="font-bold">R$ {order?.price?.toLocaleString('pt-BR')}</span></p>
+                          <p className="text-[10px] text-[#DCE3EA]/40 mt-1 uppercase tracking-widest">Hoje, 10:00</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {/* Placeholder for other tabs */}
               {['DADOS', 'CONTEUDO', 'ARQUIVOS', 'PREVIEW', 'VERSOES', 'HISTORICO'].includes(activeTab) && (
+
                 <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-50">
                   <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-2xl">🚧</div>
                   <div>

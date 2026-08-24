@@ -5,6 +5,9 @@ import { createHash, randomBytes } from "crypto";
 // Tipos baseados no schema do Prisma
 export type SiteOrderStatus = 'SUBMITTED' | 'DATA_REVIEW' | 'IN_PRODUCTION' | 'WAITING_APPROVAL' | 'CHANGES_REQUESTED' | 'APPROVED' | 'PUBLISHED' | 'CANCELLED';
 export type SiteOrderVersionStatus = 'DRAFT' | 'WAITING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'ARCHIVED';
+export type PaymentStatus = 'PENDING' | 'PROOF_SUBMITTED' | 'UNDER_REVIEW' | 'PAID' | 'REJECTED' | 'CANCELLED' | 'FAILED';
+export type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'BOLETO';
+
 
 const generateToken = () => {
   const token = randomBytes(32).toString('hex');
@@ -13,7 +16,16 @@ const generateToken = () => {
 };
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .validator((data: { orderId: string, status: SiteOrderStatus, comment?: string, actorId?: string, responsibleUserId?: string }) => data)
+  .validator((data: { 
+    orderId: string, 
+    status: SiteOrderStatus, 
+    comment?: string, 
+    actorId?: string, 
+    responsibleUserId?: string,
+    paymentStatus?: PaymentStatus,
+    price?: number
+  }) => data)
+
   .handler(async ({ data }) => {
     console.log(`[API] Updating order ${data.orderId} to ${data.status} by ${data.actorId}`);
     
@@ -116,11 +128,50 @@ export const getSiteOrderDetails = createServerFn({ method: "GET" })
       businessName: "Ar-Condicionado Central",
       responsibleName: "João Silva",
       status: "IN_PRODUCTION" as SiteOrderStatus,
+      paymentStatus: "PENDING" as PaymentStatus,
+      price: 1500.00,
       priority: "NORMAL",
       createdAt: new Date(Date.now() - 86400000),
       versions: [],
       history: [],
       internalNotes: [],
-      notifications: []
+      notifications: [],
+      payments: []
     };
   });
+
+export const updatePaymentStatus = createServerFn({ method: "POST" })
+  .validator((data: { 
+    paymentId: string, 
+    status: PaymentStatus, 
+    rejectionReason?: string,
+    actorId?: string 
+  }) => data)
+  .handler(async ({ data }) => {
+    console.log(`[API] Updating payment ${data.paymentId} to ${data.status}`);
+    return { success: true };
+  });
+
+export const createPayment = createServerFn({ method: "POST" })
+  .validator((data: { 
+    orderId: string, 
+    amount: number, 
+    method: PaymentMethod,
+    proofUrl?: string 
+  }) => data)
+  .handler(async ({ data }) => {
+    console.log(`[API] Creating payment for order ${data.orderId}`);
+    return { success: true, paymentId: "new-payment-id" };
+  });
+
+export const getPaymentConfig = createServerFn({ method: "GET" })
+  .handler(async () => {
+    return {
+      pixEnabled: true,
+      pixKey: "000.000.000-00",
+      receiverName: "Automatiza Soluções LTDA",
+      instructions: "Transferência via PIX. O site entrará em publicação após a confirmação.",
+      qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=automatiza-pix-payload"
+    };
+  });
+

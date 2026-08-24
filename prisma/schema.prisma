@@ -68,7 +68,25 @@ enum NotificationStatus {
   PENDING
   SENT
   FAILED
+  SIMULATED
 }
+
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  BOLETO
+}
+
+enum PaymentStatus {
+  PENDING
+  PROOF_SUBMITTED
+  UNDER_REVIEW
+  PAID
+  REJECTED
+  CANCELLED
+  FAILED
+}
+
 
 
 
@@ -260,8 +278,12 @@ model SiteOrder {
   templateId        String
   template          SiteTemplate    @relation(fields: [templateId], references: [id])
   status            SiteOrderStatus @default(SUBMITTED)
+  paymentStatus     PaymentStatus   @default(PENDING)
+  price             Decimal?        @db.Decimal(10, 2)
   responsibleUserId String?
   slaDeadline       DateTime?
+  requirePaymentBeforePublish Boolean @default(true)
+
 
   
   // Enterprise Data
@@ -303,6 +325,8 @@ model SiteOrder {
   files             SiteOrderFile[]
   internalNotes     InternalNote[]
   notifications     NotificationLog[]
+  payments          Payment[]
+
   
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -314,7 +338,11 @@ model SiteOrderHistory {
   order         SiteOrder @relation(fields: [orderId], references: [id])
   fromStatus    SiteOrderStatus?
   toStatus      SiteOrderStatus
+  fromPaymentStatus PaymentStatus?
+  toPaymentStatus   PaymentStatus?
+  priceAtMoment     Decimal?        @db.Decimal(10, 2)
   changedBy       String?
+
   responsibleUserId String?
   comment         String?
 

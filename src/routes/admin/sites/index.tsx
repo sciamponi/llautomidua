@@ -18,15 +18,18 @@ const COLUMNS: { id: SiteOrderStatus; title: string }[] = [
   { id: 'IN_PRODUCTION', title: 'EM PRODUÇÃO' },
   { id: 'WAITING_APPROVAL', title: 'AGUARDANDO APROVAÇÃO' },
   { id: 'CHANGES_REQUESTED', title: 'AJUSTES SOLICITADOS' },
-  { id: 'APPROVED', title: 'APROVADOS' },
+  { id: 'APPROVED', title: 'APROVADOS (PAGAMENTO)' },
   { id: 'PUBLISHED', title: 'PUBLICADOS' },
   { id: 'CANCELLED', title: 'CANCELADOS' },
 ];
 
+
 function SitesKanbanPage() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showValues, setShowValues] = useState(true);
   const [orders, setOrders] = useState([
+
 
     {
       id: '1',
@@ -35,7 +38,10 @@ function SitesKanbanPage() {
       template: 'Ar-Condicionado',
       responsible: 'João Silva',
       status: 'SUBMITTED' as SiteOrderStatus,
+      paymentStatus: 'PENDING',
+      price: 1500,
       priority: 'NORMAL',
+
       createdAt: new Date().toISOString()
     },
     {
@@ -45,7 +51,10 @@ function SitesKanbanPage() {
       template: 'Energia Solar',
       responsible: 'Maria Souza',
       status: 'IN_PRODUCTION' as SiteOrderStatus,
+      paymentStatus: 'PAID',
+      price: 2400,
       priority: 'ATENÇÃO',
+
       createdAt: new Date(Date.now() - 172800000).toISOString()
     }
   ]);
@@ -83,17 +92,57 @@ function SitesKanbanPage() {
               />
             </div>
             <button className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm font-bold hover:bg-white/10 transition-all">Filtros</button>
+            <button 
+              onClick={() => setShowValues(!showValues)}
+              className="bg-[#1E8CFF]/10 border border-[#1E8CFF]/20 text-[#1E8CFF] rounded-xl px-4 py-2.5 text-sm font-bold hover:bg-[#1E8CFF]/20 transition-all"
+            >
+              {showValues ? 'Ocultar Valores' : 'Mostrar Valores'}
+            </button>
           </div>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Total Projetos</span>
+            <p className="text-2xl font-bold text-white mt-1">{orders.length}</p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Pipeline Total</span>
+            <p className="text-2xl font-bold text-[#4CDFF2] mt-1">
+              {showValues ? `R$ ${orders.reduce((acc, o) => acc + (o.price || 0), 0).toLocaleString('pt-BR')}` : 'R$ ••••'}
+            </p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Pendente</span>
+            <p className="text-2xl font-bold text-yellow-500 mt-1">
+              {showValues ? `R$ ${orders.filter(o => o.paymentStatus !== 'PAID').reduce((acc, o) => acc + (o.price || 0), 0).toLocaleString('pt-BR')}` : 'R$ ••••'}
+            </p>
+          </div>
+          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
+            <span className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest">Pago</span>
+            <p className="text-2xl font-bold text-green-500 mt-1">
+              {showValues ? `R$ ${orders.filter(o => o.paymentStatus === 'PAID').reduce((acc, o) => acc + (o.price || 0), 0).toLocaleString('pt-BR')}` : 'R$ ••••'}
+            </p>
+          </div>
+        </div>
+
 
         <div className="flex gap-4 overflow-x-auto pb-6 min-h-[calc(100vh-250px)] scrollbar-thin scrollbar-thumb-white/10">
           {COLUMNS.map(col => (
             <div key={col.id} className="min-w-[300px] w-[300px] flex-shrink-0 flex flex-col gap-4">
               <div className="flex items-center justify-between px-2">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#DCE3EA]/40">{col.title}</h3>
+                <div className="flex flex-col">
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#DCE3EA]/40">{col.title}</h3>
+                  {showValues && (
+                    <span className="text-[9px] font-bold text-[#1E8CFF]">
+                      R$ {orders.filter(o => o.status === col.id).reduce((acc, o) => acc + (o.price || 0), 0).toLocaleString('pt-BR')}
+                    </span>
+                  )}
+                </div>
                 <span className="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-[#DCE3EA]/60">
                   {orders.filter(o => o.status === col.id).length}
                 </span>
+
               </div>
 
               <div className="flex-grow bg-black/20 rounded-[1.5rem] p-3 border border-white/5 space-y-3">
