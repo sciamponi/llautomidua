@@ -60,7 +60,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
         status: data.status,
         history: {
           create: {
-            fromStatus: oldOrder?.status,
+            fromStatus: oldOrder?.status || SiteOrderStatus.SUBMITTED,
             toStatus: data.status,
             comment: data.comment
           }
@@ -87,9 +87,11 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
         status: data.status,
         rejectionReason: data.rejectionReason,
         // If paid, update order paymentStatus too
-        order: data.status === 'PAID' ? {
-          update: { paymentStatus: 'PAID' }
-        } : undefined
+        ...(data.status === 'PAID' ? {
+          order: {
+            update: { paymentStatus: 'PAID' }
+          }
+        } : {})
       }
     });
 
@@ -107,4 +109,4 @@ export const processApproval = createServerFn({ method: "POST" })
      return { success: true };
   });
 
-export type { SiteOrderStatus, PaymentStatus };
+export { SiteOrderStatus, PaymentStatus };

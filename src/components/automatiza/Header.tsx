@@ -19,7 +19,7 @@ export function Header() {
     queryFn: () => fetchProducts(),
   });
 
-  const activeSaas = products.filter(p => p.status === 'active' && p.type === 'SAAS');
+  const activeSaas = products.filter((p: any) => p.status === 'active' && p.type === 'SAAS');
 
   // Close menus on route change
   useEffect(() => {
@@ -77,7 +77,7 @@ export function Header() {
                       <div>
                         <h4 className="text-[9px] font-bold text-[#1E8CFF] uppercase tracking-[0.3em] mb-6">SaaS</h4>
                         <div className="space-y-4">
-                          {activeSaas.map(p => (
+                          {activeSaas.map((p: any) => (
                             <Link 
                               key={p.slug}
                               to="/solucoes/$productSlug"
@@ -169,7 +169,7 @@ export function Header() {
               <div className="space-y-6">
                 <p className="text-[10px] uppercase tracking-[0.4em] text-[#DCE3EA]/40">SaaS</p>
                 <div className="grid grid-cols-1 gap-5 text-lg font-medium">
-                  {activeSaas.map(p => (
+                  {activeSaas.map((p: any) => (
                     <Link key={p.slug} to="/solucoes/$productSlug" params={{ productSlug: p.slug }}>{p.name}</Link>
                   ))}
                 </div>

@@ -20,18 +20,19 @@ export const recommendProduct = createServerFn({ method: "POST" })
     const products = await getProducts();
     
     // Scoring engine logic
-    const results = products.map(product => {
+    const results = products.map((product: any) => {
       let score = 0;
       let reasons: string[] = [];
 
       // Segment Match (+100)
-      if (product.segment.toLowerCase() === data.businessSegment.toLowerCase()) {
+      if (product.segment && product.segment.toLowerCase() === data.businessSegment.toLowerCase()) {
         score += SCORING_WEIGHTS.SEGMENT;
         reasons.push(`Solução específica para o segmento de ${product.segment}`);
       }
 
       // Problem Match (+50)
-      if (product.problem?.toLowerCase().includes(data.mainProblem.toLowerCase()) || 
+      const productProblem = product.problem || "";
+      if (productProblem.toLowerCase().includes(data.mainProblem.toLowerCase()) || 
           data.mainProblem.toLowerCase().includes(product.slug.toLowerCase())) {
         score += SCORING_WEIGHTS.PROBLEM;
         reasons.push(`Atende diretamente ao problema de ${data.mainProblem}`);
@@ -57,7 +58,7 @@ export const recommendProduct = createServerFn({ method: "POST" })
         score,
         reason: reasons.join(". "),
       };
-    }).sort((a, b) => b.score - a.score);
+    }).sort((a: any, b: any) => b.score - a.score);
 
     const topMatch = results[0];
     const secondMatch = results[1];
@@ -80,7 +81,7 @@ export const recommendProduct = createServerFn({ method: "POST" })
     }
 
     // Recommendations that have a meaningful score
-    const recommendations = results.slice(0, 2).filter(r => r.score > 50);
+    const recommendations = results.slice(0, 2).filter((r: any) => r.score > 50);
 
     return {
       status: "success",
