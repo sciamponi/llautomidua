@@ -315,7 +315,7 @@ export function DiagnosticQuiz() {
             {currentQ.title}
           </h2>
           <div className="grid gap-4">
-            {options.map((option: { label: string; value: string }) => (
+            {options && options.map((option: { label: string; value: string }) => (
               <button
                 key={option.value}
                 onClick={() => handleSelect(option.value)}
