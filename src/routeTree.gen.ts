@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
@@ -20,12 +21,18 @@ import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as ClienteSitesIndexRouteImport } from './routes/cliente/sites/index'
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
 import { Route as SitesAprovacaoTokenRouteImport } from './routes/sites/aprovacao/$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteRouteRoute = ClienteRouteRouteImport.update({
+  id: '/cliente',
+  path: '/cliente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceirosRoute = ParceirosRouteImport.update({
@@ -78,6 +85,11 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClienteSitesIndexRoute = ClienteSitesIndexRouteImport.update({
+  id: '/sites/',
+  path: '/sites/',
+  getParentRoute: () => ClienteRouteRoute,
+} as any)
 const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
   id: '/pedido',
   path: '/pedido',
@@ -91,6 +103,7 @@ const SitesAprovacaoTokenRoute = SitesAprovacaoTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRouteRouteWithChildren
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -103,9 +116,11 @@ export interface FileRoutesByFullPath {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
+  '/cliente/sites/': typeof ClienteSitesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRouteRouteWithChildren
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -118,10 +133,12 @@ export interface FileRoutesByTo {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites': typeof AdminSitesIndexRoute
+  '/cliente/sites': typeof ClienteSitesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRouteRouteWithChildren
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -134,11 +151,13 @@ export interface FileRoutesById {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
+  '/cliente/sites/': typeof ClienteSitesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cliente'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -151,9 +170,11 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
+    | '/cliente/sites/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cliente'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -166,9 +187,11 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites'
+    | '/cliente/sites'
   id:
     | '__root__'
     | '/'
+    | '/cliente'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -181,10 +204,12 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
+    | '/cliente/sites/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
   ParceirosRoute: typeof ParceirosRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
@@ -205,6 +230,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente': {
+      id: '/cliente'
+      path: '/cliente'
+      fullPath: '/cliente'
+      preLoaderRoute: typeof ClienteRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiros': {
@@ -277,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cliente/sites/': {
+      id: '/cliente/sites/'
+      path: '/sites'
+      fullPath: '/cliente/sites/'
+      preLoaderRoute: typeof ClienteSitesIndexRouteImport
+      parentRoute: typeof ClienteRouteRoute
+    }
     '/sites/$templateSlug/pedido': {
       id: '/sites/$templateSlug/pedido'
       path: '/pedido'
@@ -294,6 +333,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ClienteRouteRouteChildren {
+  ClienteSitesIndexRoute: typeof ClienteSitesIndexRoute
+}
+
+const ClienteRouteRouteChildren: ClienteRouteRouteChildren = {
+  ClienteSitesIndexRoute: ClienteSitesIndexRoute,
+}
+
+const ClienteRouteRouteWithChildren = ClienteRouteRoute._addFileChildren(
+  ClienteRouteRouteChildren,
+)
+
 interface SitesTemplateSlugRouteChildren {
   SitesTemplateSlugPedidoRoute: typeof SitesTemplateSlugPedidoRoute
 }
@@ -307,6 +358,7 @@ const SitesTemplateSlugRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClienteRouteRoute: ClienteRouteRouteWithChildren,
   ParceirosRoute: ParceirosRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,

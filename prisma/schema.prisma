@@ -260,6 +260,9 @@ model SiteOrder {
   templateId        String
   template          SiteTemplate    @relation(fields: [templateId], references: [id])
   status            SiteOrderStatus @default(SUBMITTED)
+  responsibleUserId String?
+  slaDeadline       DateTime?
+
   
   // Enterprise Data
   businessName      String
@@ -311,8 +314,10 @@ model SiteOrderHistory {
   order         SiteOrder @relation(fields: [orderId], references: [id])
   fromStatus    SiteOrderStatus?
   toStatus      SiteOrderStatus
-  changedBy     String?
-  comment       String?
+  changedBy       String?
+  responsibleUserId String?
+  comment         String?
+
   createdAt     DateTime  @default(now())
 }
 
@@ -320,13 +325,17 @@ model SiteOrderVersion {
   id            String    @id @default(cuid())
   orderId       String
   order         SiteOrder @relation(fields: [orderId], references: [id])
-  version       Int
-  previewUrl    String
-  previewImage  String?
-  notes         String?
-  status        SiteOrderVersionStatus @default(DRAFT)
-  createdBy     String?
-  createdAt     DateTime  @default(now())
+  version           Int
+  versionNumber     Int             @default(1)
+  contentSnapshot   Json?
+  previewUrl        String
+  previewImage      String?
+  notes             String?
+  status            SiteOrderVersionStatus @default(DRAFT)
+  createdBy         String?
+  publishedAt       DateTime?
+  createdAt         DateTime        @default(now())
+
   approvals     ApprovalRequest[]
 }
 
@@ -339,7 +348,9 @@ model ApprovalRequest {
   status              ApprovalRequestStatus @default(PENDING)
   feedback            String?
   expiresAt           DateTime?
+  versionId           String?
   usedAt              DateTime?
+
   ipAddress           String?
   userAgent           String?
   createdAt           DateTime              @default(now())

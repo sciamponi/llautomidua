@@ -133,7 +133,7 @@ function RootComponent() {
   const isIsolatedPath = 
     location.pathname.startsWith('/admin') || 
     location.pathname.startsWith('/membros') || 
-    location.pathname.startsWith('/sites/aprovacao');
+    location.pathname.startsWith('/sites/aprovacao') || location.pathname.startsWith('/cliente');
 
   return (
     <QueryClientProvider client={queryClient}>

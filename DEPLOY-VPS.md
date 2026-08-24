@@ -1,68 +1,28 @@
-# Guia de Deploy VPS - Automatiza Solução
+# Deploy VPS - Guia de Preparação
 
-Este guia descreve como preparar e hospedar o projeto em um servidor próprio (VPS).
+Este documento detalha o status de prontidão para hospedagem própria (VPS) e as configurações necessárias.
 
-## Requisitos do Servidor
-- **SO**: Ubuntu 22.04+ (recomendado) ou qualquer distro com Docker.
-- **Hardware Mínimo**: 2 vCPU, 4GB RAM, 20GB SSD.
-- **Software**: Docker e Docker Compose instalados.
+## Status de Prontidão
 
-## Configuração do Ambiente
+| Módulo | Status | Descrição |
+| --- | --- | --- |
+| **Infraestrutura (Docker)** | PRONTO | Dockerfile e docker-compose.yml configurados com PostgreSQL 16. |
+| **Banco de Dados (Prisma)** | PRONTO | Migrations automáticas via entrypoint. |
+| **Health Check** | PRONTO | Endpoint /api/public/health configurado conforme spec. |
+| **Storage** | PRONTO | Abstração para LocalStorage com volumes persistentes. |
+| **Auth** | EM DESENVOLVIMENTO | Necessário configurar JWT e Provider (Better Auth sugerido). |
+| **Operação de Sites 2.0** | EM ANDAMENTO | Fase 5.2 em execução (Admin + Portal Cliente). |
 
-1. Clone o repositório no servidor.
-2. Copie o arquivo de exemplo e configure suas variáveis:
-   ```bash
-   cp .env.example .env
-   nano .env
-   ```
-3. Certifique-se de configurar a `DATABASE_URL` corretamente.
+## Configuração de Ambiente (.env)
 
-## Execução com Docker
+```env
+# Banco de Dados
+DATABASE_URL="postgresql://user:password@db:5432/automatiza?schema=public"
 
-Para iniciar a aplicação e o banco de dados:
-```bash
-docker compose up -d
-```
+# Segurança
+JWT_SECRET="seu_secret_gerado_no_vps"
+SHA256_SALT="seu_salt_para_tokens"
 
-O comando irá:
-1. Iniciar um banco de dados PostgreSQL 16 (isolado na rede interna).
-2. O contêiner da aplicação aguardará a prontidão do banco (via `pg_isready`).
-3. Executar `npx prisma migrate deploy` automaticamente antes do início da aplicação.
-4. Iniciar o servidor TanStack Start na porta 3000 (mapeada para 8080 no host).
-
-## Persistência de Dados
-- **Banco de Dados**: Armazenado no volume `postgres-data`.
-- **Arquivos/Uploads**: Armazenados no volume `storage-data` (mapeado para `/data/storage` no container).
-
-## Backup
-É essencial realizar backup periódico de:
-1. Volume do PostgreSQL: `docker exec automatiza-db pg_dumpall -U user > backup.sql`
-2. Diretório de storage: `/var/lib/docker/volumes/...`
-
-## Proxy Reverso e SSL
-Recomendamos o uso de **Nginx** ou **Caddy** como proxy reverso para gerenciar HTTPS (SSL).
-
-Exemplo Caddy:
-```caddy
-sua-url.com {
-    reverse_proxy localhost:8080
-}
-```
-
-## Monitoramento
-A aplicação expõe um endpoint de saúde:
-`GET /api/public/health`
-
-Resposta esperada (JSON):
-
-**1. PREVIEW / DEV SEM DATABASE_URL**
-- HTTP 200: `{"status": "ok", "database": "not_configured"}`
-
-**2. PRODUÇÃO COM DATABASE_URL E BANCO FUNCIONANDO**
-- HTTP 200: `{"status": "ok", "database": "ok"}`
-
-**3. PRODUÇÃO COM DATABASE_URL MAS BANCO INDISPONÍVEL**
-- HTTP 503: `{"status": "error", "database": "unavailable"}`
-
-**4. PRODUÇÃO SEM DATABASE_URL**
-- HTTP 503: `{"status": "error", "database": "not_configured"}`
+# Notificações (Simulação por padrão)
+WHATSAPP_API_URL=""
+WHATSAPP_API_TOKEN=""

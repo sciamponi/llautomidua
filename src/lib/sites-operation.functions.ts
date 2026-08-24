@@ -2,11 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
 
-// Tipos baseados no schema do Prisma (serão importados do client em produção)
+// Tipos baseados no schema do Prisma
 export type SiteOrderStatus = 'SUBMITTED' | 'DATA_REVIEW' | 'IN_PRODUCTION' | 'WAITING_APPROVAL' | 'CHANGES_REQUESTED' | 'APPROVED' | 'PUBLISHED' | 'CANCELLED';
 export type SiteOrderVersionStatus = 'DRAFT' | 'WAITING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'ARCHIVED';
 
-// Helper para gerar token e hash
 const generateToken = () => {
   const token = randomBytes(32).toString('hex');
   const hash = createHash('sha256').update(token).digest('hex');
@@ -14,56 +13,83 @@ const generateToken = () => {
 };
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .validator((data: { orderId: string, status: SiteOrderStatus, comment?: string, userId?: string }) => data)
+  .validator((data: { orderId: string, status: SiteOrderStatus, comment?: string, actorId?: string, responsibleUserId?: string }) => data)
   .handler(async ({ data }) => {
-    // Aqui viria a lógica do Prisma
-    console.log(`[API] Updating order ${data.orderId} to ${data.status}`);
+    console.log(`[API] Updating order ${data.orderId} to ${data.status} by ${data.actorId}`);
     
-    // Simulação de histórico
-    const historyEntry = {
-      orderId: data.orderId,
-      toStatus: data.status,
-      comment: data.comment,
-      changedBy: data.userId,
-      createdAt: new Date()
-    };
-
-    // Lógica de Eventos/Notificações seria disparada aqui
+    // In production:
+    // const { prisma } = await import('@/lib/prisma.server');
+    // await prisma.siteOrderHistory.create({
+    //   data: {
+    //     orderId: data.orderId,
+    //     toStatus: data.status,
+    //     changedBy: data.actorId,
+    //     responsibleUserId: data.responsibleUserId,
+    //     comment: data.comment
+    //   }
+    // });
+    // await prisma.siteOrder.update({
+    //   where: { id: data.orderId },
+    //   data: { status: data.status, responsibleUserId: data.responsibleUserId }
+    // });
     
-    return { success: true, historyEntry };
+    return { success: true };
   });
 
-export const createSiteVersion = createServerFn({ method: "POST" })
-  .validator((data: { orderId: string, previewUrl: string, previewImage?: string, notes?: string, versionNumber: number, createdBy?: string }) => data)
+export const createImmutableVersion = createServerFn({ method: "POST" })
+  .validator((data: { 
+    orderId: string, 
+    contentSnapshot: any, 
+    previewUrl: string, 
+    notes?: string, 
+    versionNumber: number, 
+    createdBy?: string,
+    publish?: boolean
+  }) => data)
   .handler(async ({ data }) => {
-    console.log(`[API] Creating version ${data.versionNumber} for order ${data.orderId}`);
+    console.log(`[API] Creating immutable version ${data.versionNumber} for order ${data.orderId}`);
     
-    const newVersion = {
-      id: `v_${Math.random().toString(36).substr(2, 9)}`,
-      orderId: data.orderId,
-      version: data.versionNumber,
-      previewUrl: data.previewUrl,
-      previewImage: data.previewImage,
-      notes: data.notes,
-      status: 'DRAFT' as SiteOrderVersionStatus,
-      createdAt: new Date(),
-      createdBy: data.createdBy
-    };
-
-    return { success: true, version: newVersion };
+    // In production:
+    // const { prisma } = await import('@/lib/prisma.server');
+    // const newVersion = await prisma.siteOrderVersion.create({
+    //   data: {
+    //     orderId: data.orderId,
+    //     version: data.versionNumber,
+    //     versionNumber: data.versionNumber,
+    //     contentSnapshot: data.contentSnapshot,
+    //     previewUrl: data.previewUrl,
+    //     notes: data.notes,
+    //     status: data.publish ? 'APPROVED' : 'DRAFT',
+    //     createdBy: data.createdBy,
+    //     publishedAt: data.publish ? new Date() : null
+    //   }
+    // });
+    
+    return { success: true };
   });
 
 export const requestApproval = createServerFn({ method: "POST" })
-  .validator((data: { orderId: string, versionId: string }) => data)
+  .validator((data: { orderId: string, versionId: string, expiresDays?: number }) => data)
   .handler(async ({ data }) => {
     const { token, hash } = generateToken();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + (data.expiresDays || 7));
     
     console.log(`[API] Requesting approval for order ${data.orderId} version ${data.versionId}`);
     
-    // Salvar ApprovalRequest com hash
-    // Atualizar status da ordem e versão para WAITING_APPROVAL
+    // In production:
+    // const { prisma } = await import('@/lib/prisma.server');
+    // await prisma.approvalRequest.create({
+    //   data: {
+    //     orderId: data.orderId,
+    //     orderVersionId: data.versionId,
+    //     tokenHash: hash,
+    //     expiresAt,
+    //     status: 'PENDING'
+    //   }
+    // });
     
-    const approvalUrl = `http://localhost:8080/sites/aprovacao/${token}`;
+    const approvalUrl = `http://localhost:8080/cliente/sites/aprovacao/${token}`;
     
     return { success: true, approvalUrl, token };
   });
@@ -77,15 +103,7 @@ export const processApproval = createServerFn({ method: "POST" })
     
     // 1. Buscar ApprovalRequest pelo hash
     // 2. Validar expiração e status PENDING
-    // 3. Se aprovado:
-    //    - ApprovalRequest.status = APPROVED
-    //    - SiteOrderVersion.status = APPROVED
-    //    - SiteOrder.status = APPROVED
-    // 4. Se ajustes:
-    //    - ApprovalRequest.status = CHANGES_REQUESTED
-    //    - SiteOrder.status = CHANGES_REQUESTED
-    //    - SiteOrderVersion.status = REJECTED
-    //    - Salvar feedback no request
+    // 3. Atualizar SiteOrder, SiteOrderVersion e SiteOrderHistory
     
     return { success: true, status: data.approved ? 'APPROVED' : 'CHANGES_REQUESTED' };
   });
@@ -93,7 +111,6 @@ export const processApproval = createServerFn({ method: "POST" })
 export const getSiteOrderDetails = createServerFn({ method: "GET" })
   .validator((data: string) => data) // orderId
   .handler(async ({ data: orderId }) => {
-    // Mock de retorno detalhado
     return {
       id: orderId,
       businessName: "Ar-Condicionado Central",
