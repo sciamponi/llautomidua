@@ -104,7 +104,8 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
         mainProblem: String(data.answers['mainProblem'] || ""),
         specificNeed: data.answers['specificNeed'] ? String(data.answers['specificNeed']) : undefined,
         currentOperation: data.answers['currentOperation'] ? String(data.answers['currentOperation']) : undefined,
-      }
+      },
+      request: new Request('http://localhost') 
     });
 
     console.log(`Completing session ${data.sessionId}`, { result, leadData: data.leadData });
