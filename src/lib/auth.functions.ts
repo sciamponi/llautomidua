@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getRequest } from "@tanstack/react-start/server";
 import { parseCookies, setCookie, deleteCookie } from "vinxi/http";
+import { roleMiddleware } from "./auth.middleware";
+
 
 const SESSION_COOKIE_NAME = "auth_token";
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
