@@ -61,14 +61,23 @@ function Index() {
                     <h4 className="text-2xl font-bold text-white mb-4 font-sora">{item.name}</h4>
                     <p className="text-[#DCE3EA]/60 text-sm mb-8 leading-relaxed italic">"{item.problem}"</p>
                   </div>
-                  <Link 
-                    to={item.type === 'MEDIA' ? '/media-indoor' : item.slug === 'sites' ? '/sites' : '/solucoes/$productSlug'} 
-                    params={item.type === 'SAAS' ? { productSlug: item.slug } : undefined}
-                    className="w-full py-4 rounded-xl bg-white text-[#071A2F] font-bold text-xs uppercase tracking-widest text-center hover:bg-[#F7F8FA] transition-all"
-                  >
+                  {item.type === 'SAAS' ? (
+                    <Link 
+                      to="/solucoes/$productSlug"
+                      params={{ productSlug: item.slug }}
+                      className="w-full py-4 rounded-xl bg-white text-[#071A2F] font-bold text-xs uppercase tracking-widest text-center hover:bg-[#F7F8FA] transition-all"
+                    >
+                      Conhecer Solução
+                    </Link>
+                  ) : (
+                    <Link 
+                      to={item.slug === 'sites' ? '/sites' : '/media-indoor'}
+                      className="w-full py-4 rounded-xl bg-white text-[#071A2F] font-bold text-xs uppercase tracking-widest text-center hover:bg-[#F7F8FA] transition-all"
+                    >
+                      Conhecer Solução
+                    </Link>
+                  )}
 
-                    Conhecer Solução
-                  </Link>
                 </div>
               ))}
               
