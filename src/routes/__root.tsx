@@ -6,27 +6,31 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useLocation,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Toaster } from "sonner";
+import { Header } from "@/components/automatiza/Header";
+import { Footer } from "@/components/automatiza/Footer";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#071A2F] px-4 text-[#DCE3EA]">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+        <h1 className="text-7xl font-bold text-white font-sora">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-white">Página não encontrada</h2>
+        <p className="mt-2 text-sm text-[#DCE3EA]/60">
+          A página que você está procurando não existe ou foi movida.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-xl bg-[#1E8CFF] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1E8CFF]/90"
           >
-            Go home
+            Voltar para o Início
           </Link>
         </div>
       </div>
@@ -42,13 +46,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#071A2F] px-4 text-[#DCE3EA]">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+        <h1 className="text-xl font-semibold tracking-tight text-white font-sora">
+          Esta página não pôde ser carregada
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <p className="mt-2 text-sm text-[#DCE3EA]/60">
+          Algo deu errado do nosso lado. Tente atualizar ou voltar para o início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -56,15 +60,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-xl bg-[#1E8CFF] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1E8CFF]/90"
           >
-            Try again
+            Tentar novamente
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10"
           >
-            Go home
+            Voltar para o Início
           </a>
         </div>
       </div>
@@ -108,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -122,11 +126,25 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+
+  // Define route patterns that should NOT have the global header/footer
+  const isIsolatedPath = 
+    location.pathname.startsWith('/admin') || 
+    location.pathname.startsWith('/membros') || 
+    location.pathname.startsWith('/sites/aprovacao');
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex flex-col min-h-screen">
+        {!isIsolatedPath && <Header />}
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+        {!isIsolatedPath && <Footer />}
+      </div>
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
 }
+
