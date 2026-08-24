@@ -97,6 +97,7 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
     }).optional()
   }).parse(data))
   .handler(async ({ data }) => {
+    // Correctly call the server function
     const result = await recommendProduct({
       data: {
         businessSegment: String(data.answers['businessSegment'] || ""),

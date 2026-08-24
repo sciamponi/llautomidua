@@ -80,15 +80,21 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!process.env['DATABASE_URL']) return null;
     
+    // Exact optional property types: we must check if we want to include 'order' field
+    const updateData: any = {
+      status: data.status,
+      rejectionReason: data.rejectionReason || "",
+    };
+
+    if (data.status === PaymentStatus.PAID) {
+      updateData.order = {
+        update: { paymentStatus: PaymentStatus.PAID }
+      };
+    }
+
     const payment = await prisma.payment.update({
       where: { id: data.paymentId },
-      data: { 
-        status: data.status,
-        rejectionReason: data.rejectionReason || "",
-        order: data.status === PaymentStatus.PAID ? {
-          update: { paymentStatus: PaymentStatus.PAID }
-        } : undefined
-      }
+      data: updateData
     });
 
     return JSON.parse(JSON.stringify(payment));
