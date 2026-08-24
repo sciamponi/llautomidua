@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useServerFn } from '@tanstack/react-start';
 import { processApproval } from '@/lib/sites-operation.functions';
@@ -16,7 +16,7 @@ function ClientApprovalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [view, setView] = useState<'details' | 'success' | 'adjustments'>('details');
-  const [order, setOrder] = useState({
+  const [order] = useState({
     businessName: 'Ar-Condicionado Central',
     templateName: 'Ar-Condicionado',
     version: 1,
@@ -59,7 +59,7 @@ function ClientApprovalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#071A2F] text-[#DCE3EA] font-inter">
+    <div className="bg-[#071A2F] text-[#DCE3EA] font-inter">
       <header className="border-b border-white/10 p-6 bg-black/20">
         <div className="container mx-auto flex justify-between items-center">
           <div>
@@ -168,3 +168,4 @@ function ClientApprovalPage() {
     </div>
   );
 }
+
