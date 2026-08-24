@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useLoaderData } from '@tanstack/react-router'
-import { Header } from '@/components/automatiza/Header'
 import { RobotMessage } from '@/components/automatiza/RobotMessage'
 import { useState, useMemo } from 'react'
 import { getProducts } from '@/lib/products.functions'
-import { Search, Filter } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 export const Route = createFileRoute('/solucoes/')({
   loader: async () => {
@@ -41,8 +40,7 @@ function SolucoesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <Header />
+    <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
       <main className="container px-4 py-20">
         <div className="max-w-3xl mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-white font-sora mb-6">
@@ -138,12 +136,7 @@ function SolucoesPage() {
           </div>
         </div>
       </main>
-
-      <footer className="py-12 border-t border-white/10 mt-20">
-        <div className="container px-4 text-center">
-          <p className="text-[#DCE3EA]/40 text-sm">© 2026 Automatiza Solução. Todos os direitos reservados.</p>
-        </div>
-      </footer>
     </div>
   )
 }
+
