@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/automatiza/Header';
 import { useServerFn } from '@tanstack/react-start';
 import { getSiteTemplateBySlug } from '@/lib/sites.functions';
+import { captureLead } from '@/lib/leads.functions';
 import { useQuery } from '@tanstack/react-query';
+
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/sites/$templateSlug/pedido')({
@@ -25,6 +27,8 @@ const STEPS = [
 function OrderFormPage() {
   const { templateSlug } = Route.useParams();
   const fetchTemplate = useServerFn(getSiteTemplateBySlug);
+  const sendLead = useServerFn(captureLead);
+
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -58,12 +62,27 @@ function OrderFormPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    // Simulation
-    await new Promise(r => setTimeout(r, 2000));
-    toast.success("Pedido enviado com sucesso! Nossa equipe entrará em contato em breve.");
-    setIsSubmitting(false);
-    setCurrentStep(STEPS.length - 1); // Go to "Envio" success step
+    try {
+      await sendLead({
+        data: {
+          name: formData.responsibleName,
+          whatsapp: formData.whatsapp,
+          email: formData.email,
+          company: formData.businessName,
+          city: formData.city,
+          message: `Pedido de Site: ${template?.name}. Segmento: ${formData.segment}. Serviços: ${formData.services}`,
+          type: 'SITE_ORDER'
+        }
+      });
+      toast.success("Pedido enviado com sucesso! Nossa equipe entrará em contato em breve.");
+      setCurrentStep(STEPS.length - 1); // Go to "Envio" success step
+    } catch (error) {
+      toast.error("Erro ao enviar pedido. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   const renderStep = () => {
     switch (currentStep) {

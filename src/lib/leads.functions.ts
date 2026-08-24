@@ -13,7 +13,7 @@ const LeadSchema = z.object({
   segment: z.string().optional(),
   objective: z.string().optional(),
   message: z.string().optional(),
-  type: z.enum(['GENERAL', 'DEMO', 'QUOTE', 'SCREEN_INSTALLATION', 'SCREEN_ADVERTISING', 'PARTNER']),
+  type: z.enum(['GENERAL', 'DEMO', 'QUOTE', 'SCREEN_INSTALLATION', 'SCREEN_ADVERTISING', 'PARTNER', 'SITE_ORDER']),
 });
 
 export const captureLead = createServerFn({ method: "POST" })
