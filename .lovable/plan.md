@@ -5,49 +5,53 @@ Evolve the site production ecosystem into a professional workflow connecting Adm
 ## User Review Required
 
 > [!IMPORTANT]
-> - **Dedicated Client Portal**: A new layout will be implemented for `/cliente/*` routes, separate from the public site header. It will include a specific navigation: Meu Site, Soluções (Cross-sell), Suporte, and Logout.
-> - **Immutable Versions**: Published versions will be immutable snapshots. A `contentSnapshot` (JSON) will be added to `SiteOrderVersion` to store the state of the site at the time of publication.
-> - **Notification Strategy**: All communications (WhatsApp/Email) will follow the "Simulated" (Mock) vs "Sent" (Real) logic, with mandatory `NotificationPreview` in the Admin panel.
-> - **Transition to Auth**: Token-based access for `/cliente/*` serves as a bridge to Phase 6 (full Authentication).
+> - **Isolated Client Portal (`/cliente/*`)**: A new dedicated layout and header will be implemented for all client-facing dashboard routes, completely separate from the public site navigation.
+> - **Secure Token Transition**: Initial access will use SHA-256 hashed tokens linked to specific orders and versions. This serves as a secure bridge to full authentication in Phase 6.
+> - **Immutable Publishing**: Every publication action will create a new immutable `SiteOrderVersion` with a `contentSnapshot` (Json), ensuring a full audit trail and easy rollbacks.
+> - **Template-Oriented Editor**: The client-facing editor will be structured and driven by the template's schema (Name, Contacts, Services, Assets), preventing arbitrary code or layout changes.
+> - **Notification Simulation**: All automated communications (WhatsApp/Email) will require a manual `NotificationPreview` in the Admin panel and will follow the "Simulated" vs "Sent" logic.
 
 ## Proposed Changes
 
 ### 1. Database & Server Logic (TanStack Start & Prisma)
 - **Schema Enhancements**:
-    - `SiteOrder`: Add `responsibleUserId` (UUID/String) and `slaDeadline` (DateTime).
-    - `SiteOrderVersion`: Add `versionNumber` (Int), `contentSnapshot` (Json), and `publishedAt` (DateTime).
-    - `SiteOrderHistory`: Ensure every update logs `actor` (responsibleUserId), `action`, and status transition.
-    - `ApprovalRequest`: Standardize on SHA-256 hashed tokens with expiration.
+    - `SiteOrder`: Add `responsibleUserId` and `slaDeadline`.
+    - `SiteOrderVersion`: Add `versionNumber`, `contentSnapshot` (Json), and `publishedAt`.
+    - `SiteOrderHistory`: Enforce logging of `actor`, `action`, and status transitions.
+    - `ApprovalRequest`: Standardize on SHA-256 tokens with expiration and link to order + version.
 - **Server Functions (`src/lib/`)**:
-    - `sites-operation.functions.ts`: Detailed lifecycle management (Status transitions, history creation, versioning).
-    - `notifications.functions.ts`: Logic for simulating notifications, template rendering, and preview generation.
-    - `sites-portal.functions.ts`: (New) Fetching data for the client portal via secure tokens.
+    - `sites-operation.functions.ts`: Manage status transitions, immutable versioning, and history logging.
+    - `notifications.functions.ts`: Logic for simulating/sending notifications with template support and manual preview verification.
+    - `sites-portal.functions.ts`: Secure fetching of site data for the client portal using validated tokens.
 
 ### 2. Layout & Navigation Architecture
 - **Root Layout (`src/routes/__root.tsx`)**:
-    - Add `/cliente` to `isIsolatedPath`.
-    - Plan for a `ClientLayout` component that wraps all client-facing dashboard routes.
-- **Client Portal Header (`ClientHeader.tsx`)**:
-    - Dedicated nav for logged-in (token-verified) clients.
+    - Isolate `/cliente` routes from the global public header/footer.
+- **Client Components (`src/components/cliente/`)**:
+    - `ClientLayout`: Wrapper for portal routes.
+    - `ClientHeader`: Specific navigation (Meu Site, Soluções, Suporte, Sair).
 
 ### 3. Admin Operations (`/admin/sites`)
-- **Enhanced Order Modal**: Implement the multi-tab modal (Resumo, Dados, Conteúdo, Arquivos, Preview, Versões, Histórico, Comunicações).
-- **Communication Flow**: Manual review and trigger of "Simulated" notifications.
+- **Order Modal (`OrderModal.tsx`)**:
+    - Multi-tab management: Resumo, Dados, Conteúdo, Arquivos, Preview, Versões, Histórico, Comunicações.
+    - Status update flow with mandatory historical logging.
+    - Notification simulation/preview before "sending".
 
 ### 4. Client Portal & Maintenance (`/cliente/sites/$orderId`)
-- **Dashboard**: Status timeline, current version preview, and direct approval/feedback actions.
-- **Structured Editor**: Client-facing tool to update basic business data (Phone, WhatsApp, Services, Logo) which triggers new version drafts.
+- **Secure Dashboard**: Status timeline (Submitted -> Review -> Production -> Approval -> Published) and current version preview.
+- **Approval Flow**: One-click approval or "Changes Requested" with mandatory feedback.
+- **Structured Editor**: Client-facing tool to update content (Phone, WhatsApp, Services, Logo) based on template schema.
 
 ### 5. Cross-Sell / Soluções
-- **RelatedSolutions**: An upsell section within the client portal suggesting other Automatiza products (BarberIA, Media Indoor, etc.) based on the client's niche.
+- **RelatedSolutions**: Recommend Automatiza products (BarberIA, Media Indoor, etc.) based on the client's niche and current solutions.
 
 ## Technical Strategy
-- **Z-Index Tokens**: Header (1000), Mega Menu (1100), Portal Nav (1200), Modal (2000), Toast (3000).
-- **Persistence**: Use `Json` field in Prisma for flexible content snapshots until the structured editor fields are finalized.
-- **Security**: Token validation in server route loaders for `/cliente` until full Auth is implemented.
+- **Z-Index Tokens**: Header (1000), Mega Menu (1100), Client Header (1200), Modal (2000), Toast (3000).
+- **Security**: Server-side token validation for all `/cliente` routes.
+- **Modularity**: Editor fields are defined by the `SiteTemplate` to support different content structures.
 
 ## Next Steps
 1. Update `prisma/schema.prisma` with the new fields and run migration.
-2. Create `src/components/cliente/ClientHeader.tsx` and the `/cliente` route structure.
-3. Build the `OrderModal.tsx` for Admin with the 8 tabs.
-4. Implement the status update logic with history and notification simulation hooks.
+2. Create `src/components/cliente/ClientHeader.tsx` and the `/cliente` layout structure.
+3. Build the `OrderModal.tsx` for Admin with the 8 specific tabs.
+4. Implement the immutable versioning and status history logic in server functions.
