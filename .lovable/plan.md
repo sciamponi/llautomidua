@@ -1,56 +1,39 @@
 # Plano de Implementação: Fechamento Sites Operation 2.0 (Fase 5.2)
 
-Finalização do fluxo ponta a ponta da operação de sites com persistência real em banco de dados, validação de segurança (ownership) e interface administrativa/cliente completa.
+Finalização da operação de sites com persistência real em banco de dados, motor de notificações operacional e portal do cliente integrado.
 
-## 1. Persistência e Backend (Server Functions)
+## 1. Persistência de Dados e Lógica de Negócio
+- **Sites Operation Functions (`src/lib/sites-operation.functions.ts`)**:
+  - Implementar lógica real no Prisma para `updateOrderStatus`, garantindo o registro de histórico em `SiteOrderHistory`.
+  - Finalizar `processApproval` para validar tokens de aprovação, expiração e ownership.
+  - Implementar `getSiteOrderDetails` para retornar todos os relacionamentos necessários (histórico, versões, notificações).
+- **Notificações (`src/lib/notifications.functions.ts`)**:
+  - Persistir cada disparo no banco de dados (`NotificationLog`).
+  - Implementar lógica de fallback para o estado `SIMULATED` quando providers reais não estiverem configurados.
 
-### A. Sites Operation Functions (`src/lib/sites-operation.functions.ts`)
-- **Implementação Real**: Substituir todos os `console.log` e comentários "In production" por chamadas reais ao Prisma.
-- **updateOrderStatus**:
-  - Validar permissão do ator.
-  - Atualizar `status` e `responsibleUserId` na tabela `SiteOrder`.
-  - Criar entrada em `SiteOrderHistory` registrando o status anterior, o novo status, o ator e qualquer comentário.
-  - Integrar disparo de notificações automáticas via `sendNotification` baseado na transição.
-- **processApproval**:
-  - Validar token, expiração e status da solicitação.
-  - Atualizar `SiteOrder` e criar histórico de aprovação ou solicitação de ajustes.
-- **getSiteOrderDetails**: Retornar dados reais do banco, incluindo histórico, versões, pagamentos e notificações.
-
-### B. Motor de Notificações (`src/lib/notifications.functions.ts`)
-- **Persistência**: Gravar cada tentativa de envio em `NotificationLog`.
-- **Status Handling**: Gerenciar corretamente os estados `SIMULATED`, `SENT` e `FAILED`.
-
-## 2. Interface Administrativa (Kanban & Modal)
-
-### A. Kanban (`src/routes/admin/sites/index.tsx`)
-- **Data Fetching**: Substituir o `useState` de pedidos por dados reais persistidos (via `useQuery` / `useSuspenseQuery`).
-- **Drag-and-Drop**: Persistir a mudança de coluna chamando `updateOrderStatus` imediatamente e tratar erros com rollback visual.
-- **Totalizadores**: Refletir os valores reais do banco no resumo financeiro superior.
-
-### B. OrderModal (`src/components/admin/sites/OrderModal.tsx`)
-- **DADOS/CONTEÚDO**: Exibir campos reais do banco (Instagram, Segmento, Diferenciais, etc.).
-- **HISTÓRICO**: Renderizar a linha do tempo real vinda da tabela `SiteOrderHistory`.
-- **COMUNICAÇÕES**: Listar logs de `NotificationLog` e permitir disparo manual com preview.
-- **VERSÕES**: Listar snapshots imutáveis e permitir visualização.
+## 2. Interface Administrativa (Admin Kanban)
+- **Refatoração do Kanban (`src/routes/admin/sites/index.tsx`)**:
+  - Substituir o estado local (`useState`) por dados reais do banco (via queries do TanStack).
+  - Persistir o drag-and-drop chamando `updateOrderStatus` no servidor.
+  - Adicionar totalizadores dinâmicos (quantidade e valor) por coluna.
+- **OrderModal (`src/components/admin/sites/OrderModal.tsx`)**:
+  - Completar as abas `RESUMO`, `DADOS`, `CONTEÚDO`, `ARQUIVOS`, `VERSÕES` e `HISTÓRICO` com dados persistidos.
+  - Implementar prévia de mensagens antes do disparo manual na aba `COMUNICAÇÕES`.
 
 ## 3. Portal do Cliente (`/cliente/*`)
+- **Visualização Segura**:
+  - Validar ownership em todas as requisições para que um cliente não acesse dados de outro.
+  - Renderizar a timeline de progresso real baseada no histórico do banco.
+- **Fluxo de Aprovação**:
+  - Integrar a tela de aprovação com a lógica de versionamento imutável.
+  - Redirecionar para o fluxo de pagamento pós-aprovação se configurado (`requirePaymentBeforePublish`).
 
-### A. Dashboard e Detalhes
-- **Listagem Segura**: Filtrar `SiteOrder` pelo `userId` do cliente autenticado.
-- **Timeline de Progresso**: Criar componente visual que reflete o `status` atual e o histórico público.
-- **Ownership**: Garantir que o `orderId` na URL pertence ao usuário da sessão em todas as server functions do portal.
-
-### B. Fluxo de Aprovação
-- **Solicitação de Ajustes**: Exigir comentário e salvar no banco como `SiteOrderHistory` com tipo específico.
-
-## 4. Segurança
-
-- **Middleware**: Aplicar validação de sessão em todas as funções de escrita e leitura de dados sensíveis.
-- **Asset Access**: Validar que o `orderId` associado ao arquivo pertence ao solicitante.
+## 4. Versionamento Imutável
+- **Snapshots**: Garantir que cada envio para aprovação ou publicação gere uma nova entrada em `SiteOrderVersion` com o `contentSnapshot` daquele momento.
 
 ## Detalhes do Usuário (Não Técnico)
-Esta atualização transforma o sistema de "protótipo" em uma ferramenta de operação real:
-1. **Nada se perde**: Todas as mudanças de status, aprovações e conversas ficam gravadas para sempre no histórico do projeto.
-2. **Segurança**: Seus dados e os dados de seus clientes estão protegidos; um cliente nunca verá o projeto de outro.
-3. **Automação**: O sistema enviará avisos automáticos (WhatsApp/E-mail) em cada etapa importante, mantendo todos informados sem esforço manual.
-4. **Transparência**: O cliente vê exatamente em que fase o site está (Produção, Revisão, etc.) através do portal exclusivo.
+Esta atualização remove todos os "dados de simulação" do sistema:
+1. **Histórico Real**: Tudo o que acontecer com um projeto (mudança de status, arquivos enviados, mensagens) ficará gravado no banco de dados.
+2. **Portal Seguro**: O cliente terá uma área exclusiva e protegida para acompanhar seu site, dar feedbacks e aprovar o projeto.
+3. **Notificações Inteligentes**: O sistema enviará alertas automáticos (WhatsApp/E-mail) em cada etapa importante da produção.
+4. **Kanban Operacional**: A equipe administrativa terá um painel que reflete a realidade da produção, com totalizadores financeiros automáticos.
