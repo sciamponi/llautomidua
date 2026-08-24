@@ -52,7 +52,7 @@ function Index() {
               <p className="text-lg text-[#DCE3EA]/60 max-w-2xl">Tecnologia especializada para problemas reais. Cada ferramenta da Automatiza foi desenhada para resolver uma dor específica do seu negócio.</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.filter(p => p.status === 'active' && p.featured).map((item, i) => (
+              {products.filter((p: any) => p.status === 'active' && p.featured).map((item: any, i: number) => (
                 <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col justify-between">
                   <div>
                     <span className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-widest bg-[#1E8CFF]/10 px-3 py-1 rounded-full border border-[#1E8CFF]/20 mb-6 inline-block">

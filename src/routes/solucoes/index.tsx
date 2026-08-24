@@ -18,7 +18,7 @@ function SolucoesPage() {
   const [activeFilter, setActiveFilter] = useState('TODOS');
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p => {
+    return products.filter((p: any) => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                            p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            p.problem?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -84,7 +84,7 @@ function SolucoesPage() {
 
         {filteredProducts.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((p) => (
+            {filteredProducts.map((p: any) => (
               <div key={p.id} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col">
                 <div className="mb-6">
                   <span className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-widest bg-[#1E8CFF]/10 px-3 py-1 rounded-full border border-[#1E8CFF]/20">

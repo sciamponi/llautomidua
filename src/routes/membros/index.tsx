@@ -1,25 +1,36 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, redirect, Link, Outlet } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 
-
 export const Route = createFileRoute('/membros/')({
-  component: MembersPage
+  beforeLoad: async ({ context }) => {
+    const session = context.session;
+    
+    if (!session) {
+      throw redirect({ to: '/login', search: { redirect: '/membros' } });
+    }
+
+    const hasPartnerRole = session.user.roles.some((r: any) => 
+      ['PARTNER', 'MASTER_ADMIN', 'ADMIN'].includes(r.role)
+    );
+
+    if (!hasPartnerRole) {
+      throw redirect({ to: '/' });
+    }
+  },
+  component: MembersDashboardPage
 })
 
-function MembersPage() {
+function MembersDashboardPage() {
+  const { session } = Route.useRouteContext();
+  
   return (
-    <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
+    <div className="bg-[#071A2F] font-inter text-[#DCE3EA] min-h-screen">
       <main className="container px-4 py-8 md:py-12">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-12">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Link to="/" className="text-[#1E8CFF] hover:underline text-xs font-bold uppercase tracking-widest flex items-center gap-1">
-                  ← Voltar ao site
-                </Link>
-              </div>
               <h1 className="text-3xl md:text-4xl font-bold text-white font-sora mb-2">Área de Membros</h1>
-              <p className="text-[#DCE3EA]/60 text-lg">Bem-vindo de volta, parceiro.</p>
+              <p className="text-[#DCE3EA]/60 text-lg">Bem-vindo de volta, {session?.user.name?.split(' ')[0] || 'parceiro'}.</p>
             </div>
             <div className="flex gap-4">
               <button className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-medium hover:bg-white/10 transition-all text-sm">
@@ -57,9 +68,9 @@ function MembersPage() {
             <div className="lg:col-span-3 space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
                 {[
-                  { label: "Clientes Ativos", value: "12", color: "text-[#4CDFF2]" },
-                  { label: "Comissões (Mês)", value: "R$ 588,00", color: "text-[#F0A820]" },
-                  { label: "Pontos Clube", value: "1.240", color: "text-[#1E8CFF]" }
+                  { label: "Clientes Ativos", value: "0", color: "text-[#4CDFF2]" },
+                  { label: "Comissões (Mês)", value: "R$ 0,00", color: "text-[#F0A820]" },
+                  { label: "Pontos Clube", value: "0", color: "text-[#1E8CFF]" }
                 ].map((stat, i) => (
                   <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white/5 border border-white/10">
                     <p className="text-[10px] font-bold text-[#DCE3EA]/40 uppercase tracking-widest mb-2">{stat.label}</p>
@@ -69,11 +80,11 @@ function MembersPage() {
               </div>
 
               <div className="space-y-6">
-                <h3 className="text-xl md:text-2xl font-bold text-white font-sora">Continuar Assistindo</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-white font-sora">Treinamentos Sugeridos</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   {[
-                    { title: "Dominando o BarberIA", progress: 65, cat: "Tutorial" },
-                    { title: "Scripts de Alta Conversão", progress: 20, cat: "Vendas" }
+                    { title: "Dominando o Ecossistema", progress: 0, cat: "Tutorial" },
+                    { title: "Scripts de Vendas 2.0", progress: 0, cat: "Vendas" }
                   ].map((course, i) => (
                     <div key={i} className="p-6 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group cursor-pointer">
                       <div className="aspect-video bg-[#071A2F] rounded-xl mb-6 border border-white/5 flex items-center justify-center">
@@ -105,5 +116,3 @@ function MembersPage() {
     </div>
   )
 }
-
-

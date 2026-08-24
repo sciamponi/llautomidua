@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
@@ -13,9 +12,93 @@ import { Toaster } from "sonner";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/automatiza/Header";
 import { Footer } from "@/components/automatiza/Footer";
-
+import { getSession } from "@/lib/auth.functions";
+import type { QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: async () => {
+    const session = await getSession();
+    return { session };
+  },
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "Automatiza Solução | Tecnologia para automatizar. Oportunidades para crescer." },
+      { name: "description", content: "Automatize o atendimento, organize sua equipe e transforme seu WhatsApp em uma operação inteligente de vendas e relacionamento." },
+      { name: "author", content: "Automatiza Solução" },
+      { property: "og:title", content: "Automatiza Solução | Tecnologia para automatizar." },
+      { property: "og:description", content: "Automatize o atendimento e transforme seu WhatsApp em uma operação inteligente." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@Automatiza" },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap",
+      },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+    ],
+  }),
+  shellComponent: RootShell,
+  component: RootComponent,
+  notFoundComponent: NotFoundComponent,
+  errorComponent: ErrorComponent,
+});
+
+function RootShell({ children }: { children: ReactNode }) {
+  return (
+    <html lang="pt-BR">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+  const location = useLocation();
+
+  const isIsolatedPath = 
+    location.pathname.startsWith('/admin') || 
+    location.pathname.startsWith('/membros') || 
+    location.pathname.startsWith('/sites/aprovacao') || 
+    location.pathname.startsWith('/cliente') ||
+    location.pathname === '/login';
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <div className="flex flex-col min-h-screen">
+        {!isIsolatedPath && <Header />}
+        <main 
+          className={cn(
+            "flex-grow",
+            !isIsolatedPath && "pt-[var(--header-height-mobile)] lg:pt-[var(--header-height)]"
+          )}
+        >
+          <Outlet />
+        </main>
+        {!isIsolatedPath && <Footer />}
+      </div>
+      <Toaster position="top-center" richColors />
+    </QueryClientProvider>
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -76,81 +159,3 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     </div>
   );
 }
-
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Automatiza Solução | Tecnologia para automatizar. Oportunidades para crescer." },
-      { name: "description", content: "Automatize o atendimento, organize sua equipe e transforme seu WhatsApp em uma operação inteligente de vendas e relacionamento." },
-      { name: "author", content: "Automatiza Solução" },
-      { property: "og:title", content: "Automatiza Solução | Tecnologia para automatizar." },
-      { property: "og:description", content: "Automatize o atendimento e transforme seu WhatsApp em uma operação inteligente." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Automatiza" },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap",
-      },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
-
-function RootShell({ children }: { children: ReactNode }) {
-  return (
-    <html lang="pt-BR">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-  const location = useLocation();
-
-  // Define route patterns that should NOT have the global header/footer
-  const isIsolatedPath = 
-    location.pathname.startsWith('/admin') || 
-    location.pathname.startsWith('/membros') || 
-    location.pathname.startsWith('/sites/aprovacao') || location.pathname.startsWith('/cliente');
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col min-h-screen">
-        {!isIsolatedPath && <Header />}
-        <main 
-          className={cn(
-            "flex-grow",
-            !isIsolatedPath && "pt-[var(--header-height-mobile)] lg:pt-[var(--header-height)]"
-          )}
-        >
-          <Outlet />
-        </main>
-        {!isIsolatedPath && <Footer />}
-      </div>
-      <Toaster position="top-center" richColors />
-    </QueryClientProvider>
-  );
-}
-

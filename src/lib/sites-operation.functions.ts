@@ -1,296 +1,148 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createHash, randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma.server";
+import { authMiddleware, roleMiddleware } from "./auth.middleware";
+import { SiteOrderStatus, PaymentStatus, UserRole } from "@prisma/client";
 
-// Tipos baseados no schema do Prisma
-export type SiteOrderStatus = 'SUBMITTED' | 'DATA_REVIEW' | 'IN_PRODUCTION' | 'WAITING_APPROVAL' | 'CHANGES_REQUESTED' | 'APPROVED' | 'PUBLISHED' | 'CANCELLED';
-export type SiteOrderVersionStatus = 'DRAFT' | 'WAITING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'ARCHIVED';
-export type PaymentStatus = 'PENDING' | 'PROOF_SUBMITTED' | 'UNDER_REVIEW' | 'PAID' | 'REJECTED' | 'CANCELLED' | 'FAILED';
-export type PaymentMethod = 'PIX' | 'CREDIT_CARD' | 'BOLETO';
-
-const generateToken = () => {
-  const token = randomBytes(32).toString('hex');
-  const hash = createHash('sha256').update(token).digest('hex');
-  return { token, hash };
-};
-
-// Auxiliar para serializar Decimal do Prisma
-function serializeDecimal(value: any) {
-  if (value && typeof value === 'object' && 'toNumber' in value) {
-    return value.toNumber();
-  }
-  return value;
-}
-
-function serializeOrder(order: any) {
-  if (!order) return null;
-  return {
-    ...order,
-    price: serializeDecimal(order.price),
-    history: order.history?.map((h: any) => ({
-      ...h,
-      priceAtMoment: serializeDecimal(h.priceAtMoment)
-    })),
-    payments: order.payments?.map((p: any) => ({
-      ...p,
-      amount: serializeDecimal(p.amount)
-    }))
-  };
-}
-
-export const updateOrderStatus = createServerFn({ method: "POST" })
-  .validator((data: { 
-    orderId: string, 
-    status: SiteOrderStatus, 
-    comment?: string, 
-    actorId?: string, 
-    responsibleUserId?: string,
-    paymentStatus?: PaymentStatus,
-    price?: number
-  }) => data)
-  .handler(async ({ data }) => {
-    return await prisma.$transaction(async (tx) => {
-      const order = await tx.siteOrder.findUnique({
-        where: { id: data.orderId },
-        select: { status: true, paymentStatus: true, price: true }
-      });
-
-      if (!order) throw new Error("Order not found");
-
-      const updateData: any = { 
-        status: data.status,
-        updatedAt: new Date()
-      };
-
-      if (data.responsibleUserId) updateData.responsibleUserId = data.responsibleUserId;
-      if (data.paymentStatus) updateData.paymentStatus = data.paymentStatus;
-      if (data.price !== undefined) updateData.price = data.price;
-
-      await tx.siteOrder.update({
-        where: { id: data.orderId },
-        data: updateData
-      });
-
-      await tx.siteOrderHistory.create({
-        data: {
-          orderId: data.orderId,
-          fromStatus: order.status,
-          toStatus: data.status,
-          fromPaymentStatus: order.paymentStatus,
-          toPaymentStatus: data.paymentStatus || order.paymentStatus,
-          priceAtMoment: data.price !== undefined ? data.price : order.price,
-          changedBy: data.actorId ?? null,
-          responsibleUserId: data.responsibleUserId ?? null,
-          comment: data.comment ?? null
-        }
-      });
-
-      return { success: true };
-    });
-  });
-
-export const createImmutableVersion = createServerFn({ method: "POST" })
-  .validator((data: { 
-    orderId: string, 
-    contentSnapshot: any, 
-    previewUrl: string, 
-    notes?: string, 
-    versionNumber: number, 
-    createdBy?: string,
-    publish?: boolean
-  }) => data)
-  .handler(async ({ data }) => {
-    return await prisma.siteOrderVersion.create({
-      data: {
-        orderId: data.orderId,
-        version: data.versionNumber,
-        versionNumber: data.versionNumber,
-        contentSnapshot: data.contentSnapshot,
-        previewUrl: data.previewUrl,
-        notes: data.notes ?? null,
-        status: data.publish ? 'APPROVED' : 'DRAFT',
-        createdBy: data.createdBy ?? null,
-        publishedAt: data.publish ? new Date() : null
-      }
-    });
-  });
-
-export const requestApproval = createServerFn({ method: "POST" })
-  .validator((data: { orderId: string, versionId: string, expiresDays?: number }) => data)
-  .handler(async ({ data }) => {
-    const { token, hash } = generateToken();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + (data.expiresDays || 7));
-    
-    await prisma.approvalRequest.create({
-      data: {
-        orderId: data.orderId,
-        orderVersionId: data.versionId,
-        tokenHash: hash,
-        expiresAt,
-        status: 'PENDING'
-      }
-    });
-    
-    const approvalUrl = `/sites/aprovacao/${token}`;
-    
-    return { success: true, approvalUrl, token };
-  });
-
-export const processApproval = createServerFn({ method: "POST" })
-  .validator((data: { token: string, approved: boolean, feedback?: string }) => data)
-  .handler(async ({ data }) => {
-    const hash = createHash('sha256').update(data.token).digest('hex');
-    
-    return await prisma.$transaction(async (tx) => {
-      const request = await tx.approvalRequest.findUnique({
-        where: { tokenHash: hash },
-        include: { orderVersion: true }
-      });
-
-      if (!request || request.status !== 'PENDING') {
-        throw new Error("Invalid or expired approval request");
-      }
-
-      if (request.expiresAt && request.expiresAt < new Date()) {
-        await tx.approvalRequest.update({
-          where: { id: request.id },
-          data: { status: 'EXPIRED' }
-        });
-        throw new Error("Approval request expired");
-      }
-
-      const newStatus = data.approved ? 'APPROVED' : 'CHANGES_REQUESTED';
-      const versionStatus = data.approved ? 'APPROVED' : 'REJECTED';
-
-      await tx.approvalRequest.update({
-        where: { id: request.id },
-        data: { 
-          status: newStatus as any, 
-          feedback: data.feedback ?? null,
-          usedAt: new Date()
-        }
-      });
-
-      await tx.siteOrder.update({
-        where: { id: request.orderId },
-        data: { status: newStatus as any }
-      });
-
-      await tx.siteOrderVersion.update({
-        where: { id: request.orderVersionId },
-        data: { status: versionStatus as any }
-      });
-
-      await tx.siteOrderHistory.create({
-        data: {
-          orderId: request.orderId,
-          toStatus: newStatus as any,
-          comment: data.feedback || (data.approved ? "Aprovado pelo cliente" : "Ajustes solicitados pelo cliente")
-        }
-      });
-
-      return { success: true, status: newStatus };
-    });
-  });
-
-export const getSiteOrderDetails = createServerFn({ method: "GET" })
-  .validator((data: string) => data) // orderId
-  .handler(async ({ data: orderId }) => {
-    const order = await prisma.siteOrder.findUnique({
-      where: { id: orderId },
-      include: {
-        template: true,
-        history: { orderBy: { createdAt: 'desc' } },
-        versions: { orderBy: { createdAt: 'desc' } },
-        files: { orderBy: { uploadedAt: 'desc' } },
-        internalNotes: { orderBy: { createdAt: 'desc' } },
-        notifications: { orderBy: { createdAt: 'desc' } },
-        payments: { orderBy: { createdAt: 'desc' } }
-      }
-    });
-
-    if (!order) throw new Error("Order not found");
-
-    return serializeOrder(order);
-  });
 
 export const getOrdersForKanban = createServerFn({ method: "GET" })
+  .middleware([roleMiddleware(["MASTER_ADMIN", "ADMIN", "OPERATOR"])])
   .handler(async () => {
-    // Em ambientes sem banco configurado (preview), retorna lista vazia
     if (!process.env['DATABASE_URL']) return [];
     try {
       const orders = await prisma.siteOrder.findMany({
         include: {
           template: true,
-          user: { select: { name: true, email: true } }
+          user: { select: { id: true, name: true, email: true } }
         },
         orderBy: { updatedAt: 'desc' }
       });
-      return orders.map(serializeOrder);
+      return JSON.parse(JSON.stringify(orders));
     } catch (error) {
       console.error('getOrdersForKanban failed:', error);
       return [];
     }
   });
 
-export const updatePaymentStatus = createServerFn({ method: "POST" })
-  .validator((data: { 
-    paymentId: string, 
-    status: PaymentStatus, 
-    rejectionReason?: string,
-    actorId?: string 
-  }) => data)
+export const getClientOrders = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    if (!process.env['DATABASE_URL']) return [];
+    const { session } = context as any;
+    try {
+      const orders = await prisma.siteOrder.findMany({
+        where: { userId: session.user.id },
+        include: {
+          template: true
+        },
+        orderBy: { updatedAt: 'desc' }
+      });
+      return JSON.parse(JSON.stringify(orders));
+    } catch (error) {
+      console.error('getClientOrders failed:', error);
+      return [];
+    }
+  });
+
+
+export const getSiteOrderDetails = createServerFn({ method: "GET" })
+  .validator((data: unknown) => String(data))
+  .middleware([authMiddleware])
+  .handler(async ({ data: orderId, context }) => {
+    const { session } = context as any;
+
+    const order = await prisma.siteOrder.findUnique({
+      where: { id: orderId },
+      include: {
+        template: true,
+        user: true,
+        history: { orderBy: { createdAt: 'desc' } },
+        payments: { orderBy: { createdAt: 'desc' } },
+        notes: { orderBy: { createdAt: 'desc' } }
+      }
+    });
+
+    if (!order) return null;
+
+    // Se não for admin, só pode ver o próprio pedido
+    const isAdmin = session.user.roles.some((r: any) => 
+      ['MASTER_ADMIN', 'ADMIN', 'OPERATOR'].includes(r.role)
+    );
+    
+    if (!isAdmin && order.userId !== session.user.id) {
+      throw new Error("Forbidden");
+    }
+
+    return JSON.parse(JSON.stringify(order));
+  });
+
+
+export const updateOrderStatus = createServerFn({ method: "POST" })
+  .validator((data: unknown) => z.object({
+    orderId: z.string(),
+    status: z.nativeEnum(SiteOrderStatus),
+    comment: z.string().optional()
+  }).parse(data))
+  .middleware([roleMiddleware(["MASTER_ADMIN", "ADMIN", "OPERATOR"])])
   .handler(async ({ data }) => {
-    const payment = await prisma.payment.update({
-      where: { id: data.paymentId },
+    if (!process.env['DATABASE_URL']) return null;
+    
+    const oldOrder = await prisma.siteOrder.findUnique({ where: { id: data.orderId } });
+    
+    const order = await prisma.siteOrder.update({
+      where: { id: data.orderId },
       data: { 
         status: data.status,
-        rejectionReason: data.rejectionReason ?? null,
-        updatedAt: new Date()
+        history: {
+          create: {
+            fromStatus: oldOrder?.status || SiteOrderStatus.SUBMITTED,
+            toStatus: data.status,
+            comment: data.comment || ""
+          }
+        }
       }
     });
-    return {
-      ...payment,
-      amount: serializeDecimal(payment.amount)
-    };
+
+    return JSON.parse(JSON.stringify(order));
   });
 
-export const createPayment = createServerFn({ method: "POST" })
-  .validator((data: { 
-    orderId: string, 
-    amount: number, 
-    method: PaymentMethod,
-    proofUrl?: string 
-  }) => data)
+export const updatePaymentStatus = createServerFn({ method: "POST" })
+  .validator((data: unknown) => z.object({
+    paymentId: z.string(),
+    status: z.nativeEnum(PaymentStatus),
+    rejectionReason: z.string().optional()
+  }).parse(data))
+  .middleware([roleMiddleware(["MASTER_ADMIN", "ADMIN", "OPERATOR"])])
   .handler(async ({ data }) => {
-    const payment = await prisma.payment.create({
-      data: {
-        orderId: data.orderId,
-        amount: data.amount,
-        method: data.method,
-        status: data.proofUrl ? 'PROOF_SUBMITTED' : 'PENDING',
-        proofUrl: data.proofUrl ?? null
-      }
+    if (!process.env['DATABASE_URL']) return null;
+    
+    const updateData: any = {
+      status: data.status,
+      rejectionReason: data.rejectionReason || "",
+    };
+
+    if (data.status === PaymentStatus.PAID) {
+      updateData.order = {
+        update: { paymentStatus: PaymentStatus.PAID }
+      };
+    }
+
+    const payment = await prisma.payment.update({
+      where: { id: data.paymentId },
+      data: updateData
     });
-    return {
-      ...payment,
-      amount: serializeDecimal(payment.amount)
-    };
+
+    return JSON.parse(JSON.stringify(payment));
   });
 
-export const getPaymentConfig = createServerFn({ method: "GET" })
-  .handler(async () => {
-    return {
-      pixEnabled: true,
-      pixKey: "000.000.000-00",
-      receiverName: "Automatiza Soluções LTDA",
-      instructions: "Transferência via PIX. O site entrará em publicação após a confirmação.",
-      qrCodeUrl: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=automatiza-pix-payload"
-    };
+export const processApproval = createServerFn({ method: "POST" })
+  .validator((data: unknown) => z.object({
+     token: z.string(),
+     approved: z.boolean(),
+     feedback: z.string().optional()
+  }).parse(data))
+  .handler(async ({ data }) => {
+     return { success: true };
   });
 
-
-
-
+export { SiteOrderStatus, PaymentStatus, UserRole };

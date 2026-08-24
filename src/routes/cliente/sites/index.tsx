@@ -4,28 +4,25 @@ import { Globe, Clock, AlertCircle, CreditCard, ChevronRight, MessageSquare } fr
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { getOrdersForKanban } from '@/lib/sites-operation.functions';
+import { getClientOrders } from '@/lib/sites-operation.functions';
 
 export const Route = createFileRoute('/cliente/sites/')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ['client-orders'],
-      queryFn: () => getOrdersForKanban(),
+      queryFn: () => getClientOrders(),
     });
   },
   component: ClientDashboardPage,
 });
 
 function ClientDashboardPage() {
-  const getOrders = useServerFn(getOrdersForKanban);
+  const fetchOrders = useServerFn(getClientOrders);
   
   const { data: orders } = useSuspenseQuery({
     queryKey: ['client-orders'],
-    queryFn: () => getOrders(),
+    queryFn: () => fetchOrders(),
   });
-
-  // Em um cenário real com autenticação, filtraríamos por user.id no servidor
-  // Por enquanto, exibimos os pedidos ativos no banco
   
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

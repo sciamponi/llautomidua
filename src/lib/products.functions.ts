@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma.server";
 
-// Mock data as specified in VOIDPRO-9 for immediate availability
+// Mock data as fallback for preview
 const MOCK_PRODUCTS = [
   {
     id: "prod_1",
@@ -20,11 +21,7 @@ const MOCK_PRODUCTS = [
     sortOrder: 1,
     features: [
       { title: "Multi-agentes", desc: "Toda sua equipe atendendo em um único número de WhatsApp de forma organizada." },
-      { title: "Funil de Vendas", desc: "Visualize em qual etapa cada cliente está e nunca perca um lead por falta de acompanhamento." },
-      { title: "Automações", desc: "Crie fluxos de mensagens automáticas para dúvidas frequentes e triagem inicial." },
-      { title: "Dashboard", desc: "Saiba exatamente quem está sendo atendido, tempo de resposta e conversão." },
-      { title: "API Oficial", desc: "Segurança total para sua operação com a conexão oficial da Meta." },
-      { title: "CRM Integrado", desc: "Histórico completo de cada cliente acessível para toda a equipe autorizada." }
+      { title: "Funil de Vendas", desc: "Visualize em qual etapa cada cliente está e nunca perca um lead por falta de acompanhamento." }
     ]
   },
   {
@@ -43,12 +40,7 @@ const MOCK_PRODUCTS = [
     featured: true,
     sortOrder: 2,
     features: [
-      { title: "Link Exclusivo", desc: "Seu cliente agenda em segundos sem precisar baixar nenhum aplicativo." },
-      { title: "Lembretes", desc: "Reduza as faltas em até 80% com notificações automáticas antes do horário." },
-      { title: "Gestão Financeira", desc: "Controle entradas, saídas e comissões de barbeiros de forma simplificada." },
-      { title: "App Profissional", desc: "Interface otimizada para o barbeiro ver sua agenda e clientes pelo celular." },
-      { title: "Controle de Estoque", desc: "Nunca fique sem os produtos essenciais da sua bancada ou revenda." },
-      { title: "Marketing", desc: "Ferramentas para enviar promoções e avisos para sua base de clientes." }
+      { title: "Link Exclusivo", desc: "Seu cliente agenda em segundos sem precisar baixar nenhum aplicativo." }
     ]
   },
   {
@@ -80,15 +72,7 @@ const MOCK_PRODUCTS = [
     pricing: "127",
     status: "active",
     featured: true,
-    sortOrder: 4,
-    features: [
-      { title: "Agendamento Automático", desc: "Seu cliente escolhe o serviço e a profissional direto pelo WhatsApp ou link." },
-      { title: "Gestão de Equipe", desc: "Organize as escalas e comissões de cada profissional de forma justa e transparente." },
-      { title: "Fidelidade", desc: "Programas de pontos e promoções automatizadas para fazer sua cliente voltar sempre." },
-      { title: "Controle Financeiro", desc: "Acompanhe faturamento diário, ticket médio e lucratividade em tempo real." },
-      { title: "Estoque", desc: "Gestão inteligente de insumos para você nunca ficar sem o esmalte favorito." },
-      { title: "Relacionamento", desc: "Envie mensagens automáticas de aniversário e pós-atendimento personalizado." }
-    ]
+    sortOrder: 4
   },
   {
     id: "prod_5",
@@ -104,15 +88,7 @@ const MOCK_PRODUCTS = [
     pricing: "197",
     status: "active",
     featured: true,
-    sortOrder: 5,
-    features: [
-      { title: "Checklist Digital", desc: "Registre avarias e necessidades do veículo direto pelo tablet ou celular." },
-      { title: "Ordens de Serviço", desc: "Gestão completa do fluxo de trabalho, do mecânico ao faturamento." },
-      { title: "Aprovação via Link", desc: "Envie o orçamento para o WhatsApp do cliente e receba a aprovação instantânea." },
-      { title: "Histórico Veicular", desc: "Tenha toda a vida útil do veículo do seu cliente gravada para consultas futuras." },
-      { title: "Gestão de Peças", desc: "Integração com fornecedores e controle rigoroso de estoque e compras." },
-      { title: "Financeiro", desc: "Controle de fluxo de caixa, cartões, notas fiscais e inadimplência." }
-    ]
+    sortOrder: 5
   },
   {
     id: "prod_6",
@@ -128,14 +104,7 @@ const MOCK_PRODUCTS = [
     pricing: "147",
     status: "active",
     featured: true,
-    sortOrder: 6,
-    features: [
-      { title: "Agenda Inteligente", desc: "Controle de horários por tosquiador e tipo de serviço pet." },
-      { title: "Ficha do Pet", desc: "Histórico completo de saúde, vacinas e preferências de cada animalzinho." },
-      { title: "Lembretes Automáticos", desc: "Envio de lembretes via WhatsApp para os tutores não esquecerem o horário." },
-      { title: "Controle de Leva e Traz", desc: "Gestão logística completa para transporte dos animais com segurança." },
-      { title: "Financeiro Pet", desc: "Controle de pacotes de banho, revenda de produtos e fluxo de caixa." }
-    ]
+    sortOrder: 6
   },
   {
     id: "prod_7",
@@ -156,11 +125,32 @@ const MOCK_PRODUCTS = [
 
 export const getProducts = createServerFn({ method: "GET" })
   .handler(async () => {
-    return MOCK_PRODUCTS;
+    if (!process.env['DATABASE_URL']) return MOCK_PRODUCTS;
+    try {
+      const products = await prisma.product.findMany({
+        where: { status: 'active' },
+        orderBy: { sortOrder: 'asc' }
+      });
+      // Merge with MOCK or return DB if not empty
+      return products.length > 0 ? JSON.parse(JSON.stringify(products)) : MOCK_PRODUCTS;
+    } catch (e) {
+      return MOCK_PRODUCTS;
+    }
   });
 
 export const getProductBySlug = createServerFn({ method: "GET" })
   .validator((data: string) => data)
   .handler(async ({ data }) => {
-    return MOCK_PRODUCTS.find(p => p.slug === data) || null;
+    if (!process.env['DATABASE_URL']) return MOCK_PRODUCTS.find(p => p.slug === data) || null;
+    try {
+      const product = await prisma.product.findUnique({
+        where: { slug: data },
+        include: {
+          recommendations: { include: { recommendedProduct: true } }
+        }
+      });
+      return product ? JSON.parse(JSON.stringify(product)) : MOCK_PRODUCTS.find(p => p.slug === data) || null;
+    } catch (e) {
+      return MOCK_PRODUCTS.find(p => p.slug === data) || null;
+    }
   });

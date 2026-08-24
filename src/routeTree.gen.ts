@@ -11,15 +11,19 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
+import { Route as MembrosDashboardRouteImport } from './routes/membros/dashboard'
 import { Route as SitesIndexRouteImport } from './routes/sites/index'
 import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateSlug'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
+import { Route as AdminUsuariosIndexRouteImport } from './routes/admin/usuarios/index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ClienteSitesIndexRouteImport } from './routes/cliente/sites/index'
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
@@ -36,9 +40,19 @@ const ClienteRouteRoute = ClienteRouteRouteImport.update({
   path: '/cliente',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ParceirosRoute = ParceirosRouteImport.update({
   id: '/parceiros',
   path: '/parceiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
@@ -54,6 +68,11 @@ const MediaIndoorIndexRoute = MediaIndoorIndexRouteImport.update({
 const MembrosIndexRoute = MembrosIndexRouteImport.update({
   id: '/membros/',
   path: '/membros/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembrosDashboardRoute = MembrosDashboardRouteImport.update({
+  id: '/membros/dashboard',
+  path: '/membros/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitesIndexRoute = SitesIndexRouteImport.update({
@@ -79,6 +98,11 @@ const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
 const AdminSitesIndexRoute = AdminSitesIndexRouteImport.update({
   id: '/admin/sites/',
   path: '/admin/sites/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsuariosIndexRoute = AdminUsuariosIndexRouteImport.update({
+  id: '/admin/usuarios/',
+  path: '/admin/usuarios/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
@@ -111,9 +135,12 @@ const ClienteSitesPagamentoOrderIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cliente': typeof ClienteRouteRouteWithChildren
+  '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
@@ -123,15 +150,19 @@ export interface FileRoutesByFullPath {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
+  '/admin/usuarios/': typeof AdminUsuariosIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
   '/cliente/sites/pagamento/$orderId': typeof ClienteSitesPagamentoOrderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cliente': typeof ClienteRouteRouteWithChildren
+  '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
   '/media-indoor': typeof MediaIndoorIndexRoute
   '/membros': typeof MembrosIndexRoute
@@ -141,6 +172,7 @@ export interface FileRoutesByTo {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites': typeof AdminSitesIndexRoute
+  '/admin/usuarios': typeof AdminUsuariosIndexRoute
   '/cliente/sites': typeof ClienteSitesIndexRoute
   '/cliente/sites/pagamento/$orderId': typeof ClienteSitesPagamentoOrderIdRoute
 }
@@ -148,9 +180,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cliente': typeof ClienteRouteRouteWithChildren
+  '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
@@ -160,6 +195,7 @@ export interface FileRoutesById {
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
+  '/admin/usuarios/': typeof AdminUsuariosIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
   '/cliente/sites/pagamento/$orderId': typeof ClienteSitesPagamentoOrderIdRoute
 }
@@ -168,9 +204,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cliente'
+    | '/login'
     | '/parceiros'
+    | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin/'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
@@ -180,15 +219,19 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
+    | '/admin/usuarios/'
     | '/cliente/sites/'
     | '/cliente/sites/pagamento/$orderId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cliente'
+    | '/login'
     | '/parceiros'
+    | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin'
     | '/diagnostico'
     | '/media-indoor'
     | '/membros'
@@ -198,15 +241,19 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites'
+    | '/admin/usuarios'
     | '/cliente/sites'
     | '/cliente/sites/pagamento/$orderId'
   id:
     | '__root__'
     | '/'
     | '/cliente'
+    | '/login'
     | '/parceiros'
+    | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin/'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
@@ -216,6 +263,7 @@ export interface FileRouteTypes {
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
+    | '/admin/usuarios/'
     | '/cliente/sites/'
     | '/cliente/sites/pagamento/$orderId'
   fileRoutesById: FileRoutesById
@@ -223,9 +271,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
   ParceirosRoute: typeof ParceirosRoute
+  MembrosDashboardRoute: typeof MembrosDashboardRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
   MediaIndoorIndexRoute: typeof MediaIndoorIndexRoute
   MembrosIndexRoute: typeof MembrosIndexRoute
@@ -234,6 +285,7 @@ export interface RootRouteChildren {
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
   AdminSitesIndexRoute: typeof AdminSitesIndexRoute
+  AdminUsuariosIndexRoute: typeof AdminUsuariosIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,11 +304,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClienteRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/parceiros': {
       id: '/parceiros'
       path: '/parceiros'
       fullPath: '/parceiros'
       preLoaderRoute: typeof ParceirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico/': {
@@ -278,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/membros'
       fullPath: '/membros/'
       preLoaderRoute: typeof MembrosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membros/dashboard': {
+      id: '/membros/dashboard'
+      path: '/membros/dashboard'
+      fullPath: '/membros/dashboard'
+      preLoaderRoute: typeof MembrosDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sites/': {
@@ -313,6 +386,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/sites'
       fullPath: '/admin/sites/'
       preLoaderRoute: typeof AdminSitesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/usuarios/': {
+      id: '/admin/usuarios/'
+      path: '/admin/usuarios'
+      fullPath: '/admin/usuarios/'
+      preLoaderRoute: typeof AdminUsuariosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
@@ -381,9 +461,12 @@ const SitesTemplateSlugRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClienteRouteRoute: ClienteRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
   ParceirosRoute: ParceirosRoute,
+  MembrosDashboardRoute: MembrosDashboardRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
+  AdminIndexRoute: AdminIndexRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
   MediaIndoorIndexRoute: MediaIndoorIndexRoute,
   MembrosIndexRoute: MembrosIndexRoute,
@@ -392,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
   AdminSitesIndexRoute: AdminSitesIndexRoute,
+  AdminUsuariosIndexRoute: AdminUsuariosIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
