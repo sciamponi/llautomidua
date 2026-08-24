@@ -1,43 +1,42 @@
-# Plan: Vitrine Interativa & Controle de Demo (Fase 6)
+# Plan: Vitrine Interativa & DemoAccess Control (Fase 6 Final)
 
-This plan implements a premium product showcase with an interactive gallery and a controlled demo access system, as specified in `VOIDPRO-58.md` and `VOIDPRO-59.md`.
+This plan integrates a premium interactive product showcase with a secure, controlled demonstration access system, fully managed through the Master Admin panel.
 
 ## User-facing changes
-- **Premium Product Cards**: Standardized cards on the solutions page and homepage featuring availability indicators and a "CONHECER" button.
-- **Interactive Presentation Modal**: Instead of navigating away, "CONHECER" opens a modal with detailed product benefits, "how it works", and target audience info.
-- **Photo Gallery**: A configurable image gallery within the modal to showcase product screenshots.
-- **Controlled Demo Flow**: "ACESSAR DEMO" triggers a lead capture modal. After submission, the system generates a secure access token and unlocks the demo link.
-- **Automatic Context**: The demo system automatically identifies the product being viewed, ensuring a seamless experience without asking the user to re-select.
+- **Interactive Showcase**: Premium product cards on `/solucoes` with "CONHECER" opening an immersive modal instead of navigating.
+- **Dynamic Content**: Product details (audience, how it works, benefits) and photo galleries are fully database-driven.
+- **Secure Demo Flow**: "ACESSAR DEMO" triggers a lead capture (Name, WhatsApp). Upon submission, a secure, temporary access link is generated.
+- **Master Admin Integration**: Admins can manage all product commercial data, galleries, and monitor all demo access requests and usage stats.
 
 ## Technical details
 
 ### 1. Database Schema (`prisma/schema.prisma`)
-- **Product Enhancement**: Add `howItWorks`, `benefits` (Json/String), and `coverImage` fields.
-- **New Model: `ProductImage`**: For gallery management (url, alt, sortOrder).
-- **New Model: `DemoAccess`**: To track and secure demo access (tokenHash, expiresAt, status).
-- **Enum: `DemoAccessStatus`**: `ACTIVE`, `EXPIRED`, `REVOKED`.
+- **Product Enhancement**: Add `audience`, `howItWorks`, `benefits` (Json), `coverImage`, `demoDurationHours`, and `demoActive`.
+- **New Model: `ProductImage`**: `url`, `alt`, `sortOrder`, `productId`.
+- **New Model: `DemoAccess`**: `tokenHash`, `leadId`, `productId`, `expiresAt`, `accessCount`, `status` (`ACTIVE`, `EXPIRED`, `REVOKED`).
+- **Lead Enhancement**: Add `source` field and relationships to `DemoAccess` and `Product`.
 
-### 2. Server Logic & API
-- **`src/lib/products.functions.ts`**: Update `getProducts` and `getProductBySlug` to include gallery images and new commercial fields.
-- **`src/lib/demo.functions.ts` (New)**:
-  - `createDemoAccess`: Validates lead, generates a secure random token (Web Crypto API), hashes it, and saves it in `DemoAccess`.
-  - `validateDemoToken`: Verifies token validity and updates `accessCount`/`lastAccessAt`.
-- **Environment Variables**: Add `DEMO_ACCESS_EXPIRATION_HOURS` support.
+### 2. Server Functions & Security
+- **`src/lib/products.functions.ts`**: Update to support rich content and administrative CRUD.
+- **`src/lib/demo.functions.ts` (New)**: 
+  - `requestDemoAccess`: Captures lead, generates a cryptographically secure random token (Web Crypto API), hashes it (SHA-256), and stores the record.
+  - `validateDemoAccess`: Middleware/helper to verify tokens without requiring user login.
+  - `getDemoStats`: Aggregator for the Master Admin dashboard.
 
-### 3. Frontend Components
-- **`src/components/automatiza/catalog/ProductCard.tsx`**: The new standardized card component.
-- **`src/components/automatiza/catalog/ProductModal.tsx`**: Premium presentation modal using Radix UI (shadcn).
-- **`src/components/automatiza/catalog/Gallery.tsx`**: Responsive image slider/viewer.
-- **`src/components/automatiza/catalog/DemoRequestModal.tsx`**: Lead capture form integrated with the `DemoAccess` flow.
-
-### 4. Integration & Routing
-- **`src/routes/solucoes/index.tsx`**: Refactor to a state-managed gallery view using the new modals.
-- **`src/routes/index.tsx`**: Update the homepage product section to use the new card architecture.
-- **Demo Unlocking**: The UI will transition from "Solicitar Acesso" to "Acessar Demo" immediately after successful lead capture and token generation.
+### 3. Frontend Architecture
+- **Public Showcase**: 
+  - `src/components/automatiza/catalog/ProductCard.tsx`
+  - `src/components/automatiza/catalog/ProductModal.tsx`
+  - `src/components/automatiza/catalog/DemoLeadModal.tsx`
+- **Master Admin**:
+  - `src/routes/admin/produtos/index.tsx`: Full catalog management.
+  - `src/routes/admin/demos/index.tsx`: Access monitoring dashboard with stats (Total, Released, Accessed).
+- **Public Routes**:
+  - `src/routes/demo/$token.tsx`: Secure entry point that validates access before rendering the product demo.
 
 ## Strategy
-1. **Migrations & Seeding**: Update Prisma schema and seed the database with rich product content and images.
-2. **Operational Infrastructure**: Implement the `DemoAccess` server functions and token logic.
-3. **UI Foundations**: Build the `ProductCard` and `ProductModal` components.
-4. **Interactive Features**: Implement the `Gallery` and `DemoRequestModal`.
-5. **Final Hookup**: Wire the components into the solutions and home pages, ensuring the multi-step flow (Card -> Modal -> Lead -> Demo) works perfectly.
+1. **Infrastructure**: Apply Prisma migrations and seed products with initial commercial copy and images.
+2. **Back-office**: Implement the `/admin/produtos` and `/admin/demos` management views.
+3. **Auth/Security**: Develop the token generation and validation logic in server functions.
+4. **Public UI**: Refactor the solutions page to use the new interactive modal and lead capture flow.
+5. **Validation**: Ensure the demo context is automatically preserved (BarberIA leads to BarberIA demo) and tokens expire correctly.
