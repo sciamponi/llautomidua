@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
@@ -34,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const ClienteRouteRoute = ClienteRouteRouteImport.update({
   id: '/cliente',
   path: '/cliente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParceirosRoute = ParceirosRouteImport.update({
@@ -111,6 +117,7 @@ const ClienteSitesPagamentoOrderIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cliente': typeof ClienteRouteRouteWithChildren
+  '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cliente': typeof ClienteRouteRouteWithChildren
+  '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cliente': typeof ClienteRouteRouteWithChildren
+  '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cliente'
+    | '/login'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cliente'
+    | '/login'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/cliente'
+    | '/login'
     | '/parceiros'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -223,6 +235,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
   ParceirosRoute: typeof ParceirosRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       path: '/cliente'
       fullPath: '/cliente'
       preLoaderRoute: typeof ClienteRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parceiros': {
@@ -381,6 +401,7 @@ const SitesTemplateSlugRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClienteRouteRoute: ClienteRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
   ParceirosRoute: ParceirosRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
