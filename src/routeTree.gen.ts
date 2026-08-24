@@ -17,6 +17,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
+import { Route as MembrosDashboardRouteImport } from './routes/membros/dashboard'
 import { Route as SitesIndexRouteImport } from './routes/sites/index'
 import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateSlug'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
@@ -66,6 +67,11 @@ const MediaIndoorIndexRoute = MediaIndoorIndexRouteImport.update({
 const MembrosIndexRoute = MembrosIndexRouteImport.update({
   id: '/membros/',
   path: '/membros/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembrosDashboardRoute = MembrosDashboardRouteImport.update({
+  id: '/membros/dashboard',
+  path: '/membros/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitesIndexRoute = SitesIndexRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
     | '/admin/'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
     | '/admin'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
     | '/admin/'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   ParceirosRoute: typeof ParceirosRoute
+  MembrosDashboardRoute: typeof MembrosDashboardRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/membros'
       fullPath: '/membros/'
       preLoaderRoute: typeof MembrosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membros/dashboard': {
+      id: '/membros/dashboard'
+      path: '/membros/dashboard'
+      fullPath: '/membros/dashboard'
+      preLoaderRoute: typeof MembrosDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sites/': {
@@ -423,6 +443,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteRouteRoute: ClienteRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   ParceirosRoute: ParceirosRoute,
+  MembrosDashboardRoute: MembrosDashboardRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
   AdminIndexRoute: AdminIndexRoute,
