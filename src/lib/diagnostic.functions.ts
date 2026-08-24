@@ -99,10 +99,10 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
     // 1. Calculate Recommendation
     const result = await recommendProduct({
       data: {
-        businessSegment: data.answers.businessSegment,
-        mainProblem: data.answers.mainProblem,
-        specificNeed: data.answers.specificNeed,
-        currentOperation: data.answers.currentOperation,
+        businessSegment: data.answers['businessSegment'] || "",
+        mainProblem: data.answers['mainProblem'] || "",
+        specificNeed: data.answers['specificNeed'],
+        currentOperation: data.answers['currentOperation'],
       }
     });
 
