@@ -3,7 +3,7 @@ import { getSession, logout } from '@/lib/auth.functions';
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
-import { LogOut, LayoutDashboard, Users, Package, DollarSign, Brain, ClipboardList, Globe } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Package, DollarSign, Brain, ClipboardList, Globe, PlayCircle } from "lucide-react";
 
 export const Route = createFileRoute('/admin/')({
   beforeLoad: async ({ context }) => {
@@ -90,7 +90,12 @@ function AdminDashboardPage() {
             description="Gerencie as soluções disponíveis, preços e configurações de recomendação."
             icon={<Package className="w-8 h-8" />}
             to="/admin/produtos"
-            disabled
+          />
+          <DashboardCard 
+            title="Controle de Demos" 
+            description="Monitore acessos temporários, leads de demonstração e estatísticas de uso."
+            icon={<PlayCircle className="w-8 h-8 text-green-400" />}
+            to="/admin/demos"
           />
           <DashboardCard 
             title="Financeiro Global" 

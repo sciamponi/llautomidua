@@ -3,6 +3,9 @@ import { RobotMessage } from '@/components/automatiza/RobotMessage'
 import { useState, useMemo } from 'react'
 import { getProducts } from '@/lib/products.functions'
 import { Search } from 'lucide-react'
+import { ProductCard } from '@/components/automatiza/catalog/ProductCard'
+import { ProductModal } from '@/components/automatiza/catalog/ProductModal'
+import { GalleryModal } from '@/components/automatiza/catalog/GalleryModal'
 
 export const Route = createFileRoute('/solucoes/')({
   loader: async () => {
@@ -16,6 +19,11 @@ function SolucoesPage() {
   const { products } = useLoaderData({ from: '/solucoes/' });
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('TODOS');
+  
+  // Modal states
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
     return products.filter((p: any) => {
@@ -29,14 +37,14 @@ function SolucoesPage() {
     });
   }, [products, searchTerm, activeFilter]);
 
-  const getCtaText = (type: string) => {
-    switch(type) {
-      case 'SAAS': return 'CONHECER';
-      case 'SERVICE': return 'SOLICITAR ORÇAMENTO';
-      case 'SOLUTION': return 'CONHECER SOLUÇÃO';
-      case 'MEDIA': return 'VER OPÇÕES';
-      default: return 'CONHECER';
-    }
+  const handleConhecer = (product: any) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleShowGallery = (product: any) => {
+    setSelectedProduct(product);
+    setIsGalleryOpen(true);
   };
 
   return (
@@ -85,30 +93,11 @@ function SolucoesPage() {
         {filteredProducts.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.map((p: any) => (
-              <div key={p.id} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col">
-                <div className="mb-6">
-                  <span className="text-[10px] font-bold text-[#1E8CFF] uppercase tracking-widest bg-[#1E8CFF]/10 px-3 py-1 rounded-full border border-[#1E8CFF]/20">
-                    {p.category}
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4 font-sora">{p.name}</h3>
-                
-                {p.problem && (
-                  <div className="p-4 rounded-xl bg-[#071A2F]/50 border border-white/5 mb-6">
-                    <p className="text-xs text-[#1E8CFF] font-bold uppercase mb-1">O Problema:</p>
-                    <p className="text-sm text-[#DCE3EA]/80 italic">"{p.problem}"</p>
-                  </div>
-                )}
-                
-                <p className="text-[#DCE3EA]/60 mb-8 flex-grow">{p.shortDescription}</p>
-                
-                <Link 
-                  to={p.slug === 'media-indoor' ? '/media-indoor' : `/solucoes/${p.slug}` as any}
-                  className="inline-flex items-center justify-center w-full bg-white text-[#071A2F] py-4 rounded-xl font-bold hover:bg-[#F7F8FA] transition-all uppercase text-sm tracking-wider"
-                >
-                  {getCtaText(p.type)}
-                </Link>
-              </div>
+              <ProductCard 
+                key={p.id} 
+                product={p} 
+                onConhecer={handleConhecer} 
+              />
             ))}
           </div>
         ) : (
@@ -136,7 +125,23 @@ function SolucoesPage() {
           </div>
         </div>
       </main>
+
+      {/* Product Discovery Modals */}
+      {selectedProduct && (
+        <>
+          <ProductModal 
+            product={selectedProduct}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onShowGallery={handleShowGallery}
+          />
+          <GalleryModal 
+            product={selectedProduct}
+            isOpen={isGalleryOpen}
+            onClose={() => setIsGalleryOpen(false)}
+          />
+        </>
+      )}
     </div>
   )
 }
-

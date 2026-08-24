@@ -14,6 +14,7 @@ import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as DemoTokenRouteImport } from './routes/demo/$token'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
@@ -22,6 +23,8 @@ import { Route as SitesIndexRouteImport } from './routes/sites/index'
 import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateSlug'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
+import { Route as AdminDemosIndexRouteImport } from './routes/admin/demos/index'
+import { Route as AdminProdutosIndexRouteImport } from './routes/admin/produtos/index'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
 import { Route as AdminUsuariosIndexRouteImport } from './routes/admin/usuarios/index'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
@@ -53,6 +56,11 @@ const ParceirosRoute = ParceirosRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTokenRoute = DemoTokenRouteImport.update({
+  id: '/demo/$token',
+  path: '/demo/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
@@ -93,6 +101,16 @@ const SolucoesIndexRoute = SolucoesIndexRouteImport.update({
 const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
   id: '/solucoes/$productSlug',
   path: '/solucoes/$productSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDemosIndexRoute = AdminDemosIndexRouteImport.update({
+  id: '/admin/demos/',
+  path: '/admin/demos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminProdutosIndexRoute = AdminProdutosIndexRouteImport.update({
+  id: '/admin/produtos/',
+  path: '/admin/produtos/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSitesIndexRoute = AdminSitesIndexRouteImport.update({
@@ -137,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/demo/$token': typeof DemoTokenRoute
   '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -149,6 +168,8 @@ export interface FileRoutesByFullPath {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
+  '/admin/demos/': typeof AdminDemosIndexRoute
+  '/admin/produtos/': typeof AdminProdutosIndexRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
   '/admin/usuarios/': typeof AdminUsuariosIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
@@ -159,6 +180,7 @@ export interface FileRoutesByTo {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/demo/$token': typeof DemoTokenRoute
   '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -171,6 +193,8 @@ export interface FileRoutesByTo {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
+  '/admin/demos': typeof AdminDemosIndexRoute
+  '/admin/produtos': typeof AdminProdutosIndexRoute
   '/admin/sites': typeof AdminSitesIndexRoute
   '/admin/usuarios': typeof AdminUsuariosIndexRoute
   '/cliente/sites': typeof ClienteSitesIndexRoute
@@ -182,6 +206,7 @@ export interface FileRoutesById {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/demo/$token': typeof DemoTokenRoute
   '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -194,6 +219,8 @@ export interface FileRoutesById {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
+  '/admin/demos/': typeof AdminDemosIndexRoute
+  '/admin/produtos/': typeof AdminProdutosIndexRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
   '/admin/usuarios/': typeof AdminUsuariosIndexRoute
   '/cliente/sites/': typeof ClienteSitesIndexRoute
@@ -206,6 +233,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/demo/$token'
     | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -218,6 +246,8 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
+    | '/admin/demos/'
+    | '/admin/produtos/'
     | '/admin/sites/'
     | '/admin/usuarios/'
     | '/cliente/sites/'
@@ -228,6 +258,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/demo/$token'
     | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -240,6 +271,8 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
+    | '/admin/demos'
+    | '/admin/produtos'
     | '/admin/sites'
     | '/admin/usuarios'
     | '/cliente/sites'
@@ -250,6 +283,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/demo/$token'
     | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -262,6 +296,8 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
+    | '/admin/demos/'
+    | '/admin/produtos/'
     | '/admin/sites/'
     | '/admin/usuarios/'
     | '/cliente/sites/'
@@ -273,6 +309,7 @@ export interface RootRouteChildren {
   ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   ParceirosRoute: typeof ParceirosRoute
+  DemoTokenRoute: typeof DemoTokenRoute
   MembrosDashboardRoute: typeof MembrosDashboardRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
@@ -284,6 +321,8 @@ export interface RootRouteChildren {
   SolucoesIndexRoute: typeof SolucoesIndexRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
+  AdminDemosIndexRoute: typeof AdminDemosIndexRoute
+  AdminProdutosIndexRoute: typeof AdminProdutosIndexRoute
   AdminSitesIndexRoute: typeof AdminSitesIndexRoute
   AdminUsuariosIndexRoute: typeof AdminUsuariosIndexRoute
 }
@@ -323,6 +362,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/$token': {
+      id: '/demo/$token'
+      path: '/demo/$token'
+      fullPath: '/demo/$token'
+      preLoaderRoute: typeof DemoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico/': {
@@ -379,6 +425,20 @@ declare module '@tanstack/react-router' {
       path: '/solucoes/$productSlug'
       fullPath: '/solucoes/$productSlug'
       preLoaderRoute: typeof SolucoesProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/demos/': {
+      id: '/admin/demos/'
+      path: '/admin/demos'
+      fullPath: '/admin/demos/'
+      preLoaderRoute: typeof AdminDemosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/produtos/': {
+      id: '/admin/produtos/'
+      path: '/admin/produtos'
+      fullPath: '/admin/produtos/'
+      preLoaderRoute: typeof AdminProdutosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/sites/': {
@@ -463,6 +523,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteRouteRoute: ClienteRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   ParceirosRoute: ParceirosRoute,
+  DemoTokenRoute: DemoTokenRoute,
   MembrosDashboardRoute: MembrosDashboardRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
@@ -474,6 +535,8 @@ const rootRouteChildren: RootRouteChildren = {
   SolucoesIndexRoute: SolucoesIndexRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
+  AdminDemosIndexRoute: AdminDemosIndexRoute,
+  AdminProdutosIndexRoute: AdminProdutosIndexRoute,
   AdminSitesIndexRoute: AdminSitesIndexRoute,
   AdminUsuariosIndexRoute: AdminUsuariosIndexRoute,
 }
