@@ -14,8 +14,11 @@ import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
+import { Route as SitesIndexRouteImport } from './routes/sites/index'
+import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateSlug'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
+import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,6 +45,16 @@ const MembrosIndexRoute = MembrosIndexRouteImport.update({
   path: '/membros/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitesIndexRoute = SitesIndexRouteImport.update({
+  id: '/sites/',
+  path: '/sites/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitesTemplateSlugRoute = SitesTemplateSlugRouteImport.update({
+  id: '/sites/$templateSlug',
+  path: '/sites/$templateSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SolucoesIndexRoute = SolucoesIndexRouteImport.update({
   id: '/solucoes/',
   path: '/solucoes/',
@@ -52,72 +65,97 @@ const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
   path: '/solucoes/$productSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
+  id: '/pedido',
+  path: '/pedido',
+  getParentRoute: () => SitesTemplateSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
+  '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
   '/media-indoor': typeof MediaIndoorIndexRoute
   '/membros': typeof MembrosIndexRoute
+  '/sites': typeof SitesIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
+  '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
+  '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/parceiros'
+    | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
+    | '/sites/'
     | '/solucoes/'
+    | '/sites/$templateSlug/pedido'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/parceiros'
+    | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
     | '/diagnostico'
     | '/media-indoor'
     | '/membros'
+    | '/sites'
     | '/solucoes'
+    | '/sites/$templateSlug/pedido'
   id:
     | '__root__'
     | '/'
     | '/parceiros'
+    | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
+    | '/sites/'
     | '/solucoes/'
+    | '/sites/$templateSlug/pedido'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ParceirosRoute: typeof ParceirosRoute
+  SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
   MediaIndoorIndexRoute: typeof MediaIndoorIndexRoute
   MembrosIndexRoute: typeof MembrosIndexRoute
+  SitesIndexRoute: typeof SitesIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
 }
 
@@ -158,6 +196,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MembrosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sites/': {
+      id: '/sites/'
+      path: '/sites'
+      fullPath: '/sites/'
+      preLoaderRoute: typeof SitesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sites/$templateSlug': {
+      id: '/sites/$templateSlug'
+      path: '/sites/$templateSlug'
+      fullPath: '/sites/$templateSlug'
+      preLoaderRoute: typeof SitesTemplateSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/solucoes/': {
       id: '/solucoes/'
       path: '/solucoes'
@@ -172,16 +224,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolucoesProductSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sites/$templateSlug/pedido': {
+      id: '/sites/$templateSlug/pedido'
+      path: '/pedido'
+      fullPath: '/sites/$templateSlug/pedido'
+      preLoaderRoute: typeof SitesTemplateSlugPedidoRouteImport
+      parentRoute: typeof SitesTemplateSlugRoute
+    }
   }
 }
+
+interface SitesTemplateSlugRouteChildren {
+  SitesTemplateSlugPedidoRoute: typeof SitesTemplateSlugPedidoRoute
+}
+
+const SitesTemplateSlugRouteChildren: SitesTemplateSlugRouteChildren = {
+  SitesTemplateSlugPedidoRoute: SitesTemplateSlugPedidoRoute,
+}
+
+const SitesTemplateSlugRouteWithChildren =
+  SitesTemplateSlugRoute._addFileChildren(SitesTemplateSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ParceirosRoute: ParceirosRoute,
+  SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
   MediaIndoorIndexRoute: MediaIndoorIndexRoute,
   MembrosIndexRoute: MembrosIndexRoute,
+  SitesIndexRoute: SitesIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
 }
 export const routeTree = rootRouteImport
