@@ -14,6 +14,7 @@ import { Route as ClienteRouteRouteImport } from './routes/cliente/route'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as DemoTokenRouteImport } from './routes/demo/$token'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
@@ -53,6 +54,11 @@ const ParceirosRoute = ParceirosRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoTokenRoute = DemoTokenRouteImport.update({
+  id: '/demo/$token',
+  path: '/demo/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/demo/$token': typeof DemoTokenRoute
   '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/demo/$token': typeof DemoTokenRoute
   '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/cliente': typeof ClienteRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/parceiros': typeof ParceirosRoute
+  '/demo/$token': typeof DemoTokenRoute
   '/membros/dashboard': typeof MembrosDashboardRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/demo/$token'
     | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/demo/$token'
     | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/cliente'
     | '/login'
     | '/parceiros'
+    | '/demo/$token'
     | '/membros/dashboard'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
@@ -273,6 +285,7 @@ export interface RootRouteChildren {
   ClienteRouteRoute: typeof ClienteRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   ParceirosRoute: typeof ParceirosRoute
+  DemoTokenRoute: typeof DemoTokenRoute
   MembrosDashboardRoute: typeof MembrosDashboardRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/$token': {
+      id: '/demo/$token'
+      path: '/demo/$token'
+      fullPath: '/demo/$token'
+      preLoaderRoute: typeof DemoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico/': {
@@ -463,6 +483,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClienteRouteRoute: ClienteRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   ParceirosRoute: ParceirosRoute,
+  DemoTokenRoute: DemoTokenRoute,
   MembrosDashboardRoute: MembrosDashboardRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
