@@ -46,6 +46,12 @@ export const recommendProduct = createServerFn({ method: "POST" })
         score += 50;
       }
 
+      if (data.mainProblem === "sites" && product.slug === "sites") {
+        score += 150;
+        reasons.push("Recomendação direta para Presença Digital & Sites Profissionais");
+      }
+
+
       return {
         product,
         score,
