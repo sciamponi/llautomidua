@@ -27,7 +27,7 @@ export function Hero({
   const defaultSubtitle = "A Automatiza Solução reúne ferramentas, tecnologia e oportunidades para quem quer vender mais, automatizar processos e transformar conhecimento em negócio.";
 
   return (
-    <section className="relative overflow-hidden pt-20 pb-32">
+    <section className="relative overflow-hidden pb-32">
       <div className="container px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">

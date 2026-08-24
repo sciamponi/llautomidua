@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export function DiagnosisSection() {
   return (
-    <section className="py-24 bg-[#071A2F]/50">
+    <section className="py-24 bg-[#071A2F]/50 isolate">
       <div className="container px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold text-white font-sora mb-6">

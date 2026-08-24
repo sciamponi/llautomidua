@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
+import { cn } from "@/lib/utils";
 import { Header } from "@/components/automatiza/Header";
 import { Footer } from "@/components/automatiza/Footer";
 
@@ -138,7 +139,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col min-h-screen">
         {!isIsolatedPath && <Header />}
-        <main className="flex-grow">
+        <main 
+          className={cn(
+            "flex-grow",
+            !isIsolatedPath && "pt-[var(--header-height-mobile)] lg:pt-[var(--header-height)]"
+          )}
+        >
           <Outlet />
         </main>
         {!isIsolatedPath && <Footer />}
