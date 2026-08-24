@@ -59,10 +59,10 @@ export function DiagnosisSection() {
                 <p className="text-[#DCE3EA]/60 text-sm mb-8 leading-relaxed">"{item.desc}"</p>
               </div>
               <Link 
-                to={item.path as any}
+                to="/diagnostico"
                 className="w-full py-3 rounded-xl border border-white/10 text-white text-xs font-bold uppercase tracking-widest text-center hover:bg-white/5 transition-all"
               >
-                Ver Soluções
+                Identificar Minha Solução
               </Link>
             </div>
           ))}
