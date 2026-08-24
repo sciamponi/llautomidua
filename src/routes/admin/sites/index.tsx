@@ -4,7 +4,7 @@ import { Header } from '@/components/automatiza/Header';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
-export const Route = createFileRoute('/admin/sites/index')({
+export const Route = createFileRoute('/admin/sites/')({
   component: SitesKanbanPage,
 });
 

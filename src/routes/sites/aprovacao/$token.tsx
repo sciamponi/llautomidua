@@ -27,7 +27,12 @@ function ClientApprovalPage() {
   const handleApproval = async (approved: boolean) => {
     setIsSubmitting(true);
     try {
-      await approveFn({ data: { token, approved, feedback: approved ? undefined : feedback } });
+      const approvalData: { token: string; approved: boolean; feedback?: string } = { token, approved };
+      if (!approved && feedback) {
+        approvalData.feedback = feedback;
+      }
+      await approveFn({ data: approvalData });
+
       toast.success(approved ? "Site aprovado com sucesso!" : "Solicitação de ajustes enviada.");
       setView('success');
     } catch (error) {
