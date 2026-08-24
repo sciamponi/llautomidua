@@ -26,7 +26,7 @@ function Index() {
 
   return (
     <div className="bg-[#071A2F] font-inter text-[#DCE3EA] selection:bg-[#1E8CFF] selection:text-white">
-      <main className="pt-20">
+      <main>
         <Hero 
           title={<>Automatize.<br /><span className="text-[#1E8CFF]">Cresça.</span></>}
           subtitle="Transformando problemas operacionais em soluções digitais inteligentes que organizam seu negócio e escalam suas vendas."
