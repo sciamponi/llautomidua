@@ -90,7 +90,12 @@ function AdminDashboardPage() {
             description="Gerencie as soluções disponíveis, preços e configurações de recomendação."
             icon={<Package className="w-8 h-8" />}
             to="/admin/produtos"
-            disabled
+          />
+          <DashboardCard 
+            title="Controle de Demos" 
+            description="Monitore acessos temporários, leads de demonstração e estatísticas de uso."
+            icon={<PlayCircle className="w-8 h-8 text-green-400" />}
+            to="/admin/demos"
           />
           <DashboardCard 
             title="Financeiro Global" 
