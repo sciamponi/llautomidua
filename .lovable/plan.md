@@ -1,56 +1,62 @@
-# Plan: Diagnostic Recommendation Engine (VOIDPRO-10)
+# Plan: Commercial Recommendation Engine Overhaul (VOIDPRO-10 & 11)
 
-Evolve the current simple diagnostic form into a robust commercial recommendation engine ("Cérebro Comercial") that prioritizes specific segment solutions over generic ones and persists data for lead qualification.
+Transform the current diagnostic form into a robust commercial engine that uses a scoring matrix to recommend the best products (SaaS, Service, Media) based on business segment and specific pain points.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> - The new diagnostic will use a scoring system to recommend the best product.
-> - We will add `PetFlow` to the mock product list to support the new rules.
-> - Lead data from the diagnostic will be persisted in the database via the `Lead` table.
+> - New diagnostic logic: **Specific Solution > Generic Solution**.
+> - Data will be persisted in four new tables: `DiagnosticSession`, `DiagnosticResult`, `DiagnosticRecommendation`, and `DiagnosticRule`.
+> - `PetFlow` will be added to the catalog as a new SaaS solution for Pet Shops.
+> - The diagnostic will now be dynamic: questions change based on the selected business segment.
 
 ## Proposed Changes
 
-### Database & Schema
-- Update `prisma/schema.prisma` to include a `DiagnosticResult` model (optional, for now using `Lead` to store answers).
-- Ensure `PetFlow` exists in the mock data in `src/lib/products.functions.ts`.
+### Database & Models
+- Update `prisma/schema.prisma`:
+    - `DiagnosticSession`: Track the user's progress through the quiz.
+    - `DiagnosticResult`: Store the final calculated recommendation.
+    - `DiagnosticRecommendation`: Link multiple potential products to a result (main + alternatives).
+    - `DiagnosticRule`: Configurable scoring rules (e.g., segment=barbearia + problem=agendamento -> BarberIA).
+- Add `PetFlow` to `MOCK_PRODUCTS` in `src/lib/products.functions.ts` as a placeholder until the full DB migration is complete.
 
-### Backend (Server Functions)
+### Backend (Commercial Logic)
 - Create `src/lib/diagnostic.functions.ts`:
-    - `recommendProduct`: A server function that implements the scoring matrix.
-        - `SEGMENT_MATCH`: +100
-        - `PROBLEM_MATCH`: +50
-        - `NECESSITY_MATCH`: +30
-    - `saveDiagnosticLead`: Saves lead info along with the diagnostic answers.
+    - `SCORING_WEIGHTS`: Constant for `SEGMENT=100`, `PROBLEM=50`, `NEED=30`, `OPERATION=10`.
+    - `recommendProduct`: Server function that:
+        - Calculates scores for all active products.
+        - Determines `confidence` (HIGH, MEDIUM, LOW) based on score gaps.
+        - Handles ties by suggesting up to 2 options.
+        - Implements fallback to "Talk to Specialist" if no solution fits (score below threshold).
+    - `createDiagnosticSession`: Start tracking a user path.
+    - `updateDiagnosticSession`: Save progress step-by-step.
+    - `completeDiagnostic`: Finalize session, calculate recommendation, and link to a `Lead`.
 
-### Frontend (Diagnostic Experience)
+### Frontend (User Experience)
 - Refactor `src/components/automatiza/quiz/DiagnosticQuiz.tsx`:
-    - **Step-by-step Progressive Flow**: One question at a time with a progress bar.
-    - **Dynamic Question Logic**:
-        - Q1: Business Segment (Barbearia, Pet Shop, etc.).
-        - Q2: Contextual Problem (e.g., if Barbearia -> "Agendamentos", "WhatsApp", etc.).
-        - Q3: Specific Necessity (e.g., if Barbearia -> "Organizar horários").
-        - Q4: Current Operation (Manual, Planilha, etc.).
-    - **New Recommendation View**:
-        - Show "Encontramos a solução ideal".
-        - Display product icon/name.
-        - "Why we recommend this" (bullet points based on answers).
-        - Primary CTA: Go to Product Page.
-        - Secondary CTA: Speak to Specialist.
-        - Alternatives: Show up to 2 other products if relevant.
+    - **Step-by-step Progressive UI**: High-impact animations with `framer-motion`.
+    - **Dynamic Question Engine**:
+        - Q1: Business Segment (Barbearia, Pet Shop, Gym, etc.).
+        - Q2: Segment-specific challenges.
+        - Q3: Specific operational needs based on Q2.
+        - Q4: Current operation level.
+    - **Recommendation Screen**:
+        - Show "Ideal Solution" with specific reasoning ("Based on your challenge with agendamento...").
+        - Show alternative solutions if confidence is not 100%.
+        - Integrated Lead Capture form at the end of the flow.
 
 ### Routing & Integration
-- Update `src/routes/diagnostico/index.tsx` to handle the new engine state.
-- Ensure `Media Indoor` and `Sites` flows are correctly routed based on specific needs.
+- Update `src/routes/diagnostico/index.tsx` to mount the new `DiagnosticQuiz`.
+- Ensure `Media Indoor` flow is triggered correctly when the user selects "Publicidade" or "Instalação de Telas".
 
 ## Technical Details
-- The scoring engine will use `SEGMENT_MATCH_WEIGHT > PROBLEM_MATCH_WEIGHT`.
-- Mock products in `src/lib/products.functions.ts` will be updated to include `PetFlow` and refined descriptions.
-- Use `framer-motion` for smooth transitions between questions.
+- Scoring algorithm: `TotalScore = Σ (AnswerWeight * RuleMatch)`.
+- Confidence: `High` if top score > 150 and gap to 2nd is > 50. `Medium` if gap < 50. `Low` if top score < 100.
+- State management: Use local React state for the UI, but persist every step to the DB via `updateDiagnosticSession` to capture "abandoned" funnels.
 
 ## Success Criteria
-- [ ] Barbearia -> BarberIA.
-- [ ] Pet Shop -> PetFlow.
-- [ ] General Business + WhatsApp -> Automatiza.
-- [ ] Result shows the "Reasoning" behind the recommendation.
-- [ ] Lead is saved with the chosen path.
+- [ ] Selecting "Barbearia" + "Agendamento" recommends **BarberIA**.
+- [ ] Selecting "Pet Shop" recommends **PetFlow**.
+- [ ] Selecting "Publicidade" recommends **Media Indoor / Publicidade**.
+- [ ] "Talk to Specialist" appears when no match is found.
+- [ ] Lead record in DB is correctly linked to the `DiagnosticSession`.
