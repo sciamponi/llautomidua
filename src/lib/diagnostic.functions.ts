@@ -31,7 +31,6 @@ export const recommendProduct = createServerFn({ method: "POST" })
       }
 
       // Problem Match (+50)
-      // Basic fuzzy match for mock demonstration
       if (product.problem?.toLowerCase().includes(data.mainProblem.toLowerCase()) || 
           data.mainProblem.toLowerCase().includes(product.slug.toLowerCase())) {
         score += SCORING_WEIGHTS.PROBLEM;
@@ -40,7 +39,7 @@ export const recommendProduct = createServerFn({ method: "POST" })
 
       // Special Rules from VOIDPRO-11
       if (data.businessSegment === "barbearia" && data.mainProblem === "agendamento" && product.slug === "barberia") {
-        score += 50; // Extra boost for BarberIA in barbearia context
+        score += 50;
       }
       
       if (data.businessSegment === "pet_shop" && product.slug === "petflow") {
@@ -57,6 +56,14 @@ export const recommendProduct = createServerFn({ method: "POST" })
     const topMatch = results[0];
     const secondMatch = results[1];
     
+    if (!topMatch || topMatch.score < 50) {
+      return {
+        status: "needs_review",
+        message: "Entendemos parte do seu cenário, mas queremos indicar a solução certa para sua operação.",
+        recommendations: []
+      };
+    }
+
     let confidence = "LOW";
     if (topMatch.score > 150) {
       if (!secondMatch || (topMatch.score - secondMatch.score) > 50) {
@@ -66,16 +73,8 @@ export const recommendProduct = createServerFn({ method: "POST" })
       }
     }
 
-    // Tie/Close match handling
+    // Recommendations that have a meaningful score
     const recommendations = results.slice(0, 2).filter(r => r.score > 50);
-
-    if (topMatch.score < 50) {
-      return {
-        status: "needs_review",
-        message: "Entendemos parte do seu cenário, mas queremos indicar a solução certa para sua operação.",
-        recommendations: []
-      };
-    }
 
     return {
       status: "success",
@@ -87,8 +86,6 @@ export const recommendProduct = createServerFn({ method: "POST" })
 
 export const createDiagnosticSession = createServerFn({ method: "POST" })
   .handler(async () => {
-    // In a real DB scenario, this would create a row in DiagnosticSession
-    // For now, we return a mock ID
     return { id: `sess_${Math.random().toString(36).substr(2, 9)}` };
   });
 
@@ -99,7 +96,6 @@ export const updateDiagnosticSession = createServerFn({ method: "POST" })
     data: z.record(z.any()),
   }).parse(data))
   .handler(async ({ data }) => {
-    // Mock update
     console.log(`Updating session ${data.sessionId} at step ${data.step}`, data.data);
     return { success: true };
   });
