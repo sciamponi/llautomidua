@@ -21,6 +21,13 @@ enum LeadType {
   SCREEN_INSTALLATION
   SCREEN_ADVERTISING
   PARTNER
+  SPECIALIST_CLICK
+}
+
+enum DemoAccessStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
 }
 
 enum RevenueType {
@@ -202,18 +209,26 @@ model Product {
   audience          String?
   problem           String?
   solution          String?
+  howItWorks        String?
+  benefits          Json?     // Array of string or objects
   features          Json?     // Array of {title, desc}
   pricingType       RevenueType
   pricing           String?
   ctaType           String?
   demoUrl           String?
+  demoActive        Boolean   @default(true)
+  demoDurationHours Int       @default(24)
   landingUrl        String?
   whatsappMessage   String?
   status            String    @default("active")
   featured          Boolean   @default(false)
   sortOrder         Int       @default(0)
+  coverImage        String?
   
   // Relations
+  gallery           ProductImage[]
+  demoAccesses      DemoAccess[]
+  leads             Lead[]
   subscriptions     Subscription[]
   recommendations   ProductRecommendation[] @relation("MainProduct")
   recommendedBy     ProductRecommendation[] @relation("RecommendedProduct")
@@ -222,6 +237,32 @@ model Product {
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+}
+
+model DemoAccess {
+  id            String           @id @default(cuid())
+  leadId        String
+  lead          Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tokenHash     String           @unique
+  status        DemoAccessStatus @default(ACTIVE)
+  expiresAt     DateTime
+  firstAccessAt DateTime?
+  lastAccessAt  DateTime?
+  accessCount   Int              @default(0)
+  revokedAt     DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 }
 
 model ProductRecommendation {
@@ -250,8 +291,12 @@ model Lead {
   message       String?
   type          LeadType  @default(GENERAL)
   status        String    @default("new")
+  source        String?   // e.g., "DEMO", "LANDING", "MEGA_MENU"
   userId        String?
   user          User?     @relation(fields: [userId], references: [id])
+  productId     String?
+  product       Product?  @relation(fields: [productId], references: [id])
+  demoAccesses  DemoAccess[]
   createdAt     DateTime  @default(now())
   diagnosticSessionId String? @unique
   diagnosticSession   DiagnosticSession? @relation(fields: [diagnosticSessionId], references: [id])
