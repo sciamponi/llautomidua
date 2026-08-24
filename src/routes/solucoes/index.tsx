@@ -41,7 +41,7 @@ function SolucoesPage() {
 
   return (
     <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <main className="container px-4 py-20">
+      <main className="container px-4 py-12">
         <div className="max-w-3xl mb-16">
           <h1 className="text-4xl md:text-6xl font-bold text-white font-sora mb-6">
             Qual solução sua<br/>
