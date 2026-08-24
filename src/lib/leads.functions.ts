@@ -13,7 +13,7 @@ const LeadSchema = z.object({
   segment: z.string().optional(),
   objective: z.string().optional(),
   message: z.string().optional(),
-  type: z.enum(['GENERAL', 'DEMO', 'QUOTE', 'SCREEN_INSTALLATION', 'SCREEN_ADVERTISING', 'PARTNER', 'SITE_ORDER', 'SPECIALIST_CLICK']),
+  type: z.enum(['GENERAL', 'DEMO', 'QUOTE', 'SCREEN_INSTALLATION', 'SCREEN_ADVERTISING', 'PARTNER', 'SPECIALIST_CLICK']),
 });
 
 export const captureLead = createServerFn({ method: "POST" })
@@ -21,9 +21,34 @@ export const captureLead = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     console.log('Server capturing lead:', data);
     
-    // Simulating database latency
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (!process.env['DATABASE_URL']) {
+      // Preview mode simulated response
+      return { success: true, simulated: true, message: "Lead capturado com sucesso (Modo Simulado)!" };
+    }
 
-    // In production: return await prisma.lead.create({ data });
-    return { success: true, message: "Lead capturado com sucesso!" };
+    const { prisma } = await import("@/lib/prisma.server");
+    
+    try {
+      await prisma.lead.create({
+        data: {
+          name: data.name,
+          email: data.email || null,
+          whatsapp: data.whatsapp,
+          company: data.company || null,
+          city: data.city || null,
+          address: data.address || null,
+          establishmentType: data.establishmentType || null,
+          screenCount: data.screenCount ?? null,
+          segment: data.segment || null,
+          objective: data.objective || null,
+          message: data.message || null,
+          type: data.type,
+          source: "DIRECT_FORM"
+        }
+      });
+      return { success: true, simulated: false, message: "Lead capturado com sucesso!" };
+    } catch (error) {
+      console.error('Lead capture failed:', error);
+      throw new Error("Não foi possível salvar o lead no momento.");
+    }
   });

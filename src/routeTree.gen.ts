@@ -27,6 +27,7 @@ import { Route as AdminDemosIndexRouteImport } from './routes/admin/demos/index'
 import { Route as AdminProdutosIndexRouteImport } from './routes/admin/produtos/index'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
 import { Route as AdminUsuariosIndexRouteImport } from './routes/admin/usuarios/index'
+import { Route as ApiAdminBootstrapRouteImport } from './routes/api/admin/bootstrap'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ClienteSitesIndexRouteImport } from './routes/cliente/sites/index'
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
@@ -123,6 +124,11 @@ const AdminUsuariosIndexRoute = AdminUsuariosIndexRouteImport.update({
   path: '/admin/usuarios/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminBootstrapRoute = ApiAdminBootstrapRouteImport.update({
+  id: '/api/admin/bootstrap',
+  path: '/api/admin/bootstrap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/membros/': typeof MembrosIndexRoute
   '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/membros': typeof MembrosIndexRoute
   '/sites': typeof SitesIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
+  '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/membros/': typeof MembrosIndexRoute
   '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/api/admin/bootstrap': typeof ApiAdminBootstrapRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/membros/'
     | '/sites/'
     | '/solucoes/'
+    | '/api/admin/bootstrap'
     | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/membros'
     | '/sites'
     | '/solucoes'
+    | '/api/admin/bootstrap'
     | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/membros/'
     | '/sites/'
     | '/solucoes/'
+    | '/api/admin/bootstrap'
     | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
@@ -319,6 +331,7 @@ export interface RootRouteChildren {
   MembrosIndexRoute: typeof MembrosIndexRoute
   SitesIndexRoute: typeof SitesIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
+  ApiAdminBootstrapRoute: typeof ApiAdminBootstrapRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
   AdminDemosIndexRoute: typeof AdminDemosIndexRoute
@@ -455,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsuariosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/bootstrap': {
+      id: '/api/admin/bootstrap'
+      path: '/api/admin/bootstrap'
+      fullPath: '/api/admin/bootstrap'
+      preLoaderRoute: typeof ApiAdminBootstrapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/health': {
       id: '/api/public/health'
       path: '/api/public/health'
@@ -533,6 +553,7 @@ const rootRouteChildren: RootRouteChildren = {
   MembrosIndexRoute: MembrosIndexRoute,
   SitesIndexRoute: SitesIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
+  ApiAdminBootstrapRoute: ApiAdminBootstrapRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
   AdminDemosIndexRoute: AdminDemosIndexRoute,

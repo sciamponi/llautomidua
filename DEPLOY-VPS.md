@@ -40,7 +40,7 @@ docker exec automatiza-app npx prisma status
 Após o primeiro deploy, execute o bootstrap para criar o usuário administrador global:
 ```bash
 # Exemplo via chamada curl interna (requer BOOTSTRAP_SECRET)
-curl -X POST http://localhost:8080/api/public/bootstrap \
+curl -X POST http://localhost:8080/api/admin/bootstrap \
   -H "Content-Type: application/json" \
   -d '{
     "secret": "SEU_BOOTSTRAP_SECRET",
