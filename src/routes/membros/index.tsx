@@ -60,7 +60,7 @@ function MembersPage() {
                 ].map((stat, i) => (
                   <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10">
                     <p className="text-xs font-bold text-[#DCE3EA]/40 uppercase tracking-widest mb-2">{stat.label}</p>
-                    <p className={`text-3xl font-bold font-sora ${stat.color}`}>{stat.value}</p>
+                    <p className={cn("text-3xl font-bold font-sora", stat.color)}>{stat.value}</p>
                   </div>
                 ))}
               </div>
