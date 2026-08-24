@@ -80,7 +80,6 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!process.env['DATABASE_URL']) return null;
     
-    // Exact optional property types: we must check if we want to include 'order' field
     const updateData: any = {
       status: data.status,
       rejectionReason: data.rejectionReason || "",
