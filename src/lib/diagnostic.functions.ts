@@ -10,7 +10,12 @@ export const recommendProduct = createServerFn({ method: "POST" })
     currentOperation: z.string().optional().nullable(),
   }).parse(data))
   .handler(async ({ data }) => {
-    return recommendProductLogic(data);
+    return recommendProductLogic({
+      businessSegment: data.businessSegment,
+      mainProblem: data.mainProblem,
+      specificNeed: data.specificNeed ?? null,
+      currentOperation: data.currentOperation ?? null,
+    });
   });
 
 export const completeDiagnostic = createServerFn({ method: "POST" })
