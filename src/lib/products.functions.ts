@@ -13,12 +13,18 @@ const MOCK_PRODUCTS = [
     segment: "Tecnologia",
     shortDescription: "Transforme seu WhatsApp em uma operação organizada.",
     description: "CRM e Automação para WhatsApp.",
+    audience: "Empresas que atendem pelo WhatsApp e precisam de organização.",
     problem: "Tenho muitas mensagens e dificuldade para organizar.",
+    solution: "Centralize tudo em um único número com múltiplos atendentes e funil de vendas.",
+    howItWorks: "Conecte seu WhatsApp, crie sua equipe e comece a gerenciar atendimentos.",
+    benefits: ["Multi-agentes", "Funil de Vendas", "Relatórios", "Automação"],
     pricingType: "SUBSCRIPTION",
     pricing: "297",
     status: "active",
     featured: true,
     sortOrder: 1,
+    demoActive: true,
+    demoDurationHours: 24,
     features: [
       { title: "Multi-agentes", desc: "Toda sua equipe atendendo em um único número de WhatsApp de forma organizada." },
       { title: "Funil de Vendas", desc: "Visualize em qual etapa cada cliente está e nunca perca um lead por falta de acompanhamento." }
@@ -33,12 +39,18 @@ const MOCK_PRODUCTS = [
     segment: "Beleza",
     shortDescription: "Agendamento inteligente para barbearias.",
     description: "Gestão completa para o setor de beleza.",
+    audience: "Donos de barbearia que querem automatizar agendamentos.",
     problem: "Minha operação depende de agendamentos manuais.",
+    solution: "Link exclusivo para o cliente agendar em segundos.",
+    howItWorks: "Cadastre seus serviços e profissionais e divulgue seu link de agendamento.",
+    benefits: ["Link de Agendamento", "Gestão de Clientes", "Financeiro", "Relatórios"],
     pricingType: "SUBSCRIPTION",
     pricing: "97",
     status: "active",
     featured: true,
     sortOrder: 2,
+    demoActive: true,
+    demoDurationHours: 48,
     features: [
       { title: "Link Exclusivo", desc: "Seu cliente agenda em segundos sem precisar baixar nenhum aplicativo." }
     ]
@@ -56,70 +68,8 @@ const MOCK_PRODUCTS = [
     pricingType: "MEDIA",
     status: "active",
     featured: true,
+    demoActive: false,
     sortOrder: 3
-  },
-  {
-    id: "prod_4",
-    name: "Esmaltter-IA",
-    slug: "esmalteria",
-    type: "SAAS",
-    category: "Beleza & Estética",
-    segment: "Beleza",
-    shortDescription: "Organize atendimento, clientes e agendamentos do seu negócio de beleza.",
-    description: "O sistema inteligente desenvolvido para esmalterias, salões e clínicas de estética.",
-    problem: "O operacional está travando seu salão?",
-    pricingType: "SUBSCRIPTION",
-    pricing: "127",
-    status: "active",
-    featured: true,
-    sortOrder: 4
-  },
-  {
-    id: "prod_5",
-    name: "Solução Oficinas",
-    slug: "oficinas",
-    type: "SAAS",
-    category: "Gestão Automotiva",
-    segment: "Automotivo",
-    shortDescription: "Organize a operação da oficina e o relacionamento com seus clientes.",
-    description: "A tecnologia que transforma o pátio da sua oficina em uma linha de produção inteligente.",
-    problem: "Sua oficina está perdendo peças e dinheiro?",
-    pricingType: "SUBSCRIPTION",
-    pricing: "197",
-    status: "active",
-    featured: true,
-    sortOrder: 5
-  },
-  {
-    id: "prod_6",
-    name: "PetFlow",
-    slug: "petflow",
-    type: "SAAS",
-    category: "Gestão Pet",
-    segment: "Pet Shop",
-    shortDescription: "O controle total para o seu Pet Shop e Banho & Tosa.",
-    description: "Sistema completo de agendamento e gestão para o mercado pet.",
-    problem: "Dificuldade em organizar horários de banho e tosa.",
-    pricingType: "SUBSCRIPTION",
-    pricing: "147",
-    status: "active",
-    featured: true,
-    sortOrder: 6
-  },
-  {
-    id: "prod_7",
-    name: "Sites Profissionais",
-    slug: "sites",
-    type: "SERVICE",
-    category: "Sites & Presença Digital",
-    segment: "Tecnologia",
-    shortDescription: "Sites profissionais e Landing Pages de alta conversão.",
-    description: "Desenvolvimento de presença digital personalizada para sua marca.",
-    problem: "Preciso de um site profissional para minha empresa.",
-    pricingType: "ONE_TIME",
-    status: "active",
-    featured: true,
-    sortOrder: 7
   }
 ];
 
@@ -129,9 +79,11 @@ export const getProducts = createServerFn({ method: "GET" })
     try {
       const products = await prisma.product.findMany({
         where: { status: 'active' },
+        include: {
+          gallery: { orderBy: { sortOrder: 'asc' } }
+        },
         orderBy: { sortOrder: 'asc' }
       });
-      // Merge with MOCK or return DB if not empty
       return products.length > 0 ? JSON.parse(JSON.stringify(products)) : MOCK_PRODUCTS;
     } catch (e) {
       return MOCK_PRODUCTS;
@@ -146,6 +98,7 @@ export const getProductBySlug = createServerFn({ method: "GET" })
       const product = await prisma.product.findUnique({
         where: { slug: data },
         include: {
+          gallery: { orderBy: { sortOrder: 'asc' } },
           recommendations: { include: { recommendedProduct: true } }
         }
       });
