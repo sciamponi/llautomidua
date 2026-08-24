@@ -19,6 +19,7 @@ import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateS
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
 import { Route as AdminSitesIndexRouteImport } from './routes/admin/sites/index'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
 import { Route as SitesAprovacaoTokenRouteImport } from './routes/sites/aprovacao/$token'
 
@@ -72,6 +73,11 @@ const AdminSitesIndexRoute = AdminSitesIndexRouteImport.update({
   path: '/admin/sites/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
   id: '/pedido',
   path: '/pedido',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/membros/': typeof MembrosIndexRoute
   '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/membros': typeof MembrosIndexRoute
   '/sites': typeof SitesIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites': typeof AdminSitesIndexRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/membros/': typeof MembrosIndexRoute
   '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
   '/sites/aprovacao/$token': typeof SitesAprovacaoTokenRoute
   '/admin/sites/': typeof AdminSitesIndexRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/membros/'
     | '/sites/'
     | '/solucoes/'
+    | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/membros'
     | '/sites'
     | '/solucoes'
+    | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/membros/'
     | '/sites/'
     | '/solucoes/'
+    | '/api/public/health'
     | '/sites/$templateSlug/pedido'
     | '/sites/aprovacao/$token'
     | '/admin/sites/'
@@ -181,6 +193,7 @@ export interface RootRouteChildren {
   MembrosIndexRoute: typeof MembrosIndexRoute
   SitesIndexRoute: typeof SitesIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
   AdminSitesIndexRoute: typeof AdminSitesIndexRoute
 }
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSitesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sites/$templateSlug/pedido': {
       id: '/sites/$templateSlug/pedido'
       path: '/pedido'
@@ -295,6 +315,7 @@ const rootRouteChildren: RootRouteChildren = {
   MembrosIndexRoute: MembrosIndexRoute,
   SitesIndexRoute: SitesIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
   AdminSitesIndexRoute: AdminSitesIndexRoute,
 }
