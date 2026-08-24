@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma.server";
-import { crypto } from "crypto";
+import { randomBytes } from "crypto";
 
 const RequestDemoSchema = z.object({
   name: z.string().min(2),
@@ -35,7 +35,7 @@ export const requestDemoAccess = createServerFn({ method: "POST" })
     }
 
     // 3. Generate Secure Token
-    const rawToken = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex');
+    const rawToken = randomBytes(32).toString('hex');
     const tokenHash = await hashToken(rawToken);
 
     // 4. Create Demo Access Record
@@ -112,6 +112,7 @@ export const getDemoStats = createServerFn({ method: "GET" })
 
 async function hashToken(token: string) {
   const msgUint8 = new TextEncoder().encode(token);
+  // Using Web Crypto API for consistency if possible, otherwise Node crypto
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
