@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Header } from '@/components/automatiza/Header'
 import { ProductSalesTemplate } from '@/components/automatiza/products/ProductSalesTemplate'
 import { useLoaderData } from '@tanstack/react-router'
 import { getProductBySlug } from '@/lib/products.functions'
@@ -16,8 +15,6 @@ export const Route = createFileRoute('/solucoes/$productSlug')({
 function ProductPage() {
   const { product } = useLoaderData({ from: '/solucoes/$productSlug' });
 
-  // Customizing template data based on the dynamic product
-  // For now, mapping some fields, but in a real app, the product object would contain all these fields
   const templateData = {
     name: product.name,
     category: product.category,
@@ -49,16 +46,11 @@ function ProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <Header />
+    <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
       <main className="pt-20">
         <ProductSalesTemplate {...templateData} />
       </main>
-      <footer className="py-12 border-t border-white/10">
-        <div className="container px-4 text-center">
-          <p className="text-[#DCE3EA]/40 text-sm">© 2026 Automatiza Solução. Todos os direitos reservados.</p>
-        </div>
-      </footer>
     </div>
   );
 }
+
