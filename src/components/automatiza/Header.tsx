@@ -110,7 +110,7 @@ export function Header() {
                             <Link 
                               key={p.slug}
                               to="/solucoes/$productSlug"
-                              params={{ productSlug: p.slug }}
+                              params={{ productSlug: p.slug as string }}
                               className="block text-sm font-medium text-[#DCE3EA]/60 hover:text-white transition-colors"
                             >
                               {p.name}
@@ -247,7 +247,7 @@ export function Header() {
                 <p className="text-[10px] uppercase tracking-[0.4em] text-[#DCE3EA]/40">SaaS</p>
                 <div className="grid grid-cols-1 gap-5 text-lg font-medium">
                   {activeSaas.map((p: any) => (
-                    <Link key={p.slug} to="/solucoes/$productSlug" params={{ productSlug: p.slug }}>{p.name}</Link>
+                    <Link key={p.slug} to="/solucoes/$productSlug" params={{ productSlug: p.slug as string }}>{p.name}</Link>
                   ))}
                 </div>
               </div>
