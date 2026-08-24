@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { supabaseAdmin } from '@/integrations/supabase/client.server';
+import { prisma } from '@/lib/prisma.server';
 
 export const Route = createFileRoute('/api/public/health')({
   server: {
@@ -8,16 +8,11 @@ export const Route = createFileRoute('/api/public/health')({
         let dbStatus = 'ok';
         
         try {
-          // Check database connectivity
-          // Usando uma query simples para verificar se o banco responde
-          const { error } = await supabaseAdmin.from('Product').select('count', { count: 'exact', head: true });
-          
-          if (error) {
-            console.error('[HealthCheck] Database error:', error);
-            dbStatus = 'error';
-          }
+          // Check database connectivity using Prisma
+          // Simple raw query that works on PostgreSQL
+          await prisma.$queryRaw`SELECT 1`;
         } catch (err) {
-          console.error('[HealthCheck] Connection error:', err);
+          console.error('[HealthCheck] Database error:', err);
           dbStatus = 'error';
         }
 
