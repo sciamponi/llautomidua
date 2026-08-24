@@ -2,10 +2,12 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { OrderModal } from '@/components/admin/sites/OrderModal';
 
 export const Route = createFileRoute('/admin/sites/')({
   component: SitesKanbanPage,
 });
+
 
 
 type SiteOrderStatus = 'SUBMITTED' | 'DATA_REVIEW' | 'IN_PRODUCTION' | 'WAITING_APPROVAL' | 'CHANGES_REQUESTED' | 'APPROVED' | 'PUBLISHED' | 'CANCELLED';
@@ -22,7 +24,10 @@ const COLUMNS: { id: SiteOrderStatus; title: string }[] = [
 ];
 
 function SitesKanbanPage() {
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [orders, setOrders] = useState([
+
     {
       id: '1',
       businessName: 'Ar-Condicionado Central',
@@ -52,6 +57,12 @@ function SitesKanbanPage() {
 
   return (
     <div className="bg-[#071A2F] text-[#DCE3EA] font-inter min-h-screen">
+      <OrderModal 
+        order={selectedOrder} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+
       <main className="p-4 md:p-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div>
@@ -91,6 +102,11 @@ function SitesKanbanPage() {
                     layoutId={order.id}
                     key={order.id}
                     className="bg-white/5 border border-white/10 p-4 rounded-2xl hover:border-[#1E8CFF]/30 transition-all cursor-pointer group relative overflow-hidden"
+                    onClick={() => {
+                      setSelectedOrder(order);
+                      setIsModalOpen(true);
+                    }}
+
                   >
                     {order.priority === 'ATENÇÃO' && (
                       <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500" />
