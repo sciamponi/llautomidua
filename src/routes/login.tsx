@@ -18,8 +18,20 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const Route = createFileRoute("/login")({
+  beforeLoad: async ({ context, search }) => {
+    if (context.session) {
+      const primaryRole = context.session.user.roles[0]?.role || "CUSTOMER";
+      let redirectPath = "/";
+      if (["MASTER_ADMIN", "ADMIN", "OPERATOR"].includes(primaryRole)) redirectPath = "/admin";
+      else if (primaryRole === "PARTNER") redirectPath = "/membros";
+      else if (primaryRole === "CUSTOMER") redirectPath = "/cliente";
+      
+      throw redirect({ to: (search as any).redirect || redirectPath });
+    }
+  },
   component: LoginPage,
 });
+
 
 function LoginPage() {
   const navigate = useNavigate();
