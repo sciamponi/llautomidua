@@ -55,16 +55,14 @@ A aplicação expõe um endpoint de saúde:
 
 Resposta esperada (JSON):
 
-**Preview / Dev (`NODE_ENV != production`)**:
-```json
-{
-  "status": "ok",
-  "database": "not_configured",
-  "environment": "preview"
-}
-```
+**1. PREVIEW / DEV SEM DATABASE_URL**
+- HTTP 200: `{"status": "ok", "database": "not_configured"}`
 
-**Produção (`NODE_ENV = production`)**:
-- Estável (200 OK): `{"status": "ok", "database": "ok"}`
-- Sem URL (503): `{"status": "error", "database": "not_configured"}`
-- Sem conexão (503): `{"status": "error", "database": "unavailable"}`
+**2. PRODUÇÃO COM DATABASE_URL E BANCO FUNCIONANDO**
+- HTTP 200: `{"status": "ok", "database": "ok"}`
+
+**3. PRODUÇÃO COM DATABASE_URL MAS BANCO INDISPONÍVEL**
+- HTTP 503: `{"status": "error", "database": "unavailable"}`
+
+**4. PRODUÇÃO SEM DATABASE_URL**
+- HTTP 503: `{"status": "error", "database": "not_configured"}`

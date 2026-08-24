@@ -13,7 +13,6 @@ export const Route = createFileRoute('/api/public/health')({
             {
               status: 'ok',
               database: 'not_configured',
-              environment: 'preview',
             },
             { status: 200 },
           );
