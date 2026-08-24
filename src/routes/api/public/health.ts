@@ -1,37 +1,44 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { prisma } from '@/lib/prisma.server';
 
 export const Route = createFileRoute('/api/public/health')({
   server: {
     handlers: {
       GET: async () => {
-        let dbStatus = 'ok';
-        
+        const databaseUrl = process.env['DATABASE_URL'];
+
+        // Sem DATABASE_URL (ex.: preview do Lovable), a app está saudável,
+        // apenas sem banco configurado. Não é um erro.
+        if (!databaseUrl) {
+          return Response.json(
+            {
+              status: 'ok',
+              app: 'ok',
+              database: 'unconfigured',
+              timestamp: new Date().toISOString(),
+            },
+            { status: 200 },
+          );
+        }
+
+        let database = 'ok';
         try {
-          // Check database connectivity using Prisma
-          // Simple raw query that works on PostgreSQL
+          const { prisma } = await import('@/lib/prisma.server');
           await prisma.$queryRaw`SELECT 1`;
         } catch (err) {
           console.error('[HealthCheck] Database error:', err);
-          dbStatus = 'error';
+          database = 'error';
         }
 
-        const status = dbStatus === 'ok' ? 200 : 503;
-
-        return new Response(
-          JSON.stringify({
-            status: dbStatus === 'ok' ? 'ok' : 'error',
-            database: dbStatus,
-            timestamp: new Date().toISOString()
-          }),
+        return Response.json(
           {
-            status,
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
+            status: database === 'ok' ? 'ok' : 'degraded',
+            app: 'ok',
+            database,
+            timestamp: new Date().toISOString(),
+          },
+          { status: database === 'ok' ? 200 : 503 },
         );
-      }
-    }
-  }
+      },
+    },
+  },
 });
