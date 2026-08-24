@@ -130,7 +130,6 @@ export const login = createServerFn({ method: "POST" })
       }
     });
 
-    const request = getRequest();
     setCookie(SESSION_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env['NODE_ENV'] === "production",
