@@ -1,54 +1,56 @@
-# VPS Preparation Plan - Automatiza Solução
+# VPS Preparation Execution Plan - Automatiza Solução
 
-This plan prepares the project for future hosting on a private VPS (Virtual Private Server) using Docker and PostgreSQL, ensuring independence from the Lovable environment while maintaining full compatibility with the current stack (TanStack Start + React 19).
+This plan implements the technical foundation for self-hosting the Automatiza Solução ecosystem on a VPS using Docker and PostgreSQL, following the instructions in `VOIDPRO-28.md` and `VOIDPRO-29.md`.
 
 ## Technical Objectives
-- **Independent Infrastructure**: Create Docker configuration for the application and database.
-- **Data Persistence**: Configure PostgreSQL with Prisma for production environments.
-- **Environment Management**: Define necessary environment variables for external hosting.
-- **Health Monitoring**: Add a `/health` endpoint for monitoring and uptime checks.
-- **Documentation**: Provide a comprehensive guide for manual deployment on a VPS.
+- **Infrastructure**: Dockerize the application and database.
+- **Data Persistence**: Configure PostgreSQL with internal networking.
+- **Storage Abstraction**: Implement a `StorageProvider` pattern for local-first storage with future S3 compatibility.
+- **Health Check**: Add `/api/public/health` for monitoring.
+- **Documentation**: Provide a clear `DEPLOY-VPS.md` guide.
 
 ## Proposed Changes
 
 ### 1. Infrastructure (Docker)
-- Create `Dockerfile` using a multi-stage build (Node 22 + Alpine) for a lightweight production image.
-- Create `docker-compose.yml` defining two services:
-  - `app`: The TanStack Start application.
-  - `db`: PostgreSQL 16 with a persistent volume (`/var/lib/postgresql/data`).
-- Ensure the database is not exposed to the public internet by using internal Docker networking.
+- **Dockerfile**:
+  - Multi-stage build (Node 22-alpine).
+  - Install dependencies, build the application, and prune dev dependencies.
+  - Set production environment.
+- **docker-compose.yml**:
+  - `app`: TanStack Start app, depends on `db`, restarts on failure.
+  - `db`: PostgreSQL 16-alpine with healthcheck and persistent volume at `./data/postgres`.
+  - Private network for app-db communication.
+- **.env.example**:
+  - Document all required variables: `DATABASE_URL`, `APP_URL`, `NODE_ENV`, `WHATSAPP_API_TOKEN`, etc.
 
-### 2. Database & Prisma
-- Review `prisma/schema.prisma` to ensure compatibility with standard PostgreSQL.
-- Verify `DATABASE_URL` usage throughout the application.
-- Create an `.env.example` file listing all required environment variables (without real values):
-  - `DATABASE_URL`
-  - `APP_URL`
-  - `NODE_ENV`
-  - `BETTER_AUTH_SECRET` (if applicable)
-  - Integration keys (WhatsApp, Email, etc.)
+### 2. Storage System (Phase 1: Local)
+- **Storage Abstraction**:
+  - Create `src/lib/storage/types.ts` defining the `StorageProvider` interface.
+  - Create `src/lib/storage/local.server.ts` implementing the interface using `fs/promises`.
+  - Create `src/lib/storage/index.server.ts` to export the active provider based on environment variables.
+- **Directory Structure**:
+  - Prepare `/data/storage` with subdirectories: `logos`, `previews`, `uploads`, `documents`.
 
 ### 3. Monitoring (Health Check)
-- Create a new public API route `src/routes/api/public/health.ts`:
-  - Returns `200 OK` if the application is running.
-  - Attempts a simple database query (e.g., `prisma.$queryRaw` or counting a table) to verify DB connectivity.
-  - Returns JSON with basic status information.
+- **Route**: `src/routes/api/public/health.ts`.
+- **Logic**:
+  - Return JSON: `{ status: "ok", database: "ok" }`.
+  - Check database connectivity using `prisma.$queryRaw` or similar light check.
+  - Return `503 Service Unavailable` if the database is down.
 
-### 4. Documentation
-- Create `DEPLOY-VPS.md` with step-by-step instructions:
-  - Minimum server requirements (CPU/RAM).
-  - Installing Docker & Docker Compose.
-  - Configuring `.env`.
-  - Running migrations and starting the services.
-  - Setting up a Reverse Proxy (Nginx/Caddy) with SSL (Certbot).
+### 4. Integration Audit & Preparation
+- **Auth**: Audit current mock auth in `/admin` and `/membros` to ensure it uses `process.env` for any future logic.
+- **WhatsApp**: Audit `notifications.functions.ts` to ensure it's ready for real provider keys via `process.env`.
+- **Database**: Ensure `prisma/schema.prisma` is ready for the production PostgreSQL connection string.
 
-### 5. Deployment Preparation Script
-- Add a `deploy:prepare` script in `package.json` to handle Prisma generation and build optimization if needed.
+### 5. Documentation
+- **DEPLOY-VPS.md**:
+  - Server requirements (2 vCPU, 4GB RAM recommended).
+  - Docker & Docker Compose setup.
+  - Environment configuration.
+  - Reverse Proxy (Nginx/Caddy) and SSL instructions.
 
-## User Review Required
-
-> [!IMPORTANT]
-> This preparation does **not** perform an actual migration. The app will continue to work perfectly on Lovable Cloud.
-
-1. **Storage Strategy**: Currently, the project uses local assets or external links. For a VPS, do you prefer using a Local Volume (easier but harder to scale) or an S3-compatible service (AWS/Cloudflare R2)?
-2. **Auth & Secrets**: The project uses TanStack Start. We will ensure all secrets are read from `process.env` in server functions. Are there any specific external service tokens you'd like to document now?
+## Verification Plan
+- **Build Test**: Run `npm run build` to ensure the project bundles correctly for production.
+- **Health Check**: Verify the new endpoint locally.
+- **Docker Validation**: Run `docker-compose config` (via shell) to validate syntax.
