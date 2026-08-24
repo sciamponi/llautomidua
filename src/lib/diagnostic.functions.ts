@@ -21,7 +21,7 @@ export const recommendProduct = createServerFn({ method: "POST" })
   });
 
 export const completeDiagnostic = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
+  .validator((data: any) => {
     return z.object({
       sessionId: z.string(),
       answers: z.record(z.any()),
@@ -55,7 +55,7 @@ export const createDiagnosticSession = createServerFn({ method: "POST" })
   });
 
 export const updateDiagnosticSession = createServerFn({ method: "POST" })
-  .validator((data: unknown) => {
+  .validator((data: any) => {
     return z.object({
       sessionId: z.string(),
       step: z.number(),
