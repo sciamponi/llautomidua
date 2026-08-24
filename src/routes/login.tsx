@@ -4,11 +4,11 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/lib/auth.functions";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, createFileRoute, Link } from "@tanstack/react-router";
 import logoAsset from "@/assets/logo.png.asset.json";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 
 const loginSchema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -38,8 +38,10 @@ function LoginPage() {
     setIsLoading(true);
     try {
       const result = await login({ data: values });
-      toast.success("Login realizado com sucesso!");
-      navigate({ to: result.redirect as any });
+      if (result.success) {
+        toast.success("Login realizado com sucesso!");
+        navigate({ to: result.redirect as any });
+      }
     } catch (error: any) {
       toast.error(error.message || "Erro ao realizar login");
     } finally {
@@ -138,7 +140,3 @@ function LoginPage() {
     </div>
   );
 }
-
-// Framer Motion needs to be imported if used, but here I'll use simple div if preferred. 
-// Adding the import just in case.
-import { motion } from "framer-motion";
