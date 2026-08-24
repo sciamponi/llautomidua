@@ -18,10 +18,6 @@ import { Route as SitesIndexRouteImport } from './routes/sites/index'
 import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateSlug'
 import { Route as SolucoesIndexRouteImport } from './routes/solucoes/index'
 import { Route as SolucoesProductSlugRouteImport } from './routes/solucoes/$productSlug'
-import { Route as SitesIndexRouteImport } from './routes/sites/index'
-import { Route as SitesTemplateSlugRouteImport } from './routes/sites/$templateSlug'
-import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
-
 import { Route as SitesTemplateSlugPedidoRouteImport } from './routes/sites/$templateSlug/pedido'
 
 const IndexRoute = IndexRouteImport.update({
@@ -69,22 +65,6 @@ const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
   path: '/solucoes/$productSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitesIndexRoute = SitesIndexRouteImport.update({
-  id: '/sites/',
-  path: '/sites/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitesTemplateSlugRoute = SitesTemplateSlugRouteImport.update({
-  id: '/sites/$templateSlug',
-  path: '/sites/$templateSlug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
-  id: '/sites/$templateSlug/pedido',
-  path: '/sites/$templateSlug/pedido',
-  getParentRoute: () => rootRouteImport,
-} as any)
-
 const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
   id: '/pedido',
   path: '/pedido',
@@ -101,14 +81,6 @@ export interface FileRoutesByFullPath {
   '/membros/': typeof MembrosIndexRoute
   '/sites/': typeof SitesIndexRoute
   '/solucoes/': typeof SolucoesIndexRoute
-  '/sites/': typeof SitesIndexRoute
-  '/sites/$templateSlug': typeof SitesTemplateSlugRoute
-  '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
-
-  '/sites/': typeof SitesIndexRoute
-  '/sites/$templateSlug': typeof SitesTemplateSlugRoute
-  '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
-
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
 }
 export interface FileRoutesByTo {
@@ -121,10 +93,6 @@ export interface FileRoutesByTo {
   '/membros': typeof MembrosIndexRoute
   '/sites': typeof SitesIndexRoute
   '/solucoes': typeof SolucoesIndexRoute
-  '/sites': typeof SitesIndexRoute
-  '/sites/$templateSlug': typeof SitesTemplateSlugRoute
-  '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
-
   '/sites/$templateSlug/pedido': typeof SitesTemplateSlugPedidoRoute
 }
 export interface FileRoutesById {
@@ -287,10 +255,6 @@ const rootRouteChildren: RootRouteChildren = {
   MembrosIndexRoute: MembrosIndexRoute,
   SitesIndexRoute: SitesIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
-  SitesIndexRoute: SitesIndexRoute,
-  SitesTemplateSlugRoute: SitesTemplateSlugRoute,
-  SitesTemplateSlugPedidoRoute: SitesTemplateSlugPedidoRoute,
-
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
