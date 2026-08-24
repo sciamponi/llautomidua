@@ -1,9 +1,9 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Header } from '@/components/automatiza/Header'
+import { createFileRoute } from '@tanstack/react-router'
 import { RobotMessage } from '@/components/automatiza/RobotMessage'
 import { useState } from 'react'
 import { captureLead } from '@/lib/leads.functions'
 import { toast } from 'sonner'
+import { useServerFn } from '@tanstack/react-start'
 
 export const Route = createFileRoute('/media-indoor/')({
   component: MediaIndoorPage
@@ -12,6 +12,7 @@ export const Route = createFileRoute('/media-indoor/')({
 function MediaIndoorPage() {
   const [selectedOffer, setSelectedOffer] = useState<'INSTALL' | 'ADVERTISE' | null>(null);
   const [loading, setLoading] = useState(false);
+  const captureLeadFn = useServerFn(captureLead);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ function MediaIndoorPage() {
     const data = Object.fromEntries(formData.entries());
     
     try {
-      await captureLead({
+      await captureLeadFn({
         data: {
           name: String(data['name']),
           company: String(data['company']),
@@ -44,8 +45,7 @@ function MediaIndoorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <Header />
+    <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
       <main className="container px-4 py-20">
         <div className="max-w-4xl mx-auto text-center mb-20">
           <span className="text-[#1E8CFF] font-bold tracking-[0.3em] uppercase text-xs mb-4 block">MEDIA INDOOR</span>
@@ -68,8 +68,8 @@ function MediaIndoorPage() {
               <div className="w-20 h-20 rounded-3xl bg-[#1E8CFF]/10 flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform">
                 📺
               </div>
-              <h2 className="text-3xl font-bold text-white font-sora mb-4">Instale uma tela</h2>
-              <p className="text-[#DCE3EA]/60 mb-10 leading-relaxed">
+              <h2 className="text-3xl font-bold text-white font-sora mb-4 text-balance">Instale uma tela</h2>
+              <p className="text-[#DCE3EA]/60 mb-10 leading-relaxed max-w-sm">
                 Transforme seu estabelecimento em um ponto de mídia digital e monetize seu espaço físico.
               </p>
               <button className="bg-white text-[#071A2F] px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
@@ -85,8 +85,8 @@ function MediaIndoorPage() {
               <div className="w-20 h-20 rounded-3xl bg-[#4CDFF2]/10 flex items-center justify-center text-4xl mb-8 group-hover:scale-110 transition-transform">
                 📈
               </div>
-              <h2 className="text-3xl font-bold text-white font-sora mb-4">Anuncie em uma tela</h2>
-              <p className="text-[#DCE3EA]/60 mb-10 leading-relaxed">
+              <h2 className="text-3xl font-bold text-white font-sora mb-4 text-balance">Anuncie em uma tela</h2>
+              <p className="text-[#DCE3EA]/60 mb-10 leading-relaxed max-w-sm">
                 Coloque sua marca na frente das pessoas certas, em pontos estratégicos de alta circulação.
               </p>
               <button className="bg-[#1E8CFF] text-white px-8 py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
@@ -98,7 +98,7 @@ function MediaIndoorPage() {
           <div className="max-w-xl mx-auto">
             <button 
               onClick={() => setSelectedOffer(null)}
-              className="mb-8 text-[#DCE3EA]/60 hover:text-white flex items-center gap-2 transition-colors"
+              className="mb-8 text-[#DCE3EA]/60 hover:text-white flex items-center gap-2 transition-colors font-bold text-sm"
             >
               ← Voltar para as opções
             </button>
@@ -154,3 +154,4 @@ function MediaIndoorPage() {
     </div>
   )
 }
+

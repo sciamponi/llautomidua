@@ -2,7 +2,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useServerFn } from '@tanstack/react-start';
 import { getSiteTemplateBySlug } from '@/lib/sites.functions';
 import { useQuery } from '@tanstack/react-query';
-import { Header } from '@/components/automatiza/Header';
 
 export const Route = createFileRoute('/sites/$templateSlug')({
   component: TemplateDetailPage,
@@ -21,9 +20,7 @@ function TemplateDetailPage() {
   if (!template) return <div className="min-h-screen bg-[#071A2F] text-white flex items-center justify-center">Template não encontrado.</div>;
 
   return (
-    <div className="min-h-screen bg-[#071A2F] text-[#DCE3EA] font-inter">
-      <Header />
-      
+    <div className="bg-[#071A2F] text-[#DCE3EA] font-inter">
       <main className="container mx-auto px-6 py-12">
         <Link to="/sites" className="inline-flex items-center text-[#1E8CFF] hover:text-[#1E8CFF]/80 transition-all mb-8 text-sm font-bold uppercase tracking-widest">
           ← Voltar ao Catálogo
@@ -100,4 +97,3 @@ function TemplateDetailPage() {
     </div>
   );
 }
-

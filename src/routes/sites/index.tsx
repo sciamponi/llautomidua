@@ -40,7 +40,7 @@ function SitesPage() {
     : templates.filter(t => t.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-[#071A2F] text-white">
+    <div className="bg-[#071A2F] text-white">
       <Hero 
         title={
           <>
@@ -170,3 +170,4 @@ function SitesPage() {
     </div>
   );
 }
+

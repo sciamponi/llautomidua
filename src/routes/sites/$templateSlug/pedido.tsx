@@ -1,12 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/components/automatiza/Header';
 import { useServerFn } from '@tanstack/react-start';
 import { getSiteTemplateBySlug } from '@/lib/sites.functions';
 import { captureLead } from '@/lib/leads.functions';
 import { useQuery } from '@tanstack/react-query';
-
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/sites/$templateSlug/pedido')({
@@ -234,9 +232,7 @@ function OrderFormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#071A2F] text-[#DCE3EA] font-inter">
-      <Header />
-      
+    <div className="bg-[#071A2F] text-[#DCE3EA] font-inter">
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-3xl mx-auto">
           <Link to="/sites/$templateSlug" params={{ templateSlug }} className="inline-flex items-center text-gray-500 hover:text-white transition-all mb-8 text-xs font-bold uppercase tracking-widest">
@@ -316,3 +312,4 @@ function OrderFormPage() {
     </div>
   );
 }
+

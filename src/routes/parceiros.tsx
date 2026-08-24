@@ -1,6 +1,4 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Header } from '@/components/automatiza/Header'
-import { motion } from 'framer-motion'
 
 export const Route = createFileRoute('/parceiros')({
   component: ParceirosPage
@@ -8,8 +6,7 @@ export const Route = createFileRoute('/parceiros')({
 
 function ParceirosPage() {
   return (
-    <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <Header />
+    <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
       <main>
         {/* Hero Section */}
         <section className="pt-32 pb-20 relative overflow-hidden">
@@ -92,11 +89,7 @@ function ParceirosPage() {
           </div>
         </section>
       </main>
-      <footer className="py-12 border-t border-white/10">
-        <div className="container px-4 text-center">
-          <p className="text-[#DCE3EA]/40 text-sm">© 2026 Automatiza Solução. Todos os direitos reservados.</p>
-        </div>
-      </footer>
     </div>
   )
 }
+

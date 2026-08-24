@@ -87,5 +87,47 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    @apply antialiased overflow-x-hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sora tracking-tight;
+  }
+
+  p {
+    @apply leading-relaxed;
   }
 }
+
+@layer utilities {
+  .section-padding {
+    @apply py-24 md:py-32;
+  }
+  
+  .container-narrow {
+    @apply max-w-4xl mx-auto px-6;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom Scrollbar for Neon Aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #071A2F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 140, 255, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 140, 255, 0.4);
+}
+
