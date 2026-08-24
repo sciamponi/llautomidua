@@ -6,8 +6,8 @@ export const recommendProduct = createServerFn({ method: "POST" })
   .validator((data: any) => z.object({
     businessSegment: z.string(),
     mainProblem: z.string(),
-    specificNeed: z.string().optional(),
-    currentOperation: z.string().optional(),
+    specificNeed: z.string().optional().nullable(),
+    currentOperation: z.string().optional().nullable(),
   }).parse(data))
   .handler(async ({ data }) => {
     return recommendProductLogic(data);
@@ -20,15 +20,15 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
     leadData: z.object({
       name: z.string(),
       whatsapp: z.string(),
-      email: z.string().optional(),
-    }).optional()
+      email: z.string().optional().nullable(),
+    }).optional().nullable()
   }).parse(data))
   .handler(async ({ data }) => {
     const result = await recommendProductLogic({
       businessSegment: String(data.answers['businessSegment'] || ""),
       mainProblem: String(data.answers['mainProblem'] || ""),
-      specificNeed: data.answers['specificNeed'] ? String(data.answers['specificNeed']) : undefined,
-      currentOperation: data.answers['currentOperation'] ? String(data.answers['currentOperation']) : undefined,
+      specificNeed: data.answers['specificNeed'] ? String(data.answers['specificNeed']) : null,
+      currentOperation: data.answers['currentOperation'] ? String(data.answers['currentOperation']) : null,
     });
 
     console.log(`Completing session ${data.sessionId}`, { result, leadData: data.leadData });

@@ -10,8 +10,8 @@ export const SCORING_WEIGHTS = {
 export async function recommendProductLogic(data: {
   businessSegment: string;
   mainProblem: string;
-  specificNeed?: string;
-  currentOperation?: string;
+  specificNeed?: string | null;
+  currentOperation?: string | null;
 }) {
   const products = await getProducts();
   
