@@ -1,36 +1,56 @@
-# Plano de Implementação: Fechamento da Fase 5.2 — Sites Operation 2.0
+# Plano de Implementação: Fechamento Sites Operation 2.0 (Fase 5.2)
 
-Finalização e validação do fluxo ponta a ponta da operação de sites, garantindo persistência no banco de dados, completude do painel administrativo e do portal do cliente, e robustez no sistema de versionamento e notificações.
+Finalização do fluxo ponta a ponta da operação de sites com persistência real em banco de dados, validação de segurança (ownership) e interface administrativa/cliente completa.
 
-## Mudanças Técnicas
+## 1. Persistência e Backend (Server Functions)
 
-### 1. Persistência de Dados (Prisma & Server Functions)
-- **Implementação Completa**: Finalizar as server functions em `src/lib/sites-operation.functions.ts` e `src/lib/notifications.functions.ts`, removendo códigos comentados e integrando totalmente com o Prisma.
-- **Validação de Ownership**: Adicionar verificações de segurança para garantir que clientes acessem apenas seus próprios projetos.
-- **Fluxo de Status**: Refinar `updateOrderStatus` para registrar automaticamente no `SiteOrderHistory` e disparar notificações baseadas nas transições.
+### A. Sites Operation Functions (`src/lib/sites-operation.functions.ts`)
+- **Implementação Real**: Substituir todos os `console.log` e comentários "In production" por chamadas reais ao Prisma.
+- **updateOrderStatus**:
+  - Validar permissão do ator.
+  - Atualizar `status` e `responsibleUserId` na tabela `SiteOrder`.
+  - Criar entrada em `SiteOrderHistory` registrando o status anterior, o novo status, o ator e qualquer comentário.
+  - Integrar disparo de notificações automáticas via `sendNotification` baseado na transição.
+- **processApproval**:
+  - Validar token, expiração e status da solicitação.
+  - Atualizar `SiteOrder` e criar histórico de aprovação ou solicitação de ajustes.
+- **getSiteOrderDetails**: Retornar dados reais do banco, incluindo histórico, versões, pagamentos e notificações.
 
-### 2. Painel Admin: Kanban e Modal de Pedido
-- **Refatoração do Kanban**: Atualizar `src/routes/admin/sites/index.tsx` para substituir o estado local por `useSuspenseQuery`, garantindo sincronia com o banco.
-- **OrderModal (Fase Final)**:
-    - Implementar abas `DADOS`, `CONTEUDO`, `ARQUIVOS`, `PREVIEW`, `VERSOES` e `HISTORICO` com dados reais.
-    - Adicionar empty states claros onde não houver dados.
-    - Implementar prévia de notificações e disparador manual (SIMULATED/SENT).
+### B. Motor de Notificações (`src/lib/notifications.functions.ts`)
+- **Persistência**: Gravar cada tentativa de envio em `NotificationLog`.
+- **Status Handling**: Gerenciar corretamente os estados `SIMULATED`, `SENT` e `FAILED`.
 
-### 3. Portal do Cliente
-- **Dashboard Real**: Atualizar `/cliente/sites/index.tsx` para listar projetos reais do usuário logado.
-- **Nova Rota de Detalhes**: Criar `/cliente/sites/$orderId.tsx` para visualização detalhada, timeline de progresso e acesso rápido a aprovações/pagamentos.
-- **Melhoria UX**: Garantir que o `ClientHeader` e o layout isolado funcionem corretamente em dispositivos móveis.
+## 2. Interface Administrativa (Kanban & Modal)
 
-### 4. Versionamento e Publicação
-- **Snapshots Imutáveis**: Garantir que `createImmutableVersion` seja invocado em marcos críticos (ex: envio para aprovação).
-- **Controle de Versão**: Exibir o histórico de versões no admin e permitir que o cliente veja qual versão está revisando.
+### A. Kanban (`src/routes/admin/sites/index.tsx`)
+- **Data Fetching**: Substituir o `useState` de pedidos por dados reais persistidos (via `useQuery` / `useSuspenseQuery`).
+- **Drag-and-Drop**: Persistir a mudança de coluna chamando `updateOrderStatus` imediatamente e tratar erros com rollback visual.
+- **Totalizadores**: Refletir os valores reais do banco no resumo financeiro superior.
 
-### 5. Motor de Notificações
-- **Logs de Notificação**: Implementar gravação em `NotificationLog` para todos os disparos (WhatsApp/Email).
-- **Status da Notificação**: Gerenciar estados `SIMULATED`, `SENT` e `FAILED` corretamente.
+### B. OrderModal (`src/components/admin/sites/OrderModal.tsx`)
+- **DADOS/CONTEÚDO**: Exibir campos reais do banco (Instagram, Segmento, Diferenciais, etc.).
+- **HISTÓRICO**: Renderizar a linha do tempo real vinda da tabela `SiteOrderHistory`.
+- **COMUNICAÇÕES**: Listar logs de `NotificationLog` e permitir disparo manual com preview.
+- **VERSÕES**: Listar snapshots imutáveis e permitir visualização.
+
+## 3. Portal do Cliente (`/cliente/*`)
+
+### A. Dashboard e Detalhes
+- **Listagem Segura**: Filtrar `SiteOrder` pelo `userId` do cliente autenticado.
+- **Timeline de Progresso**: Criar componente visual que reflete o `status` atual e o histórico público.
+- **Ownership**: Garantir que o `orderId` na URL pertence ao usuário da sessão em todas as server functions do portal.
+
+### B. Fluxo de Aprovação
+- **Solicitação de Ajustes**: Exigir comentário e salvar no banco como `SiteOrderHistory` com tipo específico.
+
+## 4. Segurança
+
+- **Middleware**: Aplicar validação de sessão em todas as funções de escrita e leitura de dados sensíveis.
+- **Asset Access**: Validar que o `orderId` associado ao arquivo pertence ao solicitante.
 
 ## Detalhes do Usuário (Não Técnico)
-Esta etapa garante que todo o sistema de criação de sites funcione de forma profissional e segura.
-1. O administrador terá controle total sobre cada etapa da produção, com histórico completo e gestão de arquivos.
-2. O cliente terá um portal exclusivo onde poderá acompanhar o progresso em tempo real, ver prévias do site e realizar aprovações ou pagamentos com poucos cliques.
-3. Todas as comunicações (e-mail/WhatsApp) serão registradas, evitando falhas de entendimento e garantindo prazos (SLA).
+Esta atualização transforma o sistema de "protótipo" em uma ferramenta de operação real:
+1. **Nada se perde**: Todas as mudanças de status, aprovações e conversas ficam gravadas para sempre no histórico do projeto.
+2. **Segurança**: Seus dados e os dados de seus clientes estão protegidos; um cliente nunca verá o projeto de outro.
+3. **Automação**: O sistema enviará avisos automáticos (WhatsApp/E-mail) em cada etapa importante, mantendo todos informados sem esforço manual.
+4. **Transparência**: O cliente vê exatamente em que fase o site está (Produção, Revisão, etc.) através do portal exclusivo.
