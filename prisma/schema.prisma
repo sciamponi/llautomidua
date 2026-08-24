@@ -38,7 +38,6 @@ enum UserRole {
 }
 
 enum SiteOrderStatus {
-  DRAFT
   SUBMITTED
   DATA_REVIEW
   IN_PRODUCTION
@@ -48,6 +47,29 @@ enum SiteOrderStatus {
   PUBLISHED
   CANCELLED
 }
+
+enum SiteOrderVersionStatus {
+  DRAFT
+  WAITING_APPROVAL
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+enum ApprovalRequestStatus {
+  PENDING
+  APPROVED
+  CHANGES_REQUESTED
+  EXPIRED
+  CANCELLED
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
 
 
 model User {
@@ -237,7 +259,7 @@ model SiteOrder {
   user              User?           @relation(fields: [userId], references: [id])
   templateId        String
   template          SiteTemplate    @relation(fields: [templateId], references: [id])
-  status            SiteOrderStatus @default(DRAFT)
+  status            SiteOrderStatus @default(SUBMITTED)
   
   // Enterprise Data
   businessName      String
@@ -265,8 +287,10 @@ model SiteOrder {
   workingDays       String?
   
   // Control
+  responsibleId     String?
+  priority          String          @default("NORMAL") // NORMAL, ATENÇÃO, ATRASADO
   token             String          @unique @default(cuid())
-  submittedAt       DateTime?
+  submittedAt       DateTime?       @default(now())
   approvedAt        DateTime?
   publishedAt       DateTime?
   publishedUrl      String?
@@ -274,6 +298,8 @@ model SiteOrder {
   history           SiteOrderHistory[]
   versions          SiteOrderVersion[]
   files             SiteOrderFile[]
+  internalNotes     InternalNote[]
+  notifications     NotificationLog[]
   
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -283,7 +309,7 @@ model SiteOrderHistory {
   id            String    @id @default(cuid())
   orderId       String
   order         SiteOrder @relation(fields: [orderId], references: [id])
-  fromStatus    SiteOrderStatus
+  fromStatus    SiteOrderStatus?
   toStatus      SiteOrderStatus
   changedBy     String?
   comment       String?
@@ -296,20 +322,52 @@ model SiteOrderVersion {
   order         SiteOrder @relation(fields: [orderId], references: [id])
   version       Int
   previewUrl    String
+  previewImage  String?
   notes         String?
+  status        SiteOrderVersionStatus @default(DRAFT)
+  createdBy     String?
   createdAt     DateTime  @default(now())
   approvals     ApprovalRequest[]
 }
 
 model ApprovalRequest {
-  id                  String            @id @default(cuid())
+  id                  String                @id @default(cuid())
+  orderId             String
   orderVersionId      String
-  orderVersion        SiteOrderVersion  @relation(fields: [orderVersionId], references: [id])
-  status              String            @default("pending") // approved, changes_requested
+  orderVersion        SiteOrderVersion      @relation(fields: [orderVersionId], references: [id])
+  tokenHash           String                @unique
+  status              ApprovalRequestStatus @default(PENDING)
   feedback            String?
+  expiresAt           DateTime?
+  usedAt              DateTime?
   ipAddress           String?
   userAgent           String?
-  createdAt           DateTime          @default(now())
+  createdAt           DateTime              @default(now())
+}
+
+model InternalNote {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         SiteOrder @relation(fields: [orderId], references: [id])
+  userId        String
+  message       String
+  createdAt     DateTime  @default(now())
+}
+
+model NotificationLog {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         SiteOrder @relation(fields: [orderId], references: [id])
+  event         String
+  channel       String    // WHATSAPP, EMAIL
+  recipient     String
+  message       String
+  status        NotificationStatus @default(PENDING)
+  externalId    String?
+  error         String?
+  idempotencyKey String?  @unique
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
 }
 
 model SiteOrderFile {
@@ -323,4 +381,5 @@ model SiteOrderFile {
   category      String    // logo, photo, document, video
   uploadedAt    DateTime  @default(now())
 }
+
 
