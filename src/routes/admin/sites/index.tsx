@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { Header } from '@/components/automatiza/Header';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -51,9 +50,7 @@ function SitesKanbanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#071A2F] text-[#DCE3EA] font-inter">
-      <Header />
-      
+    <div className="bg-[#071A2F] text-[#DCE3EA] font-inter">
       <main className="p-6">
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -128,3 +125,4 @@ function SitesKanbanPage() {
     </div>
   );
 }
+
