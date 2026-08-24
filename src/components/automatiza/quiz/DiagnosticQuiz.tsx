@@ -11,7 +11,6 @@ type Question = {
   id: string;
   title: string;
   options: { label: string; value: string; icon?: string }[];
-  dependsOn?: (answers: Record<string, string>) => boolean;
 };
 
 const QUESTIONS: Question[] = [
@@ -36,12 +35,12 @@ const QUESTIONS: Question[] = [
   {
     id: "mainProblem",
     title: "Qual é o maior desafio hoje?",
-    options: [], // Dynamic options based on segment
+    options: [], 
   },
   {
     id: "specificNeed",
     title: "O que você gostaria de resolver primeiro?",
-    options: [], // Dynamic options based on problem
+    options: [], 
   },
   {
     id: "currentOperation",
@@ -114,15 +113,17 @@ export function DiagnosticQuiz() {
 
   useEffect(() => {
     startSess().then(res => setSessionId(res.id));
-  }, []);
+  }, [startSess]);
 
   const handleSelect = async (value: string) => {
     const currentQ = QUESTIONS[step];
+    if (!currentQ) return;
+    
     const newAnswers = { ...answers, [currentQ.id]: value };
     setAnswers(newAnswers);
 
     if (sessionId) {
-      updateSess({ sessionId, step: step + 1, data: newAnswers });
+      updateSess({ data: { sessionId, step: step + 1, data: newAnswers } });
     }
 
     if (step < QUESTIONS.length - 1) {
@@ -131,10 +132,12 @@ export function DiagnosticQuiz() {
       setLoading(true);
       try {
         const res = await getRec({
-          businessSegment: newAnswers.businessSegment,
-          mainProblem: newAnswers.mainProblem,
-          specificNeed: newAnswers.specificNeed,
-          currentOperation: newAnswers.currentOperation,
+          data: {
+            businessSegment: newAnswers['businessSegment'] || "",
+            mainProblem: newAnswers['mainProblem'] || "",
+            specificNeed: newAnswers['specificNeed'],
+            currentOperation: newAnswers['currentOperation'],
+          }
         });
         setResult(res);
       } catch (err) {
@@ -147,11 +150,13 @@ export function DiagnosticQuiz() {
 
   const getCurrentOptions = () => {
     const currentQ = QUESTIONS[step];
+    if (!currentQ) return [];
+    
     if (currentQ.id === "mainProblem") {
-      return SEGMENT_OPTIONS[answers.businessSegment] || SEGMENT_OPTIONS.default;
+      return SEGMENT_OPTIONS[answers['businessSegment'] || ""] || SEGMENT_OPTIONS['default'];
     }
     if (currentQ.id === "specificNeed") {
-      return NEED_OPTIONS[answers.mainProblem] || NEED_OPTIONS.default;
+      return NEED_OPTIONS[answers['mainProblem'] || ""] || NEED_OPTIONS['default'];
     }
     return currentQ.options;
   };
@@ -181,7 +186,7 @@ export function DiagnosticQuiz() {
             <p className="text-[#DCE3EA]/70 mb-8">
               Seu cenário é único e queremos garantir que você receba a ferramenta exata para sua necessidade.
             </p>
-            <Link to="/contato" className="inline-flex items-center gap-2 bg-white text-[#071A2F] px-8 py-4 rounded-xl font-bold hover:bg-white/90 transition-all">
+            <Link to="/" className="inline-flex items-center gap-2 bg-white text-[#071A2F] px-8 py-4 rounded-xl font-bold hover:bg-white/90 transition-all">
               FALAR COM ESPECIALISTA <MessageSquare className="w-5 h-5" />
             </Link>
           </div>
@@ -201,12 +206,11 @@ export function DiagnosticQuiz() {
             Encontramos a solução ideal
           </h2>
           <p className="text-[#DCE3EA]/60 text-lg">
-            Com base no seu perfil de <span className="text-[#1E8CFF] font-bold">{answers.businessSegment}</span> e desafio em <span className="text-[#1E8CFF] font-bold">{answers.mainProblem}</span>.
+            Com base no seu perfil de <span className="text-[#1E8CFF] font-bold">{answers['businessSegment']}</span> e desafio em <span className="text-[#1E8CFF] font-bold">{answers['mainProblem']}</span>.
           </p>
         </div>
 
         <div className="grid md:grid-cols-5 gap-8 items-start">
-          {/* Main Recommendation */}
           <div className="md:col-span-3 space-y-6">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#1E8CFF] to-[#4CDFF2] rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
@@ -237,7 +241,8 @@ export function DiagnosticQuiz() {
 
                 <div className="pt-4">
                   <Link 
-                    to={`/solucoes/${topMatch.product.slug}` as any}
+                    to="/solucoes/$productSlug"
+                    params={{ productSlug: topMatch.product.slug }}
                     className="flex items-center justify-center gap-2 w-full bg-[#1E8CFF] text-white py-5 rounded-2xl font-bold text-lg hover:bg-[#1E8CFF]/90 transition-all group/btn"
                   >
                     COMEÇAR AGORA <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
@@ -247,14 +252,14 @@ export function DiagnosticQuiz() {
             </div>
           </div>
 
-          {/* Alternatives or Next Steps */}
           <div className="md:col-span-2 space-y-6">
             <h4 className="text-sm font-bold text-[#DCE3EA]/40 uppercase tracking-widest px-2">Outras opções relevantes</h4>
             <div className="space-y-4">
               {recommendations.slice(1).map((rec: any) => (
                 <Link 
                   key={rec.product.id}
-                  to={`/solucoes/${rec.product.slug}` as any}
+                  to="/solucoes/$productSlug"
+                  params={{ productSlug: rec.product.slug }}
                   className="block p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all space-y-2"
                 >
                   <h5 className="font-bold text-white">{rec.product.name}</h5>
@@ -266,7 +271,7 @@ export function DiagnosticQuiz() {
                 <p className="text-sm text-[#DCE3EA]/60 italic">
                   "Ainda na dúvida? Nossa equipe pode fazer uma demonstração personalizada."
                 </p>
-                <Link to="/contato" className="flex items-center gap-2 text-[#1E8CFF] font-bold text-sm hover:underline">
+                <Link to="/" className="flex items-center gap-2 text-[#1E8CFF] font-bold text-sm hover:underline">
                   Falar com consultor <MessageSquare className="w-4 h-4" />
                 </Link>
               </div>
@@ -278,6 +283,7 @@ export function DiagnosticQuiz() {
   }
 
   const currentQ = QUESTIONS[step];
+  if (!currentQ) return null;
   const progress = ((step + 1) / QUESTIONS.length) * 100;
   const options = getCurrentOptions();
 
@@ -309,7 +315,7 @@ export function DiagnosticQuiz() {
             {currentQ.title}
           </h2>
           <div className="grid gap-4">
-            {options.map((option) => (
+            {options.map((option: { label: string; value: string }) => (
               <button
                 key={option.value}
                 onClick={() => handleSelect(option.value)}
