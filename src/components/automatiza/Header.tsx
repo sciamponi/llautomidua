@@ -1,22 +1,33 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, User, LayoutDashboard } from "lucide-react";
 import logoAsset from "@/assets/logo.png.asset.json";
 import { PUBLIC_NAV } from "@/config/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProducts } from "@/lib/products.functions";
+import { getSession, logout } from "@/lib/auth.functions";
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSolutionsOpen, setIsSolutionsOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const fetchProducts = useServerFn(getProducts);
+  const fetchSession = useServerFn(getSession);
+  const performLogout = useServerFn(logout);
 
   const { data: products = [] } = useQuery({
     queryKey: ['active-products'],
     queryFn: () => fetchProducts(),
+  });
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: () => fetchSession(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const activeSaas = products.filter((p: any) => p.status === 'active' && p.type === 'SAAS');
@@ -25,15 +36,35 @@ export function Header() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsSolutionsOpen(false);
+    setIsUserMenuOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsSolutionsOpen(false);
+      if (e.key === 'Escape') {
+        setIsSolutionsOpen(false);
+        setIsUserMenuOpen(false);
+      }
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
+
+  const handleLogout = async () => {
+    const result = await performLogout();
+    if (result.success) {
+      navigate({ to: result.redirect as any });
+    }
+  };
+
+  const getDashboardLink = () => {
+    if (!session) return null;
+    const role = session.user.roles[0]?.role;
+    if (['MASTER_ADMIN', 'ADMIN', 'OPERATOR'].includes(role)) return "/admin";
+    if (role === 'PARTNER') return "/membros";
+    if (role === 'CUSTOMER') return "/cliente";
+    return "/";
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[var(--z-header)] w-full border-b border-white/10 bg-[#071A2F]/90 backdrop-blur-lg">
@@ -59,13 +90,11 @@ export function Header() {
               <AnimatePresence>
                 {isSolutionsOpen && (
                   <>
-                    {/* Backdrop */}
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className="fixed inset-0 bg-black/40 z-[-1] pointer-events-none"
-                      onClick={() => setIsSolutionsOpen(false)}
                     />
                     
                     <motion.div 
@@ -128,12 +157,60 @@ export function Header() {
           >
             ENCONTRAR MINHA SOLUÇÃO
           </Link>
-          <Link 
-            to="/parceiros" 
-            className="hidden lg:block rounded-xl bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#071A2F] hover:bg-[#F7F8FA] transition-all"
-          >
-            QUERO SER PARCEIRO
-          </Link>
+          
+          {session ? (
+            <div className="relative">
+              <button 
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 px-4 py-2 hover:bg-white/10 transition-all"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#1E8CFF]/20 border border-[#1E8CFF]/30 flex items-center justify-center text-[#1E8CFF] text-[10px] font-bold">
+                  {session.user.name?.[0]}
+                </div>
+                <span className="hidden sm:inline text-[10px] font-bold text-white uppercase tracking-widest">
+                  {session.user.name.split(' ')[0]}
+                </span>
+                <ChevronDown className={`w-3 h-3 text-[#DCE3EA]/40 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {isUserMenuOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full right-0 mt-2 w-48 bg-[#071A2F] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[var(--z-mega-menu)]"
+                  >
+                    <div className="p-4 border-b border-white/5 bg-white/5">
+                      <p className="text-xs font-bold text-white truncate">{session.user.name}</p>
+                      <p className="text-[9px] text-[#DCE3EA]/40 uppercase tracking-widest mt-0.5">{session.user.roles[0]?.role}</p>
+                    </div>
+                    <div className="p-2">
+                      <Link 
+                        to={getDashboardLink() as any}
+                        className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-bold text-[#DCE3EA]/60 hover:text-white hover:bg-white/5 rounded-lg transition-all uppercase tracking-widest"
+                      >
+                        <LayoutDashboard className="w-3 h-3" /> Dashboard
+                      </Link>
+                      <button 
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-3 py-2 text-[10px] font-bold text-red-400 hover:text-red-300 hover:bg-red-400/5 rounded-lg transition-all uppercase tracking-widest"
+                      >
+                        <LogOut className="w-3 h-3" /> Sair
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <Link 
+              to="/login" 
+              className="hidden lg:block rounded-xl bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#071A2F] hover:bg-[#F7F8FA] transition-all"
+            >
+              ÁREA DO CLIENTE
+            </Link>
+          )}
 
           <button 
             className="lg:hidden p-2 text-white"
@@ -190,18 +267,37 @@ export function Header() {
             </nav>
 
             <div className="mt-12 pt-12 border-t border-white/10 space-y-4">
-              <Link 
-                to="/diagnostico" 
-                className="block w-full text-center py-5 rounded-2xl bg-[#1E8CFF] text-white font-bold uppercase tracking-widest text-sm"
-              >
-                ENCONTRAR MINHA SOLUÇÃO
-              </Link>
-              <Link 
-                to="/parceiros" 
-                className="block w-full text-center py-5 rounded-2xl border border-white/20 text-white font-bold uppercase tracking-widest text-sm"
-              >
-                QUERO SER PARCEIRO
-              </Link>
+              {session ? (
+                <>
+                  <Link 
+                    to={getDashboardLink() as any}
+                    className="block w-full text-center py-5 rounded-2xl bg-[#1E8CFF] text-white font-bold uppercase tracking-widest text-sm"
+                  >
+                    DASHBOARD
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="block w-full text-center py-5 rounded-2xl border border-red-500/20 text-red-400 font-bold uppercase tracking-widest text-sm"
+                  >
+                    SAIR DA CONTA
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/diagnostico" 
+                    className="block w-full text-center py-5 rounded-2xl bg-[#1E8CFF] text-white font-bold uppercase tracking-widest text-sm"
+                  >
+                    ENCONTRAR MINHA SOLUÇÃO
+                  </Link>
+                  <Link 
+                    to="/login" 
+                    className="block w-full text-center py-5 rounded-2xl border border-white/20 text-white font-bold uppercase tracking-widest text-sm"
+                  >
+                    ENTRAR NO PAINEL
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}
