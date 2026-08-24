@@ -1,0 +1,30 @@
+
+model Payment {
+  id                String        @id @default(cuid())
+  amount            Decimal       @db.Decimal(10, 2)
+  method            PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  proofUrl          String?
+  rejectionReason   String?
+  
+  orderId           String
+  order             SiteOrder     @relation(fields: [orderId], references: [id])
+  
+  customerId        String?
+  responsibleUserId String?
+  
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model PaymentConfig {
+  id                String    @id @default(cuid())
+  pixEnabled        Boolean   @default(true)
+  pixKey            String?
+  receiverName      String?
+  instructions      String?
+  qrCodeUrl         String?
+  
+  updatedAt         DateTime  @updatedAt
+}
