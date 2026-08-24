@@ -1,49 +1,50 @@
-# Plano: FASE 7 — CONEXÃO REAL COM VPS / POSTGRESQL (APROVAÇÃO FINAL)
+# Plano: FASE 7 — CONEXÃO REAL COM VPS / POSTGRESQL (VERSÃO SEGURA)
 
-Este plano estabelece a base definitiva para a operação da Automatiza Solução em produção, garantindo integridade de dados, segurança de segredos e automação de infraestrutura conforme os requisitos do `VOIDPRO-65.md`.
+Este plano estabelece a base definitiva e segura para a operação da Automatiza Solução em produção, garantindo integridade de dados, segurança de segredos e automação de infraestrutura conforme os requisitos do `VOIDPRO-66.md`.
 
 ## Auditoria de Prontidão
 
 | Componente | Estado Atual | Ação |
 | :--- | :--- | :--- |
-| **Banco de Dados** | `schema.prisma` pronto para PostgreSQL. | Gerar baseline de migração para o VPS. |
-| **Infraestrutura** | `Dockerfile` e `docker-compose.yml` isolam o banco. | Mapear volumes persistentes para `/data/storage`. |
-| **Health Check** | Contrato `200/503` implementado em `src/routes/api/public/health.ts`. | Validar contra conexão real. |
-| **Autenticação** | `auth.functions.ts` preparado. | Implementar endpoint de bootstrap seguro. |
-| **Backups** | `scripts/backup-db.sh` criado com `pg_dump`. | Documentar processo em `DEPLOY-VPS.md`. |
-| **Storage** | `LocalStorageProvider` implementado. | Garantir criação automática de subpastas no entrypoint. |
+| **Infraestrutura** | `docker-compose.yml` e `Dockerfile` presentes. | Mapear volume persistente `storage-data:/data/storage`. |
+| **Entrypoint** | `docker-entrypoint.sh` aguarda banco. | Adicionar criação automática de subpastas de storage e permissões. |
+| **Banco / Prisma** | `schema.prisma` configurado. | Gerar baseline de migração para o VPS. |
+| **Health Check** | Contrato `200/503` implementado. | Nenhuma mudança necessária (preservar contrato). |
+| **Autenticação** | `auth.functions.ts` preparado. | Implementar bootstrap idempotente em `/api/admin/bootstrap`. |
+| **Mocks** | Fallbacks implementados no preview. | Garantir desativação total quando `DATABASE_URL` estiver presente em prod. |
 
 ## Mudanças Propostas
 
-### 1. Infraestrutura e Persistência (Docker)
-- **Volumes**: Mapear `storage-data:/data/storage` no `docker-compose.yml`.
+### 1. Infraestrutura e Docker (Segurança)
+- **Volumes**: Mapear `storage-data:/data/storage` no `docker-compose.yml` para persistência real.
 - **Entrypoint**: Atualizar `docker-entrypoint.sh` para:
-    1. Aguardar o banco de dados.
-    2. Criar as pastas obrigatórias (`logos`, `previews`, `uploads`, `documents`, `proofs`).
-    3. Garantir permissões de escrita em `/data/storage`.
+    1. Aguardar o PostgreSQL estar disponível via `nc`.
+    2. Criar subpastas: `logos`, `previews`, `uploads`, `documents`, `proofs`.
+    3. Garantir permissões de leitura/escrita em `/data/storage`.
     4. Executar `npx prisma migrate deploy`.
-- **Rede**: Confirmar que `DATABASE_URL` utiliza `db:5432` para comunicação interna segura.
+- **Rede**: Garantir que o app acesse o banco via hostname interno `db` e que o banco não esteja exposto publicamente.
 
-### 2. Migrations e Dados (Prisma)
-- **Baseline de Produção**: Preparar as migrations para que o `npx prisma migrate deploy` funcione no VPS sem tentar recriar tabelas existentes (baselining).
-- **Proteção de Dados**: Reforçar em toda a lógica server-side que o `DATABASE_URL` é a única fonte da verdade em produção, desativando mocks completamente.
+### 2. Migrations e Prisma (Estabilidade)
+- **Baseline**: Preparar a pasta `prisma/migrations` para que o deploy no VPS seja suave, sem tentativas de recriação destrutiva.
+- **Produção**: Reforçar o uso exclusivo de `npx prisma migrate deploy`. Desativar explicitamente qualquer lógica de `prisma db push` ou `migrate reset`.
 
 ### 3. Setup do Master Admin (Bootstrap)
-- **Endpoint Seguro**: Criar `src/routes/api/public/bootstrap.ts` que chama a função `bootstrapMaster` interna.
-- **Segurança**: Validar contra `BOOTSTRAP_SECRET` e credenciais do `.env`. Garantir que a operação seja idempotente (falha se já existir um Master).
-- **Hash de Senha**: Utilizar `PBKDF2` (já implementado) para armazenamento seguro.
+- **Endpoint**: Criar `src/routes/api/admin/bootstrap.ts` (idempotente).
+- **Segurança**: Validar contra `BOOTSTRAP_SECRET`. O endpoint deve falhar se um `MASTER_ADMIN` já existir.
+- **Autenticação**: Configurar cookies de sessão persistidos no banco (PostgreSQL) com flags `HttpOnly`, `Secure` (prod) e `SameSite=Lax`.
 
-### 4. Autenticação e Sessões
-- **Cookies**: Configurar cookies de sessão como `HttpOnly`, `Secure` (em prod), `SameSite=Lax`, `Path=/`.
-- **Persistência**: Garantir que as sessões sejam gravadas na tabela `Session` do PostgreSQL.
+### 4. Persistência Comercial
+- **Mocks**: Remover dependências de mock para Leads, Produtos, Pedidos e Demos quando o banco estiver configurado.
+- **Auditoria**: Garantir que `AuditLog` e `NotificationLog` persistam no PostgreSQL real.
 
-### 5. Documentação de Operação
-- **DEPLOY-VPS.md**: Atualizar com os passos exatos de bootstrap, backup e restauração.
-- **Scripts**: Validar o script de backup para garantir que os arquivos SQL não fiquem presos no volume do banco.
+### 5. Documentação e Backup
+- **DEPLOY-VPS.md**: Atualizar com os passos exatos para conexão no servidor, comandos de bootstrap e guia de restore.
+- **Scripts**: Validar `scripts/backup-db.sh` para garantir uso de `pg_dump` e armazenamento fora do volume do banco.
 
 ## Critérios de Conclusão
 - [ ] Health Check validado (retorna `database: ok` com banco real).
 - [ ] Bootstrap do Master Admin testado e funcional.
 - [ ] Login real funcional com persistência em PostgreSQL e cookies HttpOnly.
-- [ ] Pastas de storage criadas automaticamente com permissões corretas.
-- [ ] Documentação de deploy completa e sem segredos expostos.
+- [ ] Subpastas de storage criadas automaticamente no startup.
+- [ ] Mocks desativados em ambiente de produção com banco conectado.
+- [ ] Guia de deploy atualizado com comandos necessários para o servidor.
