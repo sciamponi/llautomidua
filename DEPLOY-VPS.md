@@ -54,14 +54,17 @@ A aplicação expõe um endpoint de saúde:
 `GET /api/public/health`
 
 Resposta esperada (JSON):
+
+**Preview / Dev (`NODE_ENV != production`)**:
 ```json
 {
   "status": "ok",
-  "database": "ok"
+  "database": "not_configured",
+  "environment": "preview"
 }
 ```
 
-Estados possíveis (database):
-- `not_configured`: Preview / Dev (200 OK)
-- `ok`: Produção estável (200 OK)
-- `unavailable`: Produção indisponível (503 Service Unavailable)
+**Produção (`NODE_ENV = production`)**:
+- Estável (200 OK): `{"status": "ok", "database": "ok"}`
+- Sem URL (503): `{"status": "error", "database": "not_configured"}`
+- Sem conexão (503): `{"status": "error", "database": "unavailable"}`
