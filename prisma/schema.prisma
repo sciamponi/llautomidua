@@ -21,13 +21,6 @@ enum LeadType {
   SCREEN_INSTALLATION
   SCREEN_ADVERTISING
   PARTNER
-  SPECIALIST_CLICK
-}
-
-enum DemoAccessStatus {
-  ACTIVE
-  EXPIRED
-  REVOKED
 }
 
 enum RevenueType {
@@ -37,19 +30,11 @@ enum RevenueType {
   MEDIA
 }
 
-enum AuthScope {
-  GLOBAL
-  PRODUCT
-  COMPANY
-  PARTNER
-}
-
 enum UserRole {
-  MASTER_ADMIN
   ADMIN
-  OPERATOR
-  CUSTOMER
   PARTNER
+  CUSTOMER
+  STUDENT
 }
 
 enum SiteOrderStatus {
@@ -83,107 +68,23 @@ enum NotificationStatus {
   PENDING
   SENT
   FAILED
-  SIMULATED
 }
 
-enum PaymentMethod {
-  PIX
-  CREDIT_CARD
-  BOLETO
-}
 
-enum PaymentStatus {
-  PENDING
-  PROOF_SUBMITTED
-  UNDER_REVIEW
-  PAID
-  REJECTED
-  CANCELLED
-  FAILED
-}
 
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
-  passwordHash  String
+  password      String
   name          String?
-  status        String    @default("active")
-  
-  // Relations
-  roles         UserRoleMapping[]
-  sessions      Session[]
-  auditLogs     AuditLog[]
+  role          UserRole  @default(CUSTOMER)
   partnerProfile PartnerProfile?
   subscriptions Subscription[]
   leads         Lead[]
   siteOrders    SiteOrder[]
-  internalNotes InternalNote[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-model Company {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  document    String?   @unique // CNPJ
-  status      String    @default("active")
-  
-  // Relations
-  roles       UserRoleMapping[]
-  sessions    Session[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model UserRoleMapping {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role        UserRole
-  scope       AuthScope
-  
-  // Specific context
-  companyId   String?
-  company     Company?  @relation(fields: [companyId], references: [id])
-  productId   String?
-  product     Product?  @relation(fields: [productId], references: [id])
-  
-  createdAt   DateTime  @default(now())
-
-  @@unique([userId, role, scope, companyId, productId])
-}
-
-model Session {
-  id              String    @id @default(cuid())
-  userId          String
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash       String    @unique
-  expiresAt       DateTime
-  
-  // Context of the session
-  activeCompanyId String?
-  activeCompany   Company?  @relation(fields: [activeCompanyId], references: [id])
-  activeProductId String?
-  activeProduct   Product?  @relation(fields: [activeProductId], references: [id])
-  
-  ipAddress       String?
-  userAgent       String?
-  lastUsedAt      DateTime  @updatedAt
-  createdAt       DateTime  @default(now())
-}
-
-model AuditLog {
-  id          String    @id @default(cuid())
-  actorId     String
-  actor       User      @relation(fields: [actorId], references: [id])
-  action      String    // LOGIN, LOGOUT, CREATE_USER, CHANGE_ROLE, etc.
-  targetId    String?
-  metadata    Json?
-  ipAddress   String?
-  createdAt   DateTime  @default(now())
 }
 
 model PartnerProfile {
@@ -209,60 +110,21 @@ model Product {
   audience          String?
   problem           String?
   solution          String?
-  howItWorks        String?
-  benefits          Json?     // Array of string or objects
   features          Json?     // Array of {title, desc}
   pricingType       RevenueType
   pricing           String?
   ctaType           String?
   demoUrl           String?
-  demoActive        Boolean   @default(true)
-  demoDurationHours Int       @default(24)
   landingUrl        String?
   whatsappMessage   String?
   status            String    @default("active")
   featured          Boolean   @default(false)
   sortOrder         Int       @default(0)
-  coverImage        String?
-  
-  // Relations
-  gallery           ProductImage[]
-  demoAccesses      DemoAccess[]
-  leads             Lead[]
   subscriptions     Subscription[]
   recommendations   ProductRecommendation[] @relation("MainProduct")
   recommendedBy     ProductRecommendation[] @relation("RecommendedProduct")
-  roleMappings      UserRoleMapping[]
-  sessions          Session[]
-
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-}
-
-model ProductImage {
-  id        String  @id @default(cuid())
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  url       String
-  alt       String?
-  sortOrder Int     @default(0)
-}
-
-model DemoAccess {
-  id            String           @id @default(cuid())
-  leadId        String
-  lead          Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  productId     String
-  product       Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
-  tokenHash     String           @unique
-  status        DemoAccessStatus @default(ACTIVE)
-  expiresAt     DateTime
-  firstAccessAt DateTime?
-  lastAccessAt  DateTime?
-  accessCount   Int              @default(0)
-  revokedAt     DateTime?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
 }
 
 model ProductRecommendation {
@@ -291,12 +153,8 @@ model Lead {
   message       String?
   type          LeadType  @default(GENERAL)
   status        String    @default("new")
-  source        String?   // e.g., "DEMO", "LANDING", "MEGA_MENU"
   userId        String?
   user          User?     @relation(fields: [userId], references: [id])
-  productId     String?
-  product       Product?  @relation(fields: [productId], references: [id])
-  demoAccesses  DemoAccess[]
   createdAt     DateTime  @default(now())
   diagnosticSessionId String? @unique
   diagnosticSession   DiagnosticSession? @relation(fields: [diagnosticSessionId], references: [id])
@@ -402,11 +260,6 @@ model SiteOrder {
   templateId        String
   template          SiteTemplate    @relation(fields: [templateId], references: [id])
   status            SiteOrderStatus @default(SUBMITTED)
-  paymentStatus     PaymentStatus   @default(PENDING)
-  price             Decimal?        @db.Decimal(10, 2)
-  responsibleUserId String?
-  slaDeadline       DateTime?
-  requirePaymentBeforePublish Boolean @default(true)
   
   // Enterprise Data
   businessName      String
@@ -447,8 +300,7 @@ model SiteOrder {
   files             SiteOrderFile[]
   internalNotes     InternalNote[]
   notifications     NotificationLog[]
-  payments          Payment[]
-
+  
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 }
@@ -459,14 +311,8 @@ model SiteOrderHistory {
   order         SiteOrder @relation(fields: [orderId], references: [id])
   fromStatus    SiteOrderStatus?
   toStatus      SiteOrderStatus
-  fromPaymentStatus PaymentStatus?
-  toPaymentStatus   PaymentStatus?
-  priceAtMoment     Decimal?        @db.Decimal(10, 2)
-  changedBy       String?
-
-  responsibleUserId String?
-  comment         String?
-
+  changedBy     String?
+  comment       String?
   createdAt     DateTime  @default(now())
 }
 
@@ -474,17 +320,13 @@ model SiteOrderVersion {
   id            String    @id @default(cuid())
   orderId       String
   order         SiteOrder @relation(fields: [orderId], references: [id])
-  version           Int
-  versionNumber     Int             @default(1)
-  contentSnapshot   Json?
-  previewUrl        String
-  previewImage      String?
-  notes             String?
-  status            SiteOrderVersionStatus @default(DRAFT)
-  createdBy         String?
-  publishedAt       DateTime?
-  createdAt         DateTime        @default(now())
-
+  version       Int
+  previewUrl    String
+  previewImage  String?
+  notes         String?
+  status        SiteOrderVersionStatus @default(DRAFT)
+  createdBy     String?
+  createdAt     DateTime  @default(now())
   approvals     ApprovalRequest[]
 }
 
@@ -497,9 +339,7 @@ model ApprovalRequest {
   status              ApprovalRequestStatus @default(PENDING)
   feedback            String?
   expiresAt           DateTime?
-  versionId           String?
   usedAt              DateTime?
-
   ipAddress           String?
   userAgent           String?
   createdAt           DateTime              @default(now())
@@ -510,7 +350,6 @@ model InternalNote {
   orderId       String
   order         SiteOrder @relation(fields: [orderId], references: [id])
   userId        String
-  user          User      @relation(fields: [userId], references: [id])
   message       String
   createdAt     DateTime  @default(now())
 }
@@ -543,27 +382,4 @@ model SiteOrderFile {
   uploadedAt    DateTime  @default(now())
 }
 
-model Subscription {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  status    String   @default("active")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
-model Payment {
-  id              String        @id @default(cuid())
-  orderId         String
-  order           SiteOrder     @relation(fields: [orderId], references: [id])
-  amount          Decimal       @db.Decimal(10, 2)
-  method          PaymentMethod
-  status          PaymentStatus @default(PENDING)
-  proofUrl        String?
-  rejectionReason String?
-  externalId      String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-}

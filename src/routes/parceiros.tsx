@@ -9,7 +9,7 @@ function ParceirosPage() {
     <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
       <main>
         {/* Hero Section */}
-        <section className="pb-20 relative overflow-hidden">
+        <section className="pt-32 pb-20 relative overflow-hidden">
           <div className="container px-4 text-center space-y-8 relative z-10">
             <span className="text-[#1E8CFF] font-bold uppercase tracking-widest text-sm">Oportunidade de Negócio</span>
             <h1 className="text-4xl md:text-7xl font-bold text-white font-sora leading-tight max-w-4xl mx-auto">

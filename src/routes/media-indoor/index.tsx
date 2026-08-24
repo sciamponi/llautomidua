@@ -46,7 +46,7 @@ function MediaIndoorPage() {
 
   return (
     <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <main className="container px-4 py-12">
+      <main className="container px-4 py-20">
         <div className="max-w-4xl mx-auto text-center mb-20">
           <span className="text-[#1E8CFF] font-bold tracking-[0.3em] uppercase text-xs mb-4 block">MEDIA INDOOR</span>
           <h1 className="text-5xl md:text-7xl font-bold text-white font-sora mb-8">

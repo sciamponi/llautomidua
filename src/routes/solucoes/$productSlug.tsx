@@ -47,7 +47,7 @@ function ProductPage() {
 
   return (
     <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <main>
+      <main className="pt-20">
         <ProductSalesTemplate {...templateData} />
       </main>
     </div>
