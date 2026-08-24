@@ -59,67 +59,95 @@ function ClientApprovalPage() {
   }
 
   return (
-    <div className="bg-[#071A2F] text-[#DCE3EA] font-inter">
-      <header className="border-b border-white/10 p-6 bg-black/20">
+    <div className="bg-[#071A2F] text-[#DCE3EA] font-inter min-h-screen">
+      <header className="border-b border-white/10 p-6 bg-black/40 backdrop-blur-lg sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold font-sora">{order.businessName}</h1>
-            <p className="text-[10px] text-gray-400 uppercase tracking-widest">Portal de Aprovação • Versão {order.version}</p>
+          <div className="flex items-center gap-6">
+            <Link to="/" className="hidden md:block">
+              <img src="/logo.png" alt="Automatiza" className="h-8 w-auto opacity-50 hover:opacity-100 transition-opacity" />
+            </Link>
+            <div>
+              <h1 className="text-lg md:text-xl font-bold font-sora text-white">{order.businessName}</h1>
+              <p className="text-[9px] md:text-[10px] text-[#DCE3EA]/40 uppercase tracking-[0.2em]">Portal de Aprovação • Versão {order.version}</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-[#4CDFF2] rounded-full animate-pulse" />
-            <span className="text-[10px] font-bold text-[#4CDFF2] uppercase">Aguardando Aprovação</span>
+          <div className="flex items-center gap-3 bg-[#4CDFF2]/10 px-3 py-1.5 rounded-full border border-[#4CDFF2]/20">
+            <div className="w-2 h-2 bg-[#4CDFF2] rounded-full animate-pulse shadow-[0_0_8px_#4CDFF2]" />
+            <span className="text-[9px] md:text-[10px] font-bold text-[#4CDFF2] uppercase tracking-wider">Aguardando Aprovação</span>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto p-6 md:py-12 flex flex-col md:flex-row gap-8">
+      <main className="container mx-auto px-4 md:px-6 py-8 md:py-12 flex flex-col lg:row-reverse lg:flex-row gap-8">
         <div className="flex-grow space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden aspect-video relative group">
+          <div className="bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden aspect-video relative group shadow-2xl">
              {/* Mock de Iframe de Preview */}
-             <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                <div className="text-center space-y-4">
-                  <p className="text-gray-400 text-sm">Preview da Versão {order.version}</p>
-                  <a href={order.previewUrl} target="_blank" className="inline-block px-6 py-3 bg-white/10 border border-white/20 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white/20 transition-all">
-                    Abrir em nova aba
-                  </a>
+             <div className="absolute inset-0 bg-[#071A2F]/80 flex flex-col items-center justify-center p-8 text-center space-y-6">
+                <div className="w-16 h-16 bg-[#1E8CFF]/20 rounded-2xl flex items-center justify-center text-3xl">🌐</div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-white font-sora">Visualização do Site</h3>
+                  <p className="text-[#DCE3EA]/60 text-sm max-w-xs mx-auto">Esta é uma simulação do seu site. Clique no botão abaixo para ver a versão interativa completa.</p>
                 </div>
+                <a 
+                  href={order.previewUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 bg-[#1E8CFF] text-white rounded-xl text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#1E8CFF]/90 transition-all shadow-lg shadow-[#1E8CFF]/20"
+                >
+                  Abrir Preview Interativo
+                </a>
              </div>
           </div>
 
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Notas da Produção</h3>
-            <p className="text-sm leading-relaxed text-gray-300">{order.notes}</p>
+          <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 md:p-10 space-y-6">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">📝</span>
+              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[#DCE3EA]/40">Notas da Produção</h3>
+            </div>
+            <div className="bg-[#071A2F]/50 p-6 rounded-2xl border border-white/5">
+              <p className="text-base leading-relaxed text-[#DCE3EA]/80">{order.notes}</p>
+            </div>
           </div>
         </div>
 
-        <aside className="w-full md:w-80 space-y-6 shrink-0">
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6 sticky top-6">
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-gray-500">Decisão</h4>
-              <p className="text-[10px] text-gray-400">Revise o preview e as notas antes de aprovar.</p>
+        <aside className="w-full lg:w-96 space-y-6 shrink-0">
+          <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 space-y-8 sticky top-32 shadow-xl backdrop-blur-sm">
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-[#DCE3EA]/40">Revisão Final</h4>
+              <p className="text-xs text-[#DCE3EA]/60 leading-relaxed">
+                Após a aprovação, seu site seguirá para a etapa de publicação. Se precisar de mudanças, descreva-as em "Solicitar Ajustes".
+              </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <button 
                 onClick={() => handleApproval(true)}
                 disabled={isSubmitting}
-                className="w-full py-4 bg-[#4CDFF2] text-[#071A2F] rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#4CDFF2]/90 transition-all disabled:opacity-50"
+                className="w-full py-5 bg-[#4CDFF2] text-[#071A2F] rounded-2xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-[#4CDFF2]/90 transition-all shadow-lg shadow-[#4CDFF2]/20 disabled:opacity-50"
               >
-                {isSubmitting ? 'Processando...' : 'Aprovar Site'}
+                {isSubmitting ? 'PROCESSANDO...' : 'APROVAR SITE AGORA'}
               </button>
               
               <button 
                 onClick={() => setView('adjustments')}
                 disabled={isSubmitting}
-                className="w-full py-4 bg-white/5 border border-white/10 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all disabled:opacity-50"
+                className="w-full py-5 bg-white/5 border border-white/10 text-white rounded-2xl font-bold text-xs uppercase tracking-[0.2em] hover:bg-white/10 transition-all disabled:opacity-50"
               >
-                Solicitar Ajustes
+                SOLICITAR AJUSTES
               </button>
+            </div>
+
+            <div className="pt-6 border-t border-white/5 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#1E8CFF]/20 flex items-center justify-center text-sm">🤖</div>
+              <div>
+                <p className="text-[10px] font-bold text-white uppercase tracking-widest">Suporte Automatiza</p>
+                <p className="text-[9px] text-[#DCE3EA]/40">Dúvidas? Fale conosco no chat.</p>
+              </div>
             </div>
           </div>
         </aside>
       </main>
+
 
       <AnimatePresence>
         {view === 'adjustments' && (
