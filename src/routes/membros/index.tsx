@@ -39,11 +39,12 @@ function MembersPage() {
               ].map((item, i) => (
                 <button 
                   key={i}
-                  className={`w-full text-left px-6 py-4 rounded-2xl transition-all font-medium ${
+                  className={cn(
+                    "w-full text-left px-6 py-4 rounded-2xl transition-all font-medium",
                     item.active 
                       ? "bg-[#1E8CFF] text-white shadow-lg shadow-[#1E8CFF]/20" 
                       : "text-[#DCE3EA]/60 hover:bg-white/5 hover:text-white"
-                  }`}
+                  )}
                 >
                   {item.label}
                 </button>
