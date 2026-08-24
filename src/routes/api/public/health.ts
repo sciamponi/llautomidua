@@ -6,14 +6,12 @@ export const Route = createFileRoute('/api/public/health')({
       GET: async () => {
         const databaseUrl = process.env['DATABASE_URL'];
 
-        // Sem DATABASE_URL (ex.: preview do Lovable), a app está saudável,
-        // apenas sem banco configurado. Não é um erro.
+        // Preview / Desenvolvimento (DATABASE_URL ausente)
         if (!databaseUrl) {
           return Response.json(
             {
               status: 'ok',
-              app: 'ok',
-              database: 'unconfigured',
+              database: 'not_configured',
               timestamp: new Date().toISOString(),
             },
             { status: 200 },
@@ -26,13 +24,12 @@ export const Route = createFileRoute('/api/public/health')({
           await prisma.$queryRaw`SELECT 1`;
         } catch (err) {
           console.error('[HealthCheck] Database error:', err);
-          database = 'error';
+          database = 'unavailable';
         }
 
         return Response.json(
           {
             status: database === 'ok' ? 'ok' : 'degraded',
-            app: 'ok',
             database,
             timestamp: new Date().toISOString(),
           },
