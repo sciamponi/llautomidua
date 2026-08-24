@@ -218,14 +218,21 @@ export const getSiteOrderDetails = createServerFn({ method: "GET" })
 
 export const getOrdersForKanban = createServerFn({ method: "GET" })
   .handler(async () => {
-    const orders = await prisma.siteOrder.findMany({
-      include: {
-        template: true,
-        user: { select: { name: true, email: true } }
-      },
-      orderBy: { updatedAt: 'desc' }
-    });
-    return orders.map(serializeOrder);
+    // Em ambientes sem banco configurado (preview), retorna lista vazia
+    if (!process.env['DATABASE_URL']) return [];
+    try {
+      const orders = await prisma.siteOrder.findMany({
+        include: {
+          template: true,
+          user: { select: { name: true, email: true } }
+        },
+        orderBy: { updatedAt: 'desc' }
+      });
+      return orders.map(serializeOrder);
+    } catch (error) {
+      console.error('getOrdersForKanban failed:', error);
+      return [];
+    }
   });
 
 export const updatePaymentStatus = createServerFn({ method: "POST" })
