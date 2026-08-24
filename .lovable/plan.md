@@ -1,62 +1,61 @@
-# Plano de Implementação - Fase 5.3: Pagamento e Fluxo Financeiro
+# Plano de Implementação - Fase 5.3: Pagamento e Fluxo Financeiro (Sites Operation 2.0)
 
-Este plano detalha a implementação do fluxo de pagamento, aprovação financeira e pipeline de sites, integrando o sistema comercial à operação técnica.
+Este plano detalha a evolução da operação de sites para incluir o fluxo de pagamento, aprovação financeira, pipeline Kanban avançado e notificações integradas, conforme especificações em `VOIDPRO-45.md`.
 
-## 1. Evolução do Banco de Dados (Prisma)
+## 1. Banco de Dados e Modelagem (Prisma)
 
-Atualizar o `prisma/schema.prisma` para incluir os modelos de pagamento e configurações necessárias.
+Atualizar o `prisma/schema.prisma` para suportar o novo fluxo financeiro:
 
-- **Payment**: Novo modelo para registrar transações.
-  - Campos: `id`, `amount`, `method` (PIX, CREDIT_CARD, BOLETO), `status` (PENDING, PAID, etc.), `proofUrl` (para PIX manual), `orderId`, `customerId`, `responsibleUserId`, `paidAt`.
-- **PaymentConfig**: Modelo para armazenar configurações globais de pagamento (ex: Chave PIX, tokens do Asaas/Telegram).
-  - Campos: `key`, `value`, `encrypted` (booleano).
-- **SiteOrder**: Adicionar campo `paymentStatus` e `price`.
+- **SiteOrder**: Adicionar `price` (Decimal/Float) e `paymentStatus` (enum).
+- **Payment**: Criar modelo para transações.
+  - Campos: `id`, `amount`, `method` (PIX, CREDIT_CARD, BOLETO), `status` (PENDING, PROOF_SUBMITTED, UNDER_REVIEW, PAID, REJECTED, CANCELLED, FAILED), `proofUrl`, `orderId`, `customerId`, `responsibleUserId`, `paidAt`.
+- **PaymentConfig**: Criar modelo para configurações operacionais (não sensíveis).
+  - Campos: `pixEnabled`, `pixKey`, `receiverName`, `instructions`, `qrCodeUrl`.
+- **Audit/History**: Garantir que alterações de preço e status financeiro gerem registros em `SiteOrderHistory`.
 
-## 2. Infraestrutura de Pagamento e Notificações
+## 2. Infraestrutura e Providers (Server-Side)
 
-Implementar os providers de forma modular para permitir trocas futuras de gateway.
+Implementar uma arquitetura de providers abstratos para garantir modularidade e segurança.
 
-- `src/lib/payments/`:
-  - `PaymentProvider.ts`: Interface abstrata.
-  - `AsaasProvider.ts`: Integração com o gateway Asaas (Boleto/Cartão).
-  - `ManualPixProvider.ts`: Lógica para PIX manual com upload de comprovante.
-- `src/lib/notifications/`:
-  - `TelegramProvider.ts`: Integração para enviar alertas ao Admin.
-  - `EmailProvider.ts`: Template e envio de propostas/confirmantes via Resend.
+- **PaymentProvider**: Interface base para gateways.
+  - `ManualPixProvider`: Lógica para PIX com upload de comprovante.
+  - `AsaasProvider`: Integração com gateway Asaas (Boleto/Cartão).
+- **NotificationProvider**:
+  - `TelegramProvider`: Envios via bot (NOVO PEDIDO, COMPROVANTE ENVIADO, etc.).
+  - `EmailProvider`: Integração com Resend para propostas e recibos.
+- **Segurança**: Secrets (`ASAAS_API_KEY`, `TELEGRAM_BOT_TOKEN`, `RESEND_API_KEY`) permanecem exclusivamente no servidor via variáveis de ambiente.
 
-## 3. Painel Administrativo (Operação de Sites & Financeiro)
+## 3. Painel Administrativo (Sites Operation 2.0)
 
-Evoluir o Kanban e o modal de detalhes para incluir a visão financeira.
+Evolução do Kanban e gestão financeira.
 
 - **Kanban Drag & Drop**:
-  - Implementar persistência de status ao arrastar os cards.
-  - Exibir valor total e quantidade de projetos por lane.
-  - Botão para mostrar/ocultar valores financeiros (conforme permissão).
-- **OrderModal (Financeiro)**:
-  - Implementar a aba "Financeiro" no modal existente.
-  - Visualização e aprovação de comprovantes PIX.
-  - Registro de histórico de alterações de valor e status de pagamento.
+  - Implementar persistência de status no servidor ao mover cards.
+  - Exibir contagem de projetos e valor total por lane (lane totalizer).
+  - Controle administrativo para MOSTRAR/OCULTAR valores financeiros.
+- **OrderModal (Aba Financeiro)**:
+  - Visualização de dados de pagamento e comprovantes.
+  - Botões de APROVAR/REJEITAR pagamento (rejeição exige motivo).
+  - Histórico financeiro detalhado do pedido.
 
-## 4. Experiência do Cliente (Portal de Pagamento)
+## 4. Experiência do Cliente (Portal do Cliente)
 
-Evoluir o fluxo após a aprovação do site pelo cliente.
+Novo fluxo de checkout e comprovação.
 
-- **Portal do Cliente (`/cliente/*`)**:
-  - Nova rota `/cliente/sites/pagamento/$orderId`.
-  - Seleção de forma de pagamento (PIX, Cartão, Boleto).
-  - Fluxo de PIX: Exibição de QR Code (gerado ou manual), Copia e Cola, e Upload de Comprovante.
-  - Fluxo de Asaas: Link para pagamento seguro ou linha digitável.
-- **Portal de Aprovação**:
-  - Após aprovação positiva, redirecionar automaticamente para a tela de pagamento.
+- **Rota de Pagamento**: `/cliente/sites/pagamento/$orderId` (acessível via token seguro).
+- **Fluxo PIX**: Exibição da chave e QR Code, botão "Copiar Chave" e área de upload de comprovante (PDF/PNG/JPG).
+- **Fluxo Asaas**: Redirecionamento para checkout seguro ou exibição de linha digitável (Boleto).
+- **Redirecionamento**: Após o cliente aprovar o preview do site, redirecionar automaticamente para a tela de pagamento.
 
-## 5. Auditoria e Segurança
+## 5. Auditoria e Regras de Negócio
 
-- Garantir que dados sensíveis de cartão NUNCA passem ou sejam armazenados no servidor.
-- Implementar logs de auditoria detalhados para todas as ações financeiras (quem alterou, quando e o quê).
-- Proteção de rotas `/admin/*` e `/api/public/health` com as novas regras de ambiente.
+- **Regra de Publicação**: Implementar a flag `requirePaymentBeforePublish` (configurável por produto/plano).
+- **Auditoria**: Registro detalhado de "quem, quando, o quê e valor anterior/novo" para todas as transações financeiras.
 
-## Detalhes Técnicos
+## Fases de Entrega
 
-- **Tecnologias**: Prisma 6, TanStack Start (Server Functions), Framer Motion para o Kanban.
-- **Segurança**: Tokens SHA-256 para links de pagamento/aprovação sem login.
-- **Modularidade**: Uso de interfaces abstratas para todos os serviços externos.
+1. **Fase A (Kanban & Valores)**: Drag-and-drop persistente, totalizadores por lane e resumo financeiro no dashboard.
+2. **Fase B (PIX & Comprovante)**: Fluxo de PIX manual no Portal do Cliente e upload de arquivos.
+3. **Fase C (Aprovação & Telegram)**: Interface administrativa para aprovação financeira e alertas via Telegram.
+4. **Fase D (Integração Asaas)**: Pagamentos automáticos via Cartão/Boleto e Webhook de confirmação.
+5. **Fase E (Email & Refinamentos)**: Notificações via Resend e auditoria final.
