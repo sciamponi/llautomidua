@@ -12,7 +12,9 @@ export function Header() {
           <nav className="hidden md:flex gap-8">
             <Link to="/" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Início</Link>
             <Link to="/solucoes" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Soluções</Link>
+            <Link to="/sites" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Sites</Link>
             <Link to="/parceiros" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Parceiros</Link>
+
             <Link to="/membros" className="text-xs font-bold uppercase tracking-widest text-[#DCE3EA]/60 hover:text-white transition-colors">Área de Membros</Link>
           </nav>
         </div>

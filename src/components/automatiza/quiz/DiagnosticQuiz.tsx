@@ -78,7 +78,7 @@ const SEGMENT_OPTIONS: Record<string, { label: string; value: string }[]> = {
     { label: "Vendas e Leads", value: "vendas" },
     { label: "Atendimento ao Cliente", value: "atendimento" },
     { label: "Organização Operacional", value: "organizacao" },
-    { label: "Presença Digital / Site", value: "presenca" },
+    { label: "Presença Digital / Site", value: "sites" },
   ]
 };
 

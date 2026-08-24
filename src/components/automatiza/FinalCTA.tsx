@@ -17,9 +17,10 @@ export function FinalCTA() {
           </div>
           
           <h2 className="text-3xl md:text-5xl font-bold text-white font-sora leading-tight">
-            Seu WhatsApp não precisa de mais correria. <br/>
-            <span className="text-[#1E8CFF]">Precisa de processo.</span>
+            Sua empresa merece ser <br/>
+            <span className="text-[#1E8CFF]">digital por inteiro.</span>
           </h2>
+
           
           <p className="text-[#DCE3EA]/70 text-lg max-w-2xl mx-auto">
             Junte-se a centenas de empresas que transformaram o caos em uma operação inteligente e lucrativa.

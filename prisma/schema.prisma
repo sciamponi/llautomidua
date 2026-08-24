@@ -37,6 +37,19 @@ enum UserRole {
   STUDENT
 }
 
+enum SiteOrderStatus {
+  DRAFT
+  SUBMITTED
+  DATA_REVIEW
+  IN_PRODUCTION
+  WAITING_APPROVAL
+  CHANGES_REQUESTED
+  APPROVED
+  PUBLISHED
+  CANCELLED
+}
+
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -46,6 +59,8 @@ model User {
   partnerProfile PartnerProfile?
   subscriptions Subscription[]
   leads         Lead[]
+  siteOrders    SiteOrder[]
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -197,3 +212,115 @@ model Lesson {
   order         Int
   createdAt     DateTime  @default(now())
 }
+
+model SiteTemplate {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  category      String
+  segment       String
+  description   String
+  application   String?
+  previewImage  String?
+  externalUrl   String?
+  status        String    @default("active")
+  featured      Boolean   @default(false)
+  sortOrder     Int       @default(0)
+  orders        SiteOrder[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model SiteOrder {
+  id                String          @id @default(cuid())
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id])
+  templateId        String
+  template          SiteTemplate    @relation(fields: [templateId], references: [id])
+  status            SiteOrderStatus @default(DRAFT)
+  
+  // Enterprise Data
+  businessName      String
+  responsibleName   String
+  phone             String
+  email             String
+  city              String?
+  state             String?
+  address           String?
+  instagram         String?
+  website           String?
+  googleMyBusiness  String?
+  
+  // Commercial Data
+  segment           String?
+  description       String?
+  services          String?
+  differentials     String?
+  audience          String?
+  serviceRegion     String?
+  
+  // Operation Data
+  openingHours      String?
+  closingHours      String?
+  workingDays       String?
+  
+  // Control
+  token             String          @unique @default(cuid())
+  submittedAt       DateTime?
+  approvedAt        DateTime?
+  publishedAt       DateTime?
+  publishedUrl      String?
+  
+  history           SiteOrderHistory[]
+  versions          SiteOrderVersion[]
+  files             SiteOrderFile[]
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model SiteOrderHistory {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         SiteOrder @relation(fields: [orderId], references: [id])
+  fromStatus    SiteOrderStatus
+  toStatus      SiteOrderStatus
+  changedBy     String?
+  comment       String?
+  createdAt     DateTime  @default(now())
+}
+
+model SiteOrderVersion {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         SiteOrder @relation(fields: [orderId], references: [id])
+  version       Int
+  previewUrl    String
+  notes         String?
+  createdAt     DateTime  @default(now())
+  approvals     ApprovalRequest[]
+}
+
+model ApprovalRequest {
+  id                  String            @id @default(cuid())
+  orderVersionId      String
+  orderVersion        SiteOrderVersion  @relation(fields: [orderVersionId], references: [id])
+  status              String            @default("pending") // approved, changes_requested
+  feedback            String?
+  ipAddress           String?
+  userAgent           String?
+  createdAt           DateTime          @default(now())
+}
+
+model SiteOrderFile {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         SiteOrder @relation(fields: [orderId], references: [id])
+  name          String
+  url           String
+  type          String
+  size          Int
+  category      String    // logo, photo, document, video
+  uploadedAt    DateTime  @default(now())
+}
+
