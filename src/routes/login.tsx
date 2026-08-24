@@ -52,8 +52,10 @@ function LoginPage() {
       const result = await login({ data: values });
       if (result.success) {
         toast.success("Login realizado com sucesso!");
-        navigate({ to: result.redirect as any });
+        const search = Route.useSearch() as any;
+        navigate({ to: search.redirect || result.redirect });
       }
+
     } catch (error: any) {
       toast.error(error.message || "Erro ao realizar login");
     } finally {
