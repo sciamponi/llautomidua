@@ -60,6 +60,7 @@ export function Header() {
   const getDashboardLink = () => {
     if (!session) return "/";
     const role = session.user.roles[0]?.role;
+    if (!role) return "/";
     if (['MASTER_ADMIN', 'ADMIN', 'OPERATOR'].includes(role)) return "/admin";
     if (role === 'PARTNER') return "/membros";
     if (role === 'CUSTOMER') return "/cliente";
@@ -110,7 +111,7 @@ export function Header() {
                             <Link 
                               key={p.slug}
                               to="/solucoes/$productSlug"
-                              params={(prev: any) => ({ ...prev, productSlug: p.slug as string })}
+                              params={{ productSlug: p.slug as string }}
                               className="block text-sm font-medium text-[#DCE3EA]/60 hover:text-white transition-colors"
                             >
                               {p.name}
@@ -247,7 +248,7 @@ export function Header() {
                 <p className="text-[10px] uppercase tracking-[0.4em] text-[#DCE3EA]/40">SaaS</p>
                 <div className="grid grid-cols-1 gap-5 text-lg font-medium">
                   {activeSaas.map((p: any) => (
-                    <Link key={p.slug} to="/solucoes/$productSlug" params={(prev: any) => ({ ...prev, productSlug: p.slug as string })}>{p.name}</Link>
+                    <Link key={p.slug} to="/solucoes/$productSlug" params={{ productSlug: p.slug as string }}>{p.name}</Link>
                   ))}
                 </div>
               </div>
