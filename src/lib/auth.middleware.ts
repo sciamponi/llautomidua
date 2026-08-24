@@ -3,7 +3,7 @@ import { getSession } from "./auth.functions";
 import { UserRole, AuthScope } from "./prisma-enums";
 
 // Sessão simulada para o ambiente de preview (sem banco de dados configurado).
-const PREVIEW_SESSION = {
+const PREVIEW_SESSION: any = {
   user: {
     id: "preview-master",
     name: "Preview Master",
@@ -13,10 +13,9 @@ const PREVIEW_SESSION = {
 };
 
 export const authMiddleware = createMiddleware().server(async ({ next }) => {
-  if (!process.env['DATABASE_URL']) {
-    return next({ context: { session: PREVIEW_SESSION } });
-  }
-  const session = await getSession();
+  const session: any = !process.env['DATABASE_URL']
+    ? PREVIEW_SESSION
+    : await getSession();
   if (!session) {
     throw new Error("Unauthorized");
   }
