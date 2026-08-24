@@ -19,7 +19,7 @@ export function DiagnosisSection() {
               icon: "💬", 
               title: "WHATSAPP E ATENDIMENTO", 
               desc: "Tenho muitas mensagens e dificuldade para organizar os atendimentos.",
-              path: "/automacao"
+              path: "/solucoes/automacao"
             },
             { 
               icon: "📅", 
