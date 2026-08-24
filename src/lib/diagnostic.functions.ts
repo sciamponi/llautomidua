@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { prisma } from "@/lib/prisma.server";
 import { getProducts } from "./products.functions";
 
 export const SCORING_WEIGHTS = {
@@ -19,18 +20,15 @@ export const recommendProduct = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const products = await getProducts();
     
-    // Scoring engine logic
     const results = products.map((product: any) => {
       let score = 0;
       let reasons: string[] = [];
 
-      // Segment Match (+100)
       if (product.segment && product.segment.toLowerCase() === data.businessSegment.toLowerCase()) {
         score += SCORING_WEIGHTS.SEGMENT;
         reasons.push(`Solução específica para o segmento de ${product.segment}`);
       }
 
-      // Problem Match (+50)
       const productProblem = product.problem || "";
       if (productProblem.toLowerCase().includes(data.mainProblem.toLowerCase()) || 
           data.mainProblem.toLowerCase().includes(product.slug.toLowerCase())) {
@@ -38,7 +36,6 @@ export const recommendProduct = createServerFn({ method: "POST" })
         reasons.push(`Atende diretamente ao problema de ${data.mainProblem}`);
       }
 
-      // Special Rules from VOIDPRO-11
       if (data.businessSegment === "barbearia" && data.mainProblem === "agendamento" && product.slug === "barberia") {
         score += 50;
       }
@@ -51,7 +48,6 @@ export const recommendProduct = createServerFn({ method: "POST" })
         score += 150;
         reasons.push("Recomendação direta para Presença Digital & Sites Profissionais");
       }
-
 
       return {
         product,
@@ -80,7 +76,6 @@ export const recommendProduct = createServerFn({ method: "POST" })
       }
     }
 
-    // Recommendations that have a meaningful score
     const recommendations = results.slice(0, 2).filter((r: any) => r.score > 50);
 
     return {
@@ -90,7 +85,6 @@ export const recommendProduct = createServerFn({ method: "POST" })
       recommendations,
     };
   });
-
 
 export const completeDiagnostic = createServerFn({ method: "POST" })
   .validator((data: any) => z.object({
@@ -103,18 +97,15 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
     }).optional()
   }).parse(data))
   .handler(async ({ data }) => {
-    // 1. Calculate Recommendation
     const result = await recommendProduct({
       data: {
-        businessSegment: data.answers['businessSegment'] || "",
-        mainProblem: data.answers['mainProblem'] || "",
-        specificNeed: data.answers['specificNeed'],
-        currentOperation: data.answers['currentOperation'],
+        businessSegment: String(data.answers['businessSegment'] || ""),
+        mainProblem: String(data.answers['mainProblem'] || ""),
+        specificNeed: data.answers['specificNeed'] ? String(data.answers['specificNeed']) : undefined,
+        currentOperation: data.answers['currentOperation'] ? String(data.answers['currentOperation']) : undefined,
       }
     });
 
-    // 2. In a real scenario, we would persist this to DiagnosticSession, DiagnosticResult, etc.
-    // 3. If leadData is provided, create a Lead linked to the session
     console.log(`Completing session ${data.sessionId}`, { result, leadData: data.leadData });
     
     return {

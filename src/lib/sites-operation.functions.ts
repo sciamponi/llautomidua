@@ -16,7 +16,6 @@ export const getOrdersForKanban = createServerFn({ method: "GET" })
         },
         orderBy: { updatedAt: 'desc' }
       });
-      // Decimal to number for serialization
       return JSON.parse(JSON.stringify(orders));
     } catch (error) {
       console.error('getOrdersForKanban failed:', error);
@@ -62,7 +61,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
           create: {
             fromStatus: oldOrder?.status || SiteOrderStatus.SUBMITTED,
             toStatus: data.status,
-            comment: data.comment
+            comment: data.comment || ""
           }
         }
       }
@@ -85,13 +84,10 @@ export const updatePaymentStatus = createServerFn({ method: "POST" })
       where: { id: data.paymentId },
       data: { 
         status: data.status,
-        rejectionReason: data.rejectionReason,
-        // If paid, update order paymentStatus too
-        ...(data.status === 'PAID' ? {
-          order: {
-            update: { paymentStatus: 'PAID' }
-          }
-        } : {})
+        rejectionReason: data.rejectionReason || "",
+        order: data.status === PaymentStatus.PAID ? {
+          update: { paymentStatus: PaymentStatus.PAID }
+        } : undefined
       }
     });
 
@@ -105,7 +101,6 @@ export const processApproval = createServerFn({ method: "POST" })
      feedback: z.string().optional()
   }).parse(data))
   .handler(async ({ data }) => {
-     // implementation for public token approval
      return { success: true };
   });
 
