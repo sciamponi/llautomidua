@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useServerFn } from '@tanstack/react-start';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 export const Route = createFileRoute('/sites/aprovacao/$token')({
   component: ClientApprovalPage,
 });
+
 
 function ClientApprovalPage() {
   const { token } = Route.useParams();
