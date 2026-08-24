@@ -50,7 +50,9 @@ function Index() {
                 { name: "Media Indoor", cat: "Mídia", problem: "Quero criar novas oportunidades comerciais com mídia.", path: "/media-indoor" },
                 { name: "Solução Oficinas", cat: "Gestão", problem: "Preciso enxergar melhor minha operação.", path: "/solucoes/oficinas" },
                 { name: "PetFlow", cat: "Gestão Pet", problem: "Tenho dificuldade em organizar banho e tosa.", path: "/solucoes/petflow" },
+                { name: "Sites Profissionais", cat: "Presença Digital", problem: "Preciso de um site profissional que venda.", path: "/sites" },
                 { name: "Programa de Parceiros", cat: "Negócio", problem: "Quero revender tecnologia e escalar ganhos.", path: "/parceiros" }
+
               ].map((item, i) => (
                 <div key={i} className="p-8 rounded-[2rem] bg-white/5 border border-white/10 hover:border-[#1E8CFF]/30 transition-all group flex flex-col justify-between">
                   <div>
