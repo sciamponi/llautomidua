@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, LogOut, User, LayoutDashboard } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, LayoutDashboard } from "lucide-react";
 import logoAsset from "@/assets/logo.png.asset.json";
 import { PUBLIC_NAV } from "@/config/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -53,12 +53,12 @@ export function Header() {
   const handleLogout = async () => {
     const result = await performLogout();
     if (result.success) {
-      navigate({ to: result.redirect as any });
+      navigate({ to: (result.redirect as any) || '/login' });
     }
   };
 
   const getDashboardLink = () => {
-    if (!session) return null;
+    if (!session) return "/";
     const role = session.user.roles[0]?.role;
     if (['MASTER_ADMIN', 'ADMIN', 'OPERATOR'].includes(role)) return "/admin";
     if (role === 'PARTNER') return "/membros";
@@ -165,10 +165,10 @@ export function Header() {
                 className="flex items-center gap-3 rounded-xl bg-white/5 border border-white/10 px-4 py-2 hover:bg-white/10 transition-all"
               >
                 <div className="w-6 h-6 rounded-full bg-[#1E8CFF]/20 border border-[#1E8CFF]/30 flex items-center justify-center text-[#1E8CFF] text-[10px] font-bold">
-                  {session.user.name?.[0]}
+                  {session.user.name?.[0] || 'U'}
                 </div>
                 <span className="hidden sm:inline text-[10px] font-bold text-white uppercase tracking-widest">
-                  {session.user.name.split(' ')[0]}
+                  {session.user.name?.split(' ')[0] || 'Usuário'}
                 </span>
                 <ChevronDown className={`w-3 h-3 text-[#DCE3EA]/40 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -182,7 +182,7 @@ export function Header() {
                     className="absolute top-full right-0 mt-2 w-48 bg-[#071A2F] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[var(--z-mega-menu)]"
                   >
                     <div className="p-4 border-b border-white/5 bg-white/5">
-                      <p className="text-xs font-bold text-white truncate">{session.user.name}</p>
+                      <p className="text-xs font-bold text-white truncate">{session.user.name || 'Usuário'}</p>
                       <p className="text-[9px] text-[#DCE3EA]/40 uppercase tracking-widest mt-0.5">{session.user.roles[0]?.role}</p>
                     </div>
                     <div className="p-2">
