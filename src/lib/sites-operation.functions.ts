@@ -164,7 +164,6 @@ export const processApproval = createServerFn({ method: "POST" })
            data: { 
              status,
              feedback: data.feedback,
-             respondedAt: new Date()
            }
          }),
          prisma.siteOrderVersion.update({
