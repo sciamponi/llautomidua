@@ -252,3 +252,23 @@ export const bootstrapMaster = createServerFn({ method: "POST" })
 
     return { success: true, userId: user.id };
   });
+
+export const getUsers = createServerFn({ method: "GET" })
+  .middleware([roleMiddleware(["MASTER_ADMIN", "ADMIN"])])
+  .handler(async () => {
+    if (!process.env['DATABASE_URL']) return [];
+    const { prisma } = await import("@/lib/prisma.server");
+    const users = await prisma.user.findMany({
+      include: {
+        roles: {
+          include: {
+            company: true,
+            product: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return JSON.parse(JSON.stringify(users));
+  });
+
