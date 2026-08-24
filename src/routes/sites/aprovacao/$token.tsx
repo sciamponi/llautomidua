@@ -149,14 +149,13 @@ function ClientApprovalPage() {
         </aside>
       </main>
 
-
       <AnimatePresence>
         {view === 'adjustments' && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+            className="fixed inset-0 z-[2000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
           >
             <motion.div 
               initial={{ scale: 0.9, y: 20 }}
@@ -178,14 +177,14 @@ function ClientApprovalPage() {
               <div className="flex gap-4">
                 <button 
                   onClick={() => setView('details')}
-                  className="flex-1 py-4 bg-white/5 rounded-xl font-bold text-xs uppercase tracking-widest"
+                  className="flex-1 py-4 bg-white/5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
                 >
                   Cancelar
                 </button>
                 <button 
                   onClick={() => handleApproval(false)}
                   disabled={!feedback.trim() || isSubmitting}
-                  className="flex-1 py-4 bg-[#1E8CFF] rounded-xl font-bold text-xs uppercase tracking-widest disabled:opacity-50"
+                  className="flex-1 py-4 bg-[#1E8CFF] rounded-xl font-bold text-xs uppercase tracking-widest disabled:opacity-50 shadow-lg shadow-[#1E8CFF]/20"
                 >
                   Enviar Feedback
                 </button>
@@ -197,4 +196,5 @@ function ClientApprovalPage() {
     </div>
   );
 }
+
 
