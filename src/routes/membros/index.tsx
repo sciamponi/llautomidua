@@ -1,6 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Header } from '@/components/automatiza/Header'
-import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/membros/')({
@@ -9,8 +7,7 @@ export const Route = createFileRoute('/membros/')({
 
 function MembersPage() {
   return (
-    <div className="min-h-screen bg-[#071A2F] font-inter text-[#DCE3EA]">
-      <Header />
+    <div className="bg-[#071A2F] font-inter text-[#DCE3EA]">
       <main className="container px-4 py-20">
         <div className="max-w-6xl mx-auto">
           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -102,3 +99,4 @@ function MembersPage() {
     </div>
   )
 }
+
