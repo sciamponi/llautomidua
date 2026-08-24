@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma.server";
 import { authMiddleware, roleMiddleware } from "./auth.middleware";
-import { SiteOrderStatus, PaymentStatus } from "@prisma/client";
+import { SiteOrderStatus, PaymentStatus, UserRole } from "@prisma/client";
+
 
 export const getOrdersForKanban = createServerFn({ method: "GET" })
   .middleware([roleMiddleware(["MASTER_ADMIN", "ADMIN", "OPERATOR"])])
