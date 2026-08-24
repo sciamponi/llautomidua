@@ -1,43 +1,40 @@
-# Plano: FASE 7 — CONEXÃO REAL COM VPS / POSTGRESQL (VERSÃO FINAL)
+# Plano: FASE 7 — CONEXÃO REAL COM VPS / POSTGRESQL (APROVAÇÃO FINAL)
 
-Este plano detalha a preparação definitiva para a transição da Automatiza Solução do ambiente de preview para um VPS real com PostgreSQL 16 e Docker.
+Este plano estabelece a base definitiva para a operação da Automatiza Solução em produção, garantindo integridade de dados, segurança de segredos e automação de infraestrutura.
 
-## 1. Auditoria de Infraestrutura
-- **Prisma**: O schema já está preparado para PostgreSQL. A baseline de migração foi inicializada.
-- **Docker**: `Dockerfile` utiliza `node:22-alpine` com `docker-entrypoint.sh` para migrações automáticas. `docker-compose.yml` isola o banco em uma rede interna.
-- **Health Check**: `/api/public/health` está pronto para produção, retornando `503` se a conexão com o banco falhar.
-- **Storage**: O sistema utiliza `LocalStorageProvider` apontando para `/data/storage`, pronto para volumes persistentes no Docker.
+## Auditoria de Prontidão
 
-## 2. Estratégia de Banco de Dados
-- **Zero Downtime/Loss**: Utilizaremos `prisma migrate deploy` no deploy inicial e atualizações. O comando `migrate reset` está proibido em produção.
-- **Baseline**: Caso o banco no VPS já contenha dados, a primeira migration será marcada como aplicada manualmente (`prisma migrate resolve`) para evitar conflitos.
-- **Backup**: Criado o script `scripts/backup-db.sh` que realiza `pg_dump` e compressão `gzip`.
+| Componente | Estado Atual | Ação |
+| :--- | :--- | :--- |
+| **Banco de Dados** | `schema.prisma` pronto para PostgreSQL. | Gerar baseline de migração para o VPS. |
+| **Infraestrutura** | `Dockerfile` e `docker-compose.yml` isolam o banco. | Mapear volumes persistentes para `/data/storage`. |
+| **Health Check** | Contrato `200/503` implementado e testado. | Nenhuma mudança necessária. |
+| **Autenticação** | `auth.functions.ts` preparado para PostgreSQL + Cookies. | Implementar bootstrap seguro do Master Admin. |
+| **Backups** | `scripts/backup-db.sh` criado com `pg_dump`. | Documentar processo de restauração em `DEPLOY-VPS.md`. |
 
-## 3. Autenticação e Master Admin
-- **Bootstrap Seguro**: O sistema usará as variáveis `MASTER_ADMIN_EMAIL` e `MASTER_ADMIN_PASSWORD` para criar o primeiro usuário de acesso global.
-- **Sessões Reais**: Substituição total de qualquer lógica de `localStorage` para autenticação por Cookies `HttpOnly` com persistência no PostgreSQL.
+## Mudanças Propostas
 
-## 4. Implementação Técnica
+### 1. Migrations e Dados
+- **Baseline de Produção**: Criação da pasta `prisma/migrations` com o estado atual do schema para garantir que o `npx prisma migrate deploy` funcione no VPS sem apagar dados (baselining).
+- **Fallbacks Seguros**: Garantir que todas as capturas comerciais (Leads, Pedidos, Demos) verifiquem `DATABASE_URL` e usem o banco real obrigatoriamente em produção.
 
-### A. Refatoração de Servidor
-- Ajustar `src/lib/auth.functions.ts` para garantir que `bootstrapMaster` possa ser chamado via CLI ou rota protegida por `BOOTSTRAP_SECRET`.
-- Garantir que todas as funções de captura (Leads, Pedidos, Demos) falhem graciosamente se o banco estiver fora, registrando erros nos logs de servidor.
+### 2. Autenticação e Master Admin
+- **Bootstrap Idempotente**: Implementação de uma rota/função `bootstrap` que cria o primeiro `MASTER_ADMIN` usando `MASTER_ADMIN_EMAIL` e `MASTER_ADMIN_PASSWORD` do `.env`.
+- **Proteção de Segredos**: Garantir que segredos como `JWT_SECRET` e `BOOTSTRAP_SECRET` nunca vazem para o cliente.
 
-### B. Persistência de Storage
-- Verificar se o `docker-compose.yml` mapeia corretamente o volume `storage-data` para o container.
-- Confirmar permissões de escrita em `/data/storage` dentro do `Dockerfile`.
+### 3. Persistência de Arquivos (Storage)
+- Garantir que o container tenha permissões de escrita em `/data/storage`.
+- Subdividir o volume em `logos`, `previews`, `uploads`, `documents` e `proofs` automaticamente no startup.
 
-## 5. Guia de Deploy VPS (Resumo)
-1. Clonar repositório.
-2. Criar `.env` baseado no `.env.example`.
-3. `docker compose build`
-4. `docker compose up -d`
-5. Validar via `curl http://localhost:8080/api/public/health`.
-6. Executar o bootstrap do Master Admin.
+## Guia de Deploy VPS (Atualizado)
+1. **Configuração**: Clonar e criar `.env` (ex: `JWT_SECRET=$(openssl rand -base64 32)`).
+2. **Infra**: `docker compose up -d` (o entrypoint aguarda o banco e aplica migrations).
+3. **Setup**: Executar o bootstrap do Master Admin via CLI ou rota protegida.
+4. **Validação**: Acessar `/api/public/health` para confirmar status `database: "ok"`.
 
 ## Critérios de Conclusão
-- [ ] Schema sincronizado entre código e banco real.
-- [ ] Health Check retornando `database: "ok"`.
-- [ ] Login persistente funcionando com PostgreSQL.
-- [ ] Backup funcional e documentado em `DEPLOY-VPS.md`.
-- [ ] Mocks desativados automaticamente na presença de `DATABASE_URL`.
+- [ ] Mocks desativados quando `DATABASE_URL` está presente.
+- [ ] Health Check validado contra conexão real.
+- [ ] Login real funcional com persistência em PostgreSQL.
+- [ ] `DEPLOY-VPS.md` completo com instruções de backup/restore.
+- [ ] `/data/storage` persistente e mapeado corretamente.
