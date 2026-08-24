@@ -30,13 +30,13 @@ function ProductPage() {
       "Dificuldade em escalar o atendimento",
       "Falta de visão sobre os resultados"
     ],
-    solutions: [
+    solutions: product.features ? product.features.map((f: any) => f.title) : [
       "Processos automatizados e eficientes",
       "Visão clara da sua operação",
       "Escalabilidade para seu negócio",
       "Suporte especializado Automatiza"
     ],
-    features: [
+    features: product.features || [
       { title: "Dashboard", desc: "Acompanhe tudo em tempo real através de um painel intuitivo." },
       { title: "Automação", desc: "Reduza o trabalho manual e foque no que realmente importa." },
       { title: "Integração", desc: "Conecte com as ferramentas que você já utiliza no dia a dia." },
