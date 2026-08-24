@@ -6,7 +6,7 @@
 - **POSTGRESQL**: OK (PostgreSQL 16-alpine with persistence and internal networking)
 - **PRISMA**: OK (Schema verified, migrations managed via production entrypoint)
 - **STORAGE**: OK (Abstraction implemented with LocalStorageProvider at `/data/storage`)
-- **HEALTH CHECK**: OK (Environment-aware logic per VOIDPRO-34 implemented)
+- **HEALTH CHECK**: OK (Simplified contract per VOIDPRO-36 implemented)
 - **AUTH**: **NOT PRODUCTION READY** (Mock implementation using local state/mocks)
 - **MASTER ADMIN**: **NOT IMPLEMENTED** (Currently absent)
 - **WHATSAPP**: **PARTIAL** (Logic mocked in `src/lib/notifications.functions.ts`, ready for env tokens)
