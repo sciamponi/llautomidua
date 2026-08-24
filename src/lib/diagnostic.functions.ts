@@ -3,12 +3,14 @@ import { z } from "zod";
 import { recommendProductLogic } from "./diagnostic.server";
 
 export const recommendProduct = createServerFn({ method: "POST" })
-  .validator((data: any) => z.object({
-    businessSegment: z.string(),
-    mainProblem: z.string(),
-    specificNeed: z.string().optional().nullable(),
-    currentOperation: z.string().optional().nullable(),
-  }).parse(data))
+  .validator((data: unknown) => {
+    return z.object({
+      businessSegment: z.string(),
+      mainProblem: z.string(),
+      specificNeed: z.string().optional().nullable(),
+      currentOperation: z.string().optional().nullable(),
+    }).parse(data);
+  })
   .handler(async ({ data }) => {
     return recommendProductLogic({
       businessSegment: data.businessSegment,
@@ -19,7 +21,7 @@ export const recommendProduct = createServerFn({ method: "POST" })
   });
 
 export const completeDiagnostic = createServerFn({ method: "POST" })
-  .validator((data: any) => {
+  .validator((data: unknown) => {
     return z.object({
       sessionId: z.string(),
       answers: z.record(z.any()),
@@ -53,7 +55,7 @@ export const createDiagnosticSession = createServerFn({ method: "POST" })
   });
 
 export const updateDiagnosticSession = createServerFn({ method: "POST" })
-  .validator((data: any) => {
+  .validator((data: unknown) => {
     return z.object({
       sessionId: z.string(),
       step: z.number(),
