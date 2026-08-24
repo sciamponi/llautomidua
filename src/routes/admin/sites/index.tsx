@@ -2,19 +2,13 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { OrderModal } from '@/components/admin/sites/OrderModal';
 import { getOrdersForKanban, updateOrderStatus } from '@/lib/sites-operation.functions';
 import type { SiteOrderStatus } from '@/lib/sites-operation.functions';
 
 export const Route = createFileRoute('/admin/sites/')({
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData({
-      queryKey: ['orders-kanban'],
-      queryFn: () => getOrdersForKanban(),
-    });
-  },
   component: SitesKanbanPage,
 });
 
@@ -34,10 +28,11 @@ function SitesKanbanPage() {
   const getOrders = useServerFn(getOrdersForKanban);
   const updateStatus = useServerFn(updateOrderStatus);
   
-  const { data: orders } = useSuspenseQuery({
+  const { data } = useQuery({
     queryKey: ['orders-kanban'],
     queryFn: () => getOrders(),
   });
+  const orders = data ?? [];
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
