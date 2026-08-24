@@ -131,4 +131,4 @@ export const processApproval = createServerFn({ method: "POST" })
      return { success: true };
   });
 
-export { SiteOrderStatus, PaymentStatus };
+export { SiteOrderStatus, PaymentStatus, UserRole };
