@@ -24,7 +24,7 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
     return z.object({
       sessionId: z.string(),
-      answers: z.record(z.any()),
+      answers: z.record(z.unknown()),
       leadData: z.object({
         name: z.string(),
         whatsapp: z.string(),
@@ -33,11 +33,12 @@ export const completeDiagnostic = createServerFn({ method: "POST" })
     }).parse(data);
   })
   .handler(async ({ data }) => {
+    const answers = data.answers as Record<string, any>;
     const result = await recommendProductLogic({
-      businessSegment: String(data.answers['businessSegment'] || ""),
-      mainProblem: String(data.answers['mainProblem'] || ""),
-      specificNeed: data.answers['specificNeed'] ? String(data.answers['specificNeed']) : null,
-      currentOperation: data.answers['currentOperation'] ? String(data.answers['currentOperation']) : null,
+      businessSegment: String(answers['businessSegment'] || ""),
+      mainProblem: String(answers['mainProblem'] || ""),
+      specificNeed: answers['specificNeed'] ? String(answers['specificNeed']) : null,
+      currentOperation: answers['currentOperation'] ? String(answers['currentOperation']) : null,
     });
 
     console.log(`Completing session ${data.sessionId}`, { result, leadData: data.leadData });
@@ -59,7 +60,7 @@ export const updateDiagnosticSession = createServerFn({ method: "POST" })
     return z.object({
       sessionId: z.string(),
       step: z.number(),
-      data: z.record(z.any()),
+      data: z.record(z.unknown()),
     }).parse(data);
   })
   .handler(async ({ data }) => {
