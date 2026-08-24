@@ -3,7 +3,7 @@ import { getSession, logout } from '@/lib/auth.functions';
 import { cn } from "@/lib/utils";
 import { useServerFn } from "@tanstack/react-start";
 import { useNavigate } from "@tanstack/react-router";
-import { LogOut, LayoutDashboard, Users, Package, DollarSign, Brain, ClipboardList, Globe } from "lucide-react";
+import { LogOut, LayoutDashboard, Users, Package, DollarSign, Brain, ClipboardList, Globe, PlayCircle } from "lucide-react";
 
 export const Route = createFileRoute('/admin/')({
   beforeLoad: async ({ context }) => {
