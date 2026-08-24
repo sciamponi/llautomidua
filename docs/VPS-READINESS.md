@@ -2,48 +2,50 @@
 
 ## Status Summary
 - **BUILD**: OK (Full build verified with `npm run build`)
-- **DOCKER**: OK (Dockerfile and docker-compose.yml created with persistence and private networking)
-- **POSTGRESQL**: OK (Configured via Prisma and Docker)
-- **PRISMA**: OK (Schema fixed, Subscription model added, client generated)
-- **STORAGE**: OK (Abstraction implemented with LocalStorageProvider)
-- **HEALTH CHECK**: OK (Implemented at `/api/public/health` with DB verification)
-- **AUTH**: MOCK / NOT PRODUCTION READY
-- **MASTER ADMIN**: NOT IMPLEMENTED (Mock only)
-- **MEMBERS**: PARTIAL (Mock UI, infrastructure ready)
-- **WHATSAPP**: PARTIAL (Mock logic in functions, environment variables documented)
-- **EMAIL**: PARTIAL (Environment variables documented)
+- **DOCKER**: OK (Dockerfile, docker-compose.yml and secure entrypoint created)
+- **POSTGRESQL**: OK (PostgreSQL 16-alpine with persistence and internal networking)
+- **PRISMA**: OK (Schema verified, migrations managed via production entrypoint)
+- **STORAGE**: OK (Abstraction implemented with LocalStorageProvider at `/data/storage`)
+- **HEALTH CHECK**: OK (Implemented at `/api/public/health` with DB connection check)
+- **AUTH**: **NOT PRODUCTION READY** (Mock implementation using local state/mocks)
+- **MASTER ADMIN**: **NOT IMPLEMENTED** (Currently absent)
+- **WHATSAPP**: **PARTIAL** (Logic mocked in `src/lib/notifications.functions.ts`, ready for env tokens)
+- **EMAIL**: **PARTIAL** (Logic mocked, ready for SMTP env tokens)
 
-## Environment Variables (Required)
-- `DATABASE_URL`
-- `APP_URL`
-- `NODE_ENV`
-- `STORAGE_PATH`
-- `WHATSAPP_API_TOKEN`
-- `WHATSAPP_API_ENDPOINT`
-- `EMAIL_SERVER_HOST`
-- `EMAIL_SERVER_PORT`
-- `EMAIL_SERVER_USER`
-- `EMAIL_SERVER_PASSWORD`
-- `EMAIL_FROM`
+## Infrastructure Readiness
+- **Dockerized**: Yes (Multi-stage Node 22-alpine + Postgres 16-alpine)
+- **Data Persistence**: Yes (Volumes for DB and Filesystem)
+- **Safe Migrations**: Yes (Entrypoint waits for DB and runs migrations before app start)
+- **Private Networking**: Yes (App-to-DB internal communication only)
 
-## Files Created
-- `Dockerfile`
-- `docker-compose.yml`
-- `.env.example`
-- `DEPLOY-VPS.md`
-- `src/lib/storage/types.ts`
-- `src/lib/storage/local.server.ts`
-- `src/lib/storage/index.server.ts`
-- `src/lib/prisma.server.ts`
-- `src/routes/api/public/health.ts`
+## Authentication Audit
+- **Current State**: The application uses a mock authentication layer. `Admin` and `Members` areas are accessible but do not currently enforce real session-based or server-side protected authentication.
+- **Next Step Requirement**: A real authentication provider must be integrated before public production deployment.
 
-## Files Modified
-- `prisma/schema.prisma` (Added Subscription model)
-- `package.json` (Added Prisma dependencies)
+## Next Phase Recommendations (Auth)
+For the transition to a real Auth provider on a VPS:
+1. **Better Auth**: Recommended for its native TanStack Start compatibility, TypeScript-first approach, and ease of self-hosting with the existing PostgreSQL database.
+2. **Supabase Auth (Self-hosted)**: An alternative if full Supabase feature parity (like specific Go-true features) is required, though it increases infrastructure complexity.
 
-## Remaining VPS Steps
-1. Provision a VPS with Docker installed.
-2. Clone the repository and configure `.env`.
-3. Set up a Reverse Proxy (Nginx/Caddy) for SSL.
-4. Implement a real Auth provider (e.g., Better Auth or Supabase Auth self-hosted).
-5. Configure real WhatsApp and Email providers.
+## Environment Variables (Required for VPS)
+- `DATABASE_URL`: Postgres connection string.
+- `DB_HOST`: Database container name (`db`).
+- `DB_PORT`: Database port (`5432`).
+- `APP_URL`: Public application URL.
+- `NODE_ENV`: Should be set to `production`.
+- `STORAGE_PATH`: Path for persistent files (`/data/storage`).
+- `WHATSAPP_API_TOKEN` / `WHATSAPP_API_ENDPOINT`: For real WhatsApp integration.
+- `EMAIL_SERVER_*`: SMTP credentials for email delivery.
+
+## Files Created/Revisions
+- `Dockerfile` & `docker-compose.yml` (Updated for production entrypoint)
+- `docker-entrypoint.sh` (Added for safe startup)
+- `docs/VPS-READINESS.md` (This report)
+- `DEPLOY-VPS.md` (Updated guide)
+- `src/lib/storage/*` (Persistence layer)
+- `src/routes/api/public/health.ts` (Monitoring endpoint)
+
+## Final Conclusion
+**VPS INFRASTRUCTURE**: READY
+**APPLICATION**: READY FOR VPS TESTING
+**PRODUCTION**: **NOT READY** (Auth and Integrations are MOCKED)

@@ -7,6 +7,8 @@ services:
       - "8080:3000"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/automatiza?schema=public
+      - DB_HOST=db
+      - DB_PORT=5432
       - NODE_ENV=production
       - STORAGE_PATH=/data/storage
     depends_on:

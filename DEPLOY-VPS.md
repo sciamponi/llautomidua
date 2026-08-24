@@ -26,8 +26,9 @@ docker compose up -d
 
 O comando irá:
 1. Iniciar um banco de dados PostgreSQL 16 (isolado na rede interna).
-2. Construir a imagem da aplicação (Dockerfile).
-3. Executar as migrations do Prisma automaticamente (se configurado no entrypoint).
+2. O contêiner da aplicação aguardará a prontidão do banco (via `pg_isready`).
+3. Executar `npx prisma migrate deploy` automaticamente antes do início da aplicação.
+4. Iniciar o servidor TanStack Start na porta 3000 (mapeada para 8080 no host).
 
 ## Persistência de Dados
 - **Banco de Dados**: Armazenado no volume `postgres-data`.
