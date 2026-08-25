@@ -36,114 +36,116 @@ export function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[1000] w-full border-b border-white/10 bg-[#071A2F]/90 backdrop-blur-lg">
-      <div className="container flex h-20 items-center justify-between px-4">
-        <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logoAsset.url} alt="Automatiza Solução" className="h-8 md:h-10 w-auto" />
-          </Link>
-          
-          <nav className="hidden lg:flex gap-8 items-center">
-            <div 
-              className="relative group"
-              onMouseEnter={() => setIsSolutionsOpen(true)}
-              onMouseLeave={() => setIsSolutionsOpen(false)}
+    <>
+      <header className="fixed top-0 left-0 right-0 z-[1000] w-full border-b border-white/10 bg-[#071A2F]/90 backdrop-blur-lg">
+        <div className="container flex h-20 items-center justify-between px-4">
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-2">
+              <img src={logoAsset.url} alt="Automatiza Solução" className="h-8 md:h-10 w-auto" />
+            </Link>
+            
+            <nav className="hidden lg:flex gap-8 items-center">
+              <div 
+                className="relative group"
+                onMouseEnter={() => setIsSolutionsOpen(true)}
+                onMouseLeave={() => setIsSolutionsOpen(false)}
+              >
+                <button 
+                  className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors py-8 ${isSolutionsOpen ? 'text-white' : 'text-[#DCE3EA]/60 hover:text-white'}`}
+                  aria-expanded={isSolutionsOpen}
+                >
+                  Soluções <ChevronDown className={`w-3 h-3 transition-transform ${isSolutionsOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <AnimatePresence>
+                  {isSolutionsOpen && (
+                    <>
+                      {/* Backdrop */}
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/40 z-[-1] pointer-events-none"
+                        onClick={() => setIsSolutionsOpen(false)}
+                      />
+                      
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute top-full left-0 w-[520px] bg-[#071A2F] border border-white/10 rounded-2xl shadow-2xl p-8 grid grid-cols-2 gap-10 z-[1100]"
+                      >
+                        <div>
+                          <h4 className="text-[9px] font-bold text-[#1E8CFF] uppercase tracking-[0.3em] mb-6">SaaS</h4>
+                          <div className="space-y-4">
+                            {activeSaas.map(p => (
+                              <Link 
+                                key={p.slug}
+                                to="/solucoes/$productSlug"
+                                params={{ productSlug: p.slug }}
+                                className="block text-sm font-medium text-[#DCE3EA]/60 hover:text-white transition-colors"
+                              >
+                                {p.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-[9px] font-bold text-[#4CDFF2] uppercase tracking-[0.3em] mb-6">Serviços</h4>
+                          <div className="space-y-4">
+                            {PUBLIC_NAV.services.links.map(link => (
+                              <Link 
+                                key={link.href}
+                                to={link.href as any}
+                                className={`block text-sm font-medium transition-colors ${link.highlight ? 'text-[#1E8CFF] font-bold' : 'text-[#DCE3EA]/60 hover:text-white'}`}
+                              >
+                                {link.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {PUBLIC_NAV.company.map(link => (
+                <Link 
+                  key={link.href}
+                  to={link.href as any} 
+                  className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#DCE3EA]/60 hover:text-white transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link 
+              to="/diagnostico" 
+              className="hidden sm:block text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:text-[#1E8CFF] transition-all px-4"
             >
-              <button 
-                className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors py-8 ${isSolutionsOpen ? 'text-white' : 'text-[#DCE3EA]/60 hover:text-white'}`}
-                aria-expanded={isSolutionsOpen}
-              >
-                Soluções <ChevronDown className={`w-3 h-3 transition-transform ${isSolutionsOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              <AnimatePresence>
-                {isSolutionsOpen && (
-                  <>
-                    {/* Backdrop */}
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="fixed inset-0 bg-black/40 z-[-1] pointer-events-none"
-                      onClick={() => setIsSolutionsOpen(false)}
-                    />
-                    
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 w-[520px] bg-[#071A2F] border border-white/10 rounded-2xl shadow-2xl p-8 grid grid-cols-2 gap-10 z-[1100]"
-                    >
-                      <div>
-                        <h4 className="text-[9px] font-bold text-[#1E8CFF] uppercase tracking-[0.3em] mb-6">SaaS</h4>
-                        <div className="space-y-4">
-                          {activeSaas.map(p => (
-                            <Link 
-                              key={p.slug}
-                              to="/solucoes/$productSlug"
-                              params={{ productSlug: p.slug }}
-                              className="block text-sm font-medium text-[#DCE3EA]/60 hover:text-white transition-colors"
-                            >
-                              {p.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="text-[9px] font-bold text-[#4CDFF2] uppercase tracking-[0.3em] mb-6">Serviços</h4>
-                        <div className="space-y-4">
-                          {PUBLIC_NAV.services.links.map(link => (
-                            <Link 
-                              key={link.href}
-                              to={link.href as any}
-                              className={`block text-sm font-medium transition-colors ${link.highlight ? 'text-[#1E8CFF] font-bold' : 'text-[#DCE3EA]/60 hover:text-white'}`}
-                            >
-                              {link.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
+              ENCONTRAR MINHA SOLUÇÃO
+            </Link>
+            <Link 
+              to="/parceiros" 
+              className="hidden lg:block rounded-xl bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#071A2F] hover:bg-[#F7F8FA] transition-all"
+            >
+              QUERO SER PARCEIRO
+            </Link>
 
-            {PUBLIC_NAV.company.map(link => (
-              <Link 
-                key={link.href}
-                to={link.href as any} 
-                className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#DCE3EA]/60 hover:text-white transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+            <button 
+              className="lg:hidden p-2 text-white"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
-
-        <div className="flex items-center gap-4">
-          <Link 
-            to="/diagnostico" 
-            className="hidden sm:block text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:text-[#1E8CFF] transition-all px-4"
-          >
-            ENCONTRAR MINHA SOLUÇÃO
-          </Link>
-          <Link 
-            to="/parceiros" 
-            className="hidden lg:block rounded-xl bg-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#071A2F] hover:bg-[#F7F8FA] transition-all"
-          >
-            QUERO SER PARCEIRO
-          </Link>
-
-          <button 
-            className="lg:hidden p-2 text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
-        </div>
-      </div>
+      </header>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
@@ -206,6 +208,6 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
