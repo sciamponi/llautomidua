@@ -28,7 +28,11 @@ const IDS = {
 
 async function rpc(name, method, data) {
   let url = `${BASE}/_serverFn/${IDS[name]}`;
-  const headers = { "x-tsr-serverFn": "true", accept: "application/json" };
+  const headers = {
+    "x-tsr-serverFn": "true",
+    accept: "application/json",
+    "sec-fetch-site": "same-origin",
+  };
   if (cookie) headers["cookie"] = cookie;
   let body;
   if (method === "GET") {
