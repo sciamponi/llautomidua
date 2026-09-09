@@ -74,7 +74,7 @@ async function rpc(name, method, data) {
     status: res.status,
     result: envelope.result,
     error: envelope.error,
-    text: text.slice(0, 300),
+    text,
   };
 }
 
