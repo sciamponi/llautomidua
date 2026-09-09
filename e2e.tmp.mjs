@@ -172,6 +172,7 @@ try {
   });
   console.error("DEBUG createScreen error:", JSON.stringify(screen.error)?.slice(0, 300));
   console.error("DEBUG createScreen text:", screen.text);
+  require("fs").writeFileSync("screen_err.json", screen.text);
   check("createScreen", !!screen.result?.id, `id=${screen.result?.id ?? "n/a"}`);
   const screenId = screen.result?.id;
 
