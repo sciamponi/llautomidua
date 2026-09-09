@@ -51,7 +51,8 @@ async function rpc(name, method, data) {
   }
   const res = await fetch(url, { method, headers, body, redirect: "manual" });
   const sc = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
-  for (const setCookie of sc) {
+  const rawSetCookie = res.headers.get("set-cookie");
+  for (const setCookie of [...sc, ...(rawSetCookie ? [rawSetCookie] : [])]) {
     const pair = setCookie.split(";")[0];
     if (pair.includes("automatiza_session")) cookie = pair;
   }
