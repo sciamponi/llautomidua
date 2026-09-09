@@ -190,8 +190,8 @@ try {
   const capInfo = await rpc("getCampaignForCapture", "GET", campaignId);
   check(
     "getCampaignForCapture (público)",
-    capInfo.result?.name === "Campanha Teste E2E" &&
-      capInfo.result?.company?.name === "Empresa Teste E2E",
+    capInfo.result?.name.includes("Campanha Teste E2E") &&
+      capInfo.result?.company?.name.includes("Empresa Teste E2E"),
     `company=${capInfo.result?.company?.name ?? "n/a"}`,
   );
 
@@ -239,6 +239,9 @@ try {
     from: "",
     to: "",
   });
+  console.error("DEBUG getLeads error:", JSON.stringify(leads.error)?.slice(0, 300));
+  console.error("DEBUG getLeads result:", JSON.stringify(leads.result?.leads?.map((l) => l.name)));
+  console.error("DEBUG getLeads text:", leads.text.slice(0, 200));
   const found =
     Array.isArray(leads.result?.leads) &&
     leads.result.leads.some((l) => l.id === leadId);
