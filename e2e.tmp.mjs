@@ -34,6 +34,7 @@ async function rpc(name, method, data) {
     accept: "application/json",
     "sec-fetch-site": "same-origin",
   };
+  if (cookie) headers["cookie"] = cookie;
   let body;
   if (method === "GET") {
     if (data !== undefined) {
