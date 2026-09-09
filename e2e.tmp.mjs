@@ -233,11 +233,6 @@ try {
 
   const leads = await rpc("getLeads", "GET", {
     search: "João",
-    campaignId: "",
-    companyId: "",
-    status: "",
-    from: "",
-    to: "",
   });
   console.error("DEBUG getLeads error:", JSON.stringify(leads.error)?.slice(0, 300));
   console.error("DEBUG getLeads result:", JSON.stringify(leads.result?.leads?.map((l) => l.name)));
