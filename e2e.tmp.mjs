@@ -170,6 +170,7 @@ try {
     currentCampaignId: campaignId,
     companyId,
   });
+  console.error("DEBUG createScreen error:", JSON.stringify(screen.error)?.slice(0, 300));
   check("createScreen", !!screen.result?.id, `id=${screen.result?.id ?? "n/a"}`);
   const screenId = screen.result?.id;
 
