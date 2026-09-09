@@ -80,7 +80,7 @@ export const submitLead = createServerFn({ method: "POST" })
         adId: data.adId || null,
         screenId: data.screenId || null,
         source: data.source || "QR_CODE",
-        ipAddress: getClientIp() || null,
+        ipAddress: (await getClientIp()) || null,
         userAgent: null,
         utmSource: data.utmSource || null,
         utmMedium: data.utmMedium || null,

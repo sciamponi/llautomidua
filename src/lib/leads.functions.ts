@@ -45,7 +45,7 @@ export const captureLead = createServerFn({ method: "POST" })
         type: data.type,
         status: "NOVO",
         source: "FORM",
-        ipAddress: getClientIp() || null,
+        ipAddress: (await getClientIp()) || null,
       },
     });
 
