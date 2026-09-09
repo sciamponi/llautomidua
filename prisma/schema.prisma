@@ -7,7 +7,420 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Enums ───────────────────────────────────────────────
+model User {
+  id             String          @id @default(cuid())
+  email          String          @unique
+  password       String
+  name           String?
+  role           UserRole        @default(CUSTOMER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  leads          Lead[]
+  partnerProfile PartnerProfile?
+  sessions       Session[]
+  siteOrders     SiteOrder[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PartnerProfile {
+  id           String @id @default(cuid())
+  userId       String @unique
+  commission   Float  @default(0.2)
+  clientsCount Int    @default(0)
+  points       Int    @default(0)
+  status       String @default("active")
+  user         User   @relation(fields: [userId], references: [id])
+}
+
+model Product {
+  id               String                  @id @default(cuid())
+  name             String
+  slug             String                  @unique
+  type             ProductType
+  category         String
+  segment          String
+  subcategory      String?
+  shortDescription String
+  description      String
+  audience         String?
+  problem          String?
+  solution         String?
+  features         Json?
+  pricingType      RevenueType
+  pricing          String?
+  ctaType          String?
+  demoUrl          String?
+  landingUrl       String?
+  whatsappMessage  String?
+  status           String                  @default("active")
+  featured         Boolean                 @default(false)
+  sortOrder        Int                     @default(0)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  recommendations  ProductRecommendation[] @relation("MainProduct")
+  recommendedBy    ProductRecommendation[] @relation("RecommendedProduct")
+}
+
+model ProductRecommendation {
+  id                   String  @id @default(cuid())
+  productId            String
+  recommendedProductId String
+  reason               String
+  priority             Int     @default(0)
+  status               String  @default("active")
+  product              Product @relation("MainProduct", fields: [productId], references: [id])
+  recommendedProduct   Product @relation("RecommendedProduct", fields: [recommendedProductId], references: [id])
+}
+
+model Company {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  logo      String?
+  phone     String?
+  email     String?
+  website   String?
+  status    String     @default("active")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  campaigns Campaign[]
+  leads     Lead[]
+  screens   Screen[]
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  name        String
+  slug        String         @unique
+  description String?
+  companyId   String
+  imageUrl    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      CampaignStatus @default(DRAFT)
+  ctaText     String?        @default("QUERO SABER MAIS")
+  captureUrl  String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  ads         Ad[]
+  company     Company        @relation(fields: [companyId], references: [id])
+  leads       Lead[]
+  screens     Screen[]
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model Screen {
+  id                String       @id @default(cuid())
+  name              String
+  identifier        String       @unique
+  location          String?
+  establishment     String?
+  status            ScreenStatus @default(ACTIVE)
+  lastActiveAt      DateTime?
+  currentCampaignId String?
+  companyId         String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  ads               Ad[]
+  leads             Lead[]
+  company           Company?     @relation(fields: [companyId], references: [id])
+  currentCampaign   Campaign?    @relation(fields: [currentCampaignId], references: [id])
+
+  @@index([companyId])
+  @@index([status])
+}
+
+model Ad {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  videoUrl    String?
+  ctaText     String?
+  campaignId  String
+  screenId    String?
+  duration    Int?     @default(15)
+  priority    Int      @default(0)
+  status      AdStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
+  screen      Screen?  @relation(fields: [screenId], references: [id])
+  leads       Lead[]
+
+  @@index([campaignId])
+  @@index([screenId])
+  @@index([status])
+}
+
+model Lead {
+  id                  String             @id @default(cuid())
+  name                String
+  email               String?
+  whatsapp            String
+  companyName         String?
+  city                String?
+  address             String?
+  establishmentType   String?
+  screenCount         Int?
+  segment             String?
+  objective           String?
+  message             String?
+  type                LeadType           @default(GENERAL)
+  status              LeadStatus         @default(NOVO)
+  campaignId          String?
+  adId                String?
+  screenId            String?
+  companyId           String?
+  source              String?            @default("FORM")
+  ipAddress           String?
+  userAgent           String?
+  utmSource           String?
+  utmMedium           String?
+  utmCampaign         String?
+  userId              String?
+  diagnosticSessionId String?            @unique
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  ad                  Ad?                @relation(fields: [adId], references: [id])
+  campaign            Campaign?          @relation(fields: [campaignId], references: [id])
+  company             Company?           @relation(fields: [companyId], references: [id])
+  diagnosticSession   DiagnosticSession? @relation(fields: [diagnosticSessionId], references: [id])
+  screen              Screen?            @relation(fields: [screenId], references: [id])
+  user                User?              @relation(fields: [userId], references: [id])
+
+  @@index([campaignId])
+  @@index([adId])
+  @@index([screenId])
+  @@index([companyId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model DiagnosticSession {
+  id               String            @id @default(cuid())
+  leadId           String?
+  sessionId        String?
+  currentStep      Int               @default(1)
+  status           String            @default("started")
+  businessSegment  String?
+  mainProblem      String?
+  specificNeed     String?
+  currentOperation String?
+  startedAt        DateTime          @default(now())
+  completedAt      DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  result           DiagnosticResult?
+  lead             Lead?
+}
+
+model DiagnosticResult {
+  id                   String                     @id @default(cuid())
+  diagnosticSessionId  String                     @unique
+  recommendedProductId String?
+  confidence           String?
+  score                Int                        @default(0)
+  reason               String?
+  createdAt            DateTime                   @default(now())
+  recommendations      DiagnosticRecommendation[]
+  diagnosticSession    DiagnosticSession          @relation(fields: [diagnosticSessionId], references: [id])
+}
+
+model DiagnosticRecommendation {
+  id                 String           @id @default(cuid())
+  diagnosticResultId String
+  productId          String
+  score              Int
+  position           Int              @default(0)
+  reason             String?
+  diagnosticResult   DiagnosticResult @relation(fields: [diagnosticResultId], references: [id])
+}
+
+model DiagnosticRule {
+  id        String   @id @default(cuid())
+  segment   String?
+  problem   String?
+  need      String?
+  operation String?
+  productId String
+  score     Int
+  priority  Int      @default(0)
+  message   String?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  thumbnail   String?
+  createdAt   DateTime @default(now())
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  videoUrl  String
+  duration  String?
+  order     Int
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id])
+}
+
+model SiteTemplate {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  category     String
+  segment      String
+  description  String
+  application  String?
+  previewImage String?
+  externalUrl  String?
+  status       String      @default("active")
+  featured     Boolean     @default(false)
+  sortOrder    Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orders       SiteOrder[]
+}
+
+model SiteOrder {
+  id               String             @id @default(cuid())
+  userId           String?
+  templateId       String
+  status           SiteOrderStatus    @default(SUBMITTED)
+  businessName     String
+  responsibleName  String
+  phone            String
+  email            String
+  city             String?
+  state            String?
+  address          String?
+  instagram        String?
+  website          String?
+  googleMyBusiness String?
+  segment          String?
+  description      String?
+  services         String?
+  differentials    String?
+  audience         String?
+  serviceRegion    String?
+  openingHours     String?
+  closingHours     String?
+  workingDays      String?
+  responsibleId    String?
+  priority         String             @default("NORMAL")
+  token            String             @unique @default(cuid())
+  submittedAt      DateTime?          @default(now())
+  approvedAt       DateTime?
+  publishedAt      DateTime?
+  publishedUrl     String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  internalNotes    InternalNote[]
+  notifications    NotificationLog[]
+  template         SiteTemplate       @relation(fields: [templateId], references: [id])
+  user             User?              @relation(fields: [userId], references: [id])
+  files            SiteOrderFile[]
+  history          SiteOrderHistory[]
+  versions         SiteOrderVersion[]
+}
+
+model SiteOrderHistory {
+  id         String           @id @default(cuid())
+  orderId    String
+  fromStatus SiteOrderStatus?
+  toStatus   SiteOrderStatus
+  changedBy  String?
+  comment    String?
+  createdAt  DateTime         @default(now())
+  order      SiteOrder        @relation(fields: [orderId], references: [id])
+}
+
+model SiteOrderVersion {
+  id           String                 @id @default(cuid())
+  orderId      String
+  version      Int
+  previewUrl   String
+  previewImage String?
+  notes        String?
+  status       SiteOrderVersionStatus @default(DRAFT)
+  createdBy    String?
+  createdAt    DateTime               @default(now())
+  approvals    ApprovalRequest[]
+  order        SiteOrder              @relation(fields: [orderId], references: [id])
+}
+
+model ApprovalRequest {
+  id             String                @id @default(cuid())
+  orderId        String
+  orderVersionId String
+  tokenHash      String                @unique
+  status         ApprovalRequestStatus @default(PENDING)
+  feedback       String?
+  expiresAt      DateTime?
+  usedAt         DateTime?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime              @default(now())
+  orderVersion   SiteOrderVersion      @relation(fields: [orderVersionId], references: [id])
+}
+
+model InternalNote {
+  id        String    @id @default(cuid())
+  orderId   String
+  userId    String
+  message   String
+  createdAt DateTime  @default(now())
+  order     SiteOrder @relation(fields: [orderId], references: [id])
+}
+
+model NotificationLog {
+  id             String             @id @default(cuid())
+  orderId        String
+  event          String
+  channel        String
+  recipient      String
+  message        String
+  status         NotificationStatus @default(PENDING)
+  externalId     String?
+  error          String?
+  idempotencyKey String?            @unique
+  sentAt         DateTime?
+  createdAt      DateTime           @default(now())
+  order          SiteOrder          @relation(fields: [orderId], references: [id])
+}
+
+model SiteOrderFile {
+  id         String    @id @default(cuid())
+  orderId    String
+  name       String
+  url        String
+  type       String
+  size       Int
+  category   String
+  uploadedAt DateTime  @default(now())
+  order      SiteOrder @relation(fields: [orderId], references: [id])
+}
 
 enum ProductType {
   SAAS
@@ -98,453 +511,4 @@ enum NotificationStatus {
   PENDING
   SENT
   FAILED
-}
-
-// ─── Auth ────────────────────────────────────────────────
-
-model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  password       String
-  name           String?
-  role           UserRole        @default(CUSTOMER)
-  partnerProfile PartnerProfile?
-  leads          Lead[]
-  siteOrders     SiteOrder[]
-  sessions       Session[]
-
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-  @@index([expiresAt])
-}
-
-// ─── Partner ─────────────────────────────────────────────
-
-model PartnerProfile {
-  id           String @id @default(cuid())
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id])
-  commission   Float  @default(0.2)
-  clientsCount Int    @default(0)
-  points       Int    @default(0)
-  status       String @default("active")
-}
-
-// ─── Products ────────────────────────────────────────────
-
-model Product {
-  id                String                   @id @default(cuid())
-  name              String
-  slug              String                   @unique
-  type              ProductType
-  category          String
-  segment           String
-  subcategory       String?
-  shortDescription  String
-  description       String
-  audience          String?
-  problem           String?
-  solution          String?
-  features          Json?
-  pricingType       RevenueType
-  pricing           String?
-  ctaType           String?
-  demoUrl           String?
-  landingUrl        String?
-  whatsappMessage   String?
-  status            String                   @default("active")
-  featured          Boolean                  @default(false)
-  sortOrder         Int                      @default(0)
-  recommendations   ProductRecommendation[]  @relation("MainProduct")
-  recommendedBy     ProductRecommendation[]  @relation("RecommendedProduct")
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
-}
-
-model ProductRecommendation {
-  id                  String   @id @default(cuid())
-  productId           String
-  product             Product  @relation("MainProduct", fields: [productId], references: [id])
-  recommendedProductId String
-  recommendedProduct  Product  @relation("RecommendedProduct", fields: [recommendedProductId], references: [id])
-  reason              String
-  priority            Int      @default(0)
-  status              String   @default("active")
-}
-
-// ─── Media Indoor ────────────────────────────────────────
-
-model Company {
-  id        String     @id @default(cuid())
-  name      String
-  slug      String     @unique
-  logo      String?
-  phone     String?
-  email     String?
-  website   String?
-  status    String     @default("active")
-  campaigns Campaign[]
-  screens   Screen[]
-  leads     Lead[]
-
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-}
-
-model Campaign {
-  id           String         @id @default(cuid())
-  name         String
-  slug         String         @unique
-  description  String?
-  companyId    String
-  company      Company        @relation(fields: [companyId], references: [id])
-  imageUrl     String?
-  startDate    DateTime?
-  endDate      DateTime?
-  status       CampaignStatus @default(DRAFT)
-  ctaText      String?        @default("QUERO SABER MAIS")
-  captureUrl   String?
-  ads          Ad[]
-  screens      Screen[]
-  leads        Lead[]
-
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-
-  @@index([companyId])
-  @@index([status])
-}
-
-model Screen {
-  id                 String       @id @default(cuid())
-  name               String
-  identifier         String       @unique
-  location           String?
-  establishment      String?
-  status             ScreenStatus @default(ACTIVE)
-  lastActiveAt       DateTime?
-  currentCampaignId  String?
-  currentCampaign    Campaign?    @relation(fields: [currentCampaignId], references: [id])
-  companyId          String?
-  company            Company?     @relation(fields: [companyId], references: [id])
-  ads                Ad[]
-  leads              Lead[]
-
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-
-  @@index([companyId])
-  @@index([status])
-}
-
-model Ad {
-  id           String    @id @default(cuid())
-  title        String
-  description  String?
-  imageUrl     String?
-  videoUrl     String?
-  ctaText      String?
-  campaignId   String
-  campaign     Campaign  @relation(fields: [campaignId], references: [id])
-  screenId     String?
-  screen       Screen?   @relation(fields: [screenId], references: [id])
-  duration     Int?      @default(15)
-  priority     Int       @default(0)
-  status       AdStatus  @default(ACTIVE)
-  leads        Lead[]
-
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  @@index([campaignId])
-  @@index([screenId])
-  @@index([status])
-}
-
-// ─── Leads ───────────────────────────────────────────────
-
-model Lead {
-  id                 String          @id @default(cuid())
-  name               String
-  email              String?
-  whatsapp           String
-  companyName        String?
-  city               String?
-  address            String?
-  establishmentType  String?
-  screenCount        Int?
-  segment            String?
-  objective          String?
-  message            String?
-  type               LeadType        @default(GENERAL)
-  status             LeadStatus      @default(NOVO)
-
-  // Media Indoor tracking
-  campaignId         String?
-  campaign           Campaign?       @relation(fields: [campaignId], references: [id])
-  adId               String?
-  ad                 Ad?             @relation(fields: [adId], references: [id])
-  screenId           String?
-  screen             Screen?         @relation(fields: [screenId], references: [id])
-  companyId          String?
-  company            Company?        @relation(fields: [companyId], references: [id])
-
-  // Source tracking
-  source             String?         @default("FORM")
-  ipAddress          String?
-  userAgent          String?
-  utmSource          String?
-  utmMedium          String?
-  utmCampaign        String?
-
-  // Relations
-  userId             String?
-  user               User?           @relation(fields: [userId], references: [id])
-  diagnosticSessionId String?        @unique
-  diagnosticSession   DiagnosticSession? @relation(fields: [diagnosticSessionId], references: [id])
-
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-
-  @@index([campaignId])
-  @@index([adId])
-  @@index([screenId])
-  @@index([companyId])
-  @@index([status])
-  @@index([type])
-  @@index([createdAt])
-}
-
-// ─── Diagnostic ──────────────────────────────────────────
-
-model DiagnosticSession {
-  id                String              @id @default(cuid())
-  leadId            String?
-  sessionId         String?
-  currentStep       Int                 @default(1)
-  status            String              @default("started")
-  businessSegment   String?
-  mainProblem       String?
-  specificNeed      String?
-  currentOperation  String?
-  startedAt         DateTime            @default(now())
-  completedAt       DateTime?
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  lead              Lead?
-  result            DiagnosticResult?
-}
-
-model DiagnosticResult {
-  id                  String                    @id @default(cuid())
-  diagnosticSessionId String                    @unique
-  diagnosticSession   DiagnosticSession         @relation(fields: [diagnosticSessionId], references: [id])
-  recommendedProductId String?
-  confidence          String?
-  score               Int                       @default(0)
-  reason              String?
-  recommendations     DiagnosticRecommendation[]
-  createdAt           DateTime                  @default(now())
-}
-
-model DiagnosticRecommendation {
-  id                  String            @id @default(cuid())
-  diagnosticResultId  String
-  diagnosticResult    DiagnosticResult  @relation(fields: [diagnosticResultId], references: [id])
-  productId           String
-  score               Int
-  position            Int               @default(0)
-  reason              String?
-}
-
-model DiagnosticRule {
-  id          String    @id @default(cuid())
-  segment     String?
-  problem     String?
-  need        String?
-  operation   String?
-  productId   String
-  score       Int
-  priority    Int       @default(0)
-  message     String?
-  status      String    @default("active")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-// ─── Courses ─────────────────────────────────────────────
-
-model Course {
-  id          String    @id @default(cuid())
-  title       String
-  description String
-  thumbnail   String?
-  lessons     Lesson[]
-  createdAt   DateTime  @default(now())
-}
-
-model Lesson {
-  id        String   @id @default(cuid())
-  courseId   String
-  course     Course   @relation(fields: [courseId], references: [id])
-  title     String
-  videoUrl  String
-  duration  String?
-  order     Int
-  createdAt DateTime @default(now())
-}
-
-// ─── Sites ───────────────────────────────────────────────
-
-model SiteTemplate {
-  id           String      @id @default(cuid())
-  name         String
-  slug         String      @unique
-  category     String
-  segment      String
-  description  String
-  application  String?
-  previewImage String?
-  externalUrl  String?
-  status       String      @default("active")
-  featured     Boolean     @default(false)
-  sortOrder    Int         @default(0)
-  orders       SiteOrder[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-}
-
-model SiteOrder {
-  id                String          @id @default(cuid())
-  userId            String?
-  user              User?           @relation(fields: [userId], references: [id])
-  templateId        String
-  template          SiteTemplate    @relation(fields: [templateId], references: [id])
-  status            SiteOrderStatus @default(SUBMITTED)
-
-  businessName      String
-  responsibleName   String
-  phone             String
-  email             String
-  city              String?
-  state             String?
-  address           String?
-  instagram         String?
-  website           String?
-  googleMyBusiness  String?
-
-  segment           String?
-  description       String?
-  services          String?
-  differentials     String?
-  audience          String?
-  serviceRegion     String?
-
-  openingHours      String?
-  closingHours      String?
-  workingDays       String?
-
-  responsibleId     String?
-  priority          String          @default("NORMAL")
-  token             String          @unique @default(cuid())
-  submittedAt       DateTime?       @default(now())
-  approvedAt        DateTime?
-  publishedAt       DateTime?
-  publishedUrl      String?
-
-  history           SiteOrderHistory[]
-  versions          SiteOrderVersion[]
-  files             SiteOrderFile[]
-  internalNotes     InternalNote[]
-  notifications     NotificationLog[]
-
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-}
-
-model SiteOrderHistory {
-  id         String          @id @default(cuid())
-  orderId    String
-  order      SiteOrder       @relation(fields: [orderId], references: [id])
-  fromStatus SiteOrderStatus?
-  toStatus   SiteOrderStatus
-  changedBy  String?
-  comment    String?
-  createdAt  DateTime        @default(now())
-}
-
-model SiteOrderVersion {
-  id            String                @id @default(cuid())
-  orderId       String
-  order         SiteOrder             @relation(fields: [orderId], references: [id])
-  version       Int
-  previewUrl    String
-  previewImage  String?
-  notes         String?
-  status        SiteOrderVersionStatus @default(DRAFT)
-  createdBy     String?
-  createdAt     DateTime              @default(now())
-  approvals     ApprovalRequest[]
-}
-
-model ApprovalRequest {
-  id              String                @id @default(cuid())
-  orderId         String
-  orderVersionId  String
-  orderVersion    SiteOrderVersion      @relation(fields: [orderVersionId], references: [id])
-  tokenHash       String                @unique
-  status          ApprovalRequestStatus @default(PENDING)
-  feedback        String?
-  expiresAt       DateTime?
-  usedAt          DateTime?
-  ipAddress       String?
-  userAgent       String?
-  createdAt       DateTime              @default(now())
-}
-
-model InternalNote {
-  id        String    @id @default(cuid())
-  orderId   String
-  order     SiteOrder @relation(fields: [orderId], references: [id])
-  userId    String
-  message   String
-  createdAt DateTime  @default(now())
-}
-
-model NotificationLog {
-  id             String             @id @default(cuid())
-  orderId        String
-  order          SiteOrder          @relation(fields: [orderId], references: [id])
-  event          String
-  channel        String
-  recipient      String
-  message        String
-  status         NotificationStatus @default(PENDING)
-  externalId     String?
-  error          String?
-  idempotencyKey String?            @unique
-  sentAt         DateTime?
-  createdAt      DateTime           @default(now())
-}
-
-model SiteOrderFile {
-  id         String    @id @default(cuid())
-  orderId    String
-  order      SiteOrder @relation(fields: [orderId], references: [id])
-  name       String
-  url        String
-  type       String
-  size       Int
-  category   String
-  uploadedAt DateTime  @default(now())
 }
