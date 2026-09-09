@@ -1,8 +1,9 @@
-import { toJSONAsync, fromJSON } from "seroval";
+import { toJSONAsync, fromCrossJSON } from "seroval";
 import { defaultSerovalPlugins } from "@tanstack/router-core";
 
 const plugins = defaultSerovalPlugins;
 const BASE = "http://localhost:3000";
+const FN = "/_serverFn/";
 let cookie = "";
 
 const IDS = {
@@ -27,26 +28,26 @@ const IDS = {
 };
 
 async function rpc(name, method, data) {
-  let url = `${BASE}/_serverFn/${IDS[name]}`;
+  let url = `${BASE}${FN}${IDS[name]}`;
   const headers = {
     "x-tsr-serverFn": "true",
     accept: "application/json",
     "sec-fetch-site": "same-origin",
   };
-  if (cookie) headers["cookie"] = cookie;
   let body;
   if (method === "GET") {
     if (data !== undefined) {
-      const payload = { data };
-      const serialized = JSON.stringify(await toJSONAsync(payload, { plugins }));
+      const serialized = JSON.stringify(
+        await toJSONAsync({ data }, { plugins }),
+      );
       url += `?${new URLSearchParams({ payload: serialized }).toString()}`;
     }
   } else {
-    const payload = data !== undefined ? { data } : undefined;
-    if (payload) {
-      body = JSON.stringify(await toJSONAsync(payload, { plugins }));
-      headers["content-type"] = "application/json";
-    }
+    const serialized = JSON.stringify(
+      await toJSONAsync({ data }, { plugins }),
+    );
+    body = serialized;
+    headers["content-type"] = "application/json";
   }
   const res = await fetch(url, { method, headers, body, redirect: "manual" });
   const sc = res.headers.getSetCookie ? res.headers.getSetCookie() : [];
@@ -55,40 +56,52 @@ async function rpc(name, method, data) {
     if (pair.includes("automatiza_session")) cookie = pair;
   }
   const text = await res.text();
-  let decoded;
+  let envelope = { result: undefined, error: undefined };
   try {
-    decoded = fromJSON(text, { plugins }) ?? text;
+    const parsed = JSON.parse(text);
+    if (res.headers.get("x-tss-serialized") === "true") {
+      envelope = fromCrossJSON(parsed, { plugins }) ?? envelope;
+    } else {
+      envelope = { result: parsed, error: undefined };
+    }
   } catch {
-    decoded = text;
+    envelope = { result: text, error: undefined };
   }
-  return { status: res.status, decoded, text };
+  return {
+    status: res.status,
+    result: envelope.result,
+    error: envelope.error,
+    text: text.slice(0, 300),
+  };
 }
 
 const step = (label, ok, extra = "") =>
   console.log(`${ok ? "PASS" : "FAIL"} | ${label}${extra ? " | " + extra : ""}`);
 
-let exitCode = 0;
-const fail = (label, err) => {
-  console.log(`FAIL | ${label} | ${err?.message ?? err}`);
-  throw err;
+let fails = 0;
+const check = (label, ok, extra = "") => {
+  step(label, ok, extra);
+  if (!ok) fails++;
 };
 
 try {
-  // 1. Login admin
   const login = await rpc("login", "POST", {
     email: "admin@automatizasolucao.com.br",
     password: "admin36459235",
   });
-  step("login (admin)", login.status === 200 && login.decoded?.success === true,
-    `status=${login.status} user=${login.decoded?.user?.email}`);
-  if (login.decoded?.success !== true) exitCode = 1;
+  check(
+    "login (admin)",
+    login.status === 200 && login.result?.success === true,
+    `status=${login.status} user=${login.result?.user?.email}`,
+  );
 
-  // 2. Check session
   const session = await rpc("getSessionUser", "GET");
-  step("getSessionUser (sessão ativa)", session.status === 200 && session.decoded?.role === "ADMIN",
-    `role=${session.decoded?.role}`);
+  check(
+    "getSessionUser (sessão ativa)",
+    session.result?.role === "ADMIN",
+    `role=${session.result?.role ?? "n/a"}`,
+  );
 
-  // 3. Create company
   const company = await rpc("createCompany", "POST", {
     name: "Empresa Teste E2E",
     phone: "(11) 99999-0001",
@@ -96,12 +109,9 @@ try {
     website: "https://empresateste.com",
     logo: "",
   });
-  step("createCompany", company.status === 200 && !!company.decoded?.id,
-    `id=${company.decoded?.id}`);
-  if (!company.decoded?.id) exitCode = 1;
-  const companyId = company.decoded?.id;
+  check("createCompany", !!company.result?.id, `id=${company.result?.id ?? "n/a"}`);
+  const companyId = company.result?.id;
 
-  // 4. Create campaign (DRAFT -> then activate)
   const campaign = await rpc("createCampaign", "POST", {
     name: "Campanha Teste E2E",
     description: "Campanha criada pelo teste ponta a ponta.",
@@ -112,16 +122,23 @@ try {
     endDate: "2026-12-31",
     imageUrl: "",
   });
-  step("createCampaign", campaign.status === 200 && !!campaign.decoded?.id,
-    `id=${campaign.decoded?.id} status=${campaign.decoded?.status}`);
-  if (!campaign.decoded?.id) exitCode = 1;
-  const campaignId = campaign.decoded?.id;
+  check(
+    "createCampaign",
+    !!campaign.result?.id && campaign.result?.status === "DRAFT",
+    `id=${campaign.result?.id ?? "n/a"} status=${campaign.result?.status ?? "n/a"}`,
+  );
+  const campaignId = campaign.result?.id;
 
-  const activate = await rpc("updateCampaign", "POST", { id: campaignId, status: "ACTIVE" });
-  step("updateCampaign -> ACTIVE", activate.status === 200 && activate.decoded?.status === "ACTIVE",
-    `status=${activate.decoded?.status}`);
+  const activate = await rpc("updateCampaign", "POST", {
+    id: campaignId,
+    status: "ACTIVE",
+  });
+  check(
+    "updateCampaign -> ACTIVE",
+    activate.result?.status === "ACTIVE",
+    `status=${activate.result?.status ?? "n/a"}`,
+  );
 
-  // 5. Create ad
   const ad = await rpc("createAd", "POST", {
     title: "Anúncio Teste E2E",
     description: "Peça publicitária do teste.",
@@ -134,11 +151,9 @@ try {
     priority: 10,
     status: "ACTIVE",
   });
-  step("createAd", ad.status === 200 && !!ad.decoded?.id, `id=${ad.decoded?.id}`);
-  if (!ad.decoded?.id) exitCode = 1;
-  const adId = ad.decoded?.id;
+  check("createAd", !!ad.result?.id, `id=${ad.result?.id ?? "n/a"}`);
+  const adId = ad.result?.id;
 
-  // 6. Create screen (linked to company + current campaign)
   const screen = await rpc("createScreen", "POST", {
     name: "Tela Teste E2E",
     identifier: "tela-teste-e2e",
@@ -148,23 +163,25 @@ try {
     currentCampaignId: campaignId,
     companyId,
   });
-  step("createScreen", screen.status === 200 && !!screen.decoded?.id,
-    `id=${screen.decoded?.id}`);
-  if (!screen.decoded?.id) exitCode = 1;
-  const screenId = screen.decoded?.id;
+  check("createScreen", !!screen.result?.id, `id=${screen.result?.id ?? "n/a"}`);
+  const screenId = screen.result?.id;
 
-  // 7. Generate QR code for campaign
   const qr = await rpc("generateQrCode", "GET", campaignId);
-  step("generateQrCode", qr.status === 200 && typeof qr.decoded?.qrDataUrl === "string" &&
-    qr.decoded?.captureUrl?.includes("/captura/"),
-    `url=${qr.decoded?.captureUrl}`);
+  check(
+    "generateQrCode",
+    typeof qr.result?.qrDataUrl === "string" &&
+      qr.result?.captureUrl?.includes("/captura/"),
+    `url=${qr.result?.captureUrl ?? "n/a"}`,
+  );
 
-  // 8. Public capture: fetch campaign info
   const capInfo = await rpc("getCampaignForCapture", "GET", campaignId);
-  step("getCampaignForCapture (público)", capInfo.status === 200 && capInfo.decoded?.name === "Campanha Teste E2E",
-    `company=${capInfo.decoded?.company?.name}`);
+  check(
+    "getCampaignForCapture (público)",
+    capInfo.result?.name === "Campanha Teste E2E" &&
+      capInfo.result?.company?.name === "Empresa Teste E2E",
+    `company=${capInfo.result?.company?.name ?? "n/a"}`,
+  );
 
-  // 9. Public capture: submit lead (with ad + screen attribution)
   const lead = await rpc("submitLead", "POST", {
     campaignId,
     adId,
@@ -178,26 +195,29 @@ try {
     utmMedium: "",
     utmCampaign: "",
   });
-  step("submitLead (público)", lead.status === 200 && lead.decoded?.success === true &&
-    !!lead.decoded?.leadId, `leadId=${lead.decoded?.leadId}`);
-  if (!lead.decoded?.leadId) exitCode = 1;
-  const leadId = lead.decoded?.leadId;
+  check(
+    "submitLead (público)",
+    lead.result?.success === true && !!lead.result?.leadId,
+    `leadId=${lead.result?.leadId ?? "n/a"}`,
+  );
+  const leadId = lead.result?.leadId;
 
-  // 10. Reject duplicate campaign submit blocked: lead under inactive campaign
   const lead2 = await rpc("submitLead", "POST", {
     campaignId,
-    adId: "",
-    screenId: "",
-    name: "Teste Bloqueio",
-    whatsapp: "11999990003",
+    adId,
+    screenId,
+    name: "Maria Oliveira Teste",
+    whatsapp: "11999990004",
     email: "",
-    city: "",
+    city: "Guarulhos",
     source: "QR_CODE",
   });
-  step("submitLead duplicado permitido (mesma campanha ativa)", lead2.status === 200,
-    `status=${lead2.status}`);
+  check(
+    "submitLead 2º lead (mesma campanha)",
+    lead2.result?.success === true && !!lead2.result?.leadId,
+    `leadId2=${lead2.result?.leadId ?? "n/a"}`,
+  );
 
-  // 11. Admin list leads (filters + attribution)
   const leads = await rpc("getLeads", "GET", {
     search: "João",
     campaignId: "",
@@ -206,46 +226,60 @@ try {
     from: "",
     to: "",
   });
-  const found = Array.isArray(leads.decoded?.leads) && leads.decoded.leads.some((l) => l.id === leadId);
-  step("getLeads (filtro busca)", found, `total=${leads.decoded?.total}`);
+  const found =
+    Array.isArray(leads.result?.leads) &&
+    leads.result.leads.some((l) => l.id === leadId);
+  check("getLeads (filtro busca)", found, `total=${leads.result?.total}`);
 
-  // 12. Lead detail with full relations
   const detail = await rpc("getLeadById", "GET", leadId);
-  step("getLeadById", detail.status === 200 && detail.decoded?.id === leadId &&
-    detail.decoded?.campaign?.id === campaignId &&
-    detail.decoded?.ad?.id === adId &&
-    detail.decoded?.screen?.id === screenId &&
-    detail.decoded?.company?.id === companyId,
-    `campanha=${detail.decoded?.campaign?.name} ad=${detail.decoded?.ad?.title} tela=${detail.decoded?.screen?.name}`);
+  check(
+    "getLeadById (relações)",
+    detail.result?.id === leadId &&
+      detail.result?.campaign?.id === campaignId &&
+      detail.result?.ad?.id === adId &&
+      detail.result?.screen?.id === screenId &&
+      detail.result?.company?.id === companyId,
+    `campanha=${detail.result?.campaign?.name} ad=${detail.result?.ad?.title} tela=${detail.result?.screen?.name} empresa=${detail.result?.company?.name}`,
+  );
 
-  // 13. Update lead status -> CONVERTIDO
-  const upd = await rpc("updateLeadStatus", "POST", { id: leadId, status: "CONVERTIDO" });
-  step("updateLeadStatus -> CONVERTIDO", upd.status === 200 && upd.decoded?.status === "CONVERTIDO",
-    `status=${upd.decoded?.status}`);
+  const upd = await rpc("updateLeadStatus", "POST", {
+    id: leadId,
+    status: "CONVERTIDO",
+  });
+  check(
+    "updateLeadStatus -> CONVERTIDO",
+    upd.result?.status === "CONVERTIDO",
+    `status=${upd.result?.status ?? "n/a"}`,
+  );
 
-  // 14. Private list checks
   const screens = await rpc("getScreens", "GET");
-  const screensOk = screens.status === 200 && screens.decoded?.some((s) => s.id === screenId);
-  step("getScreens (privado)", screensOk);
+  check(
+    "getScreens (privado)",
+    screens.result?.some((s) => s.id === screenId),
+  );
 
   const ads = await rpc("getAds", "GET");
-  const adsOk = ads.status === 200 && ads.decoded?.some((a) => a.id === adId);
-  step("getAds (privado)", adsOk);
+  check("getAds (privado)", ads.result?.some((a) => a.id === adId));
 
   const campaigns = await rpc("getCampaigns", "GET");
-  const campaignsOk = campaigns.status === 200 && campaigns.decoded?.some((c) => c.id === campaignId);
-  step("getCampaigns (privado)", campaignsOk);
+  check(
+    "getCampaigns (privado)",
+    campaigns.result?.some((c) => c.id === campaignId),
+  );
 
   const companies = await rpc("getCompanies", "GET");
-  const companiesOk = companies.status === 200 && companies.decoded?.some((c) => c.id === companyId);
-  step("getCompanies (privado)", companiesOk);
+  check(
+    "getCompanies (privado)",
+    companies.result?.some((c) => c.id === companyId),
+  );
 
-  console.log(`\nIDs gerados: company=${companyId} campaign=${campaignId} ad=${adId} screen=${screenId} lead=${leadId}`);
-  console.log(`QR captureUrl: ${qr.decoded?.captureUrl}`);
-  console.log(exitCode === 0 ? "\nRESULTADO: SUCESSO" : "\nRESULTADO: FALHA");
-  process.exit(exitCode);
+  console.log(
+    `\nIDs: company=${companyId} campaign=${campaignId} ad=${adId} screen=${screenId} lead=${leadId}`,
+  );
+  console.log(`QR: ${qr.result?.captureUrl}\n`);
+  console.log(fails === 0 ? "RESULTADO: SUCESSO" : `RESULTADO: ${fails} CENÁRIO(S) COM FALHA`);
+  process.exit(fails === 0 ? 0 : 1);
 } catch (err) {
   console.log("ERRO no fluxo:", err?.message ?? err);
-  console.log("RESULTADO: FALHA");
   process.exit(1);
 }
