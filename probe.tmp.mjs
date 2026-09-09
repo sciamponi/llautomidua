@@ -27,7 +27,7 @@ async function call(name, method, data, cookieHeader) {
     body = JSON.stringify(await toJSONAsync({ data }, { plugins }));
     headers["content-type"] = "application/json";
   }
-  const res = await fetch(url, { method, headers, body });
+  const res = await fetch(url, { method, headers, body, redirect: "manual" });
   const text = await res.text();
   return { status: res.status, setCookie: res.headers.get("set-cookie"), text };
 }
