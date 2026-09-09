@@ -90,6 +90,8 @@ try {
     email: "admin@automatizasolucao.com.br",
     password: "admin36459235",
   });
+  console.error("DEBUG cookie after login:", JSON.stringify(cookie));
+  console.error("DEBUG login text:", login.text);
   check(
     "login (admin)",
     login.status === 200 && login.result?.success === true,
