@@ -82,10 +82,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Automatiza Solução | Tecnologia para automatizar. Oportunidades para crescer." },
-      { name: "description", content: "Automatize o atendimento, organize sua equipe e transforme seu WhatsApp em uma operação inteligente de vendas e relacionamento." },
+      {
+        name: "description",
+        content:
+          "Automatize o atendimento, organize sua equipe e transforme seu WhatsApp em uma operação inteligente de vendas e relacionamento.",
+      },
       { name: "author", content: "Automatiza Solução" },
       { property: "og:title", content: "Automatiza Solução | Tecnologia para automatizar." },
-      { property: "og:description", content: "Automatize o atendimento e transforme seu WhatsApp em uma operação inteligente." },
+      {
+        property: "og:description",
+        content: "Automatize o atendimento e transforme seu WhatsApp em uma operação inteligente.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Automatiza" },
@@ -129,10 +136,11 @@ function RootComponent() {
   const location = useLocation();
 
   // Define route patterns that should NOT have the global header/footer
-  const isIsolatedPath = 
-    location.pathname.startsWith('/admin') || 
-    location.pathname.startsWith('/membros') || 
-    location.pathname.startsWith('/sites/aprovacao');
+  const isIsolatedPath =
+    location.pathname.startsWith("/admin") ||
+    location.pathname.startsWith("/membros") ||
+    location.pathname.startsWith("/sites/aprovacao") ||
+    location.pathname.startsWith("/captura");
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -147,4 +155,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-

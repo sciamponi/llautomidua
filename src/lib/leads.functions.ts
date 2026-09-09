@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { prisma } from "./prisma.server";
+import { getClientIp } from "./auth";
 
 const LeadSchema = z.object({
   name: z.string().min(2),
@@ -13,17 +15,39 @@ const LeadSchema = z.object({
   segment: z.string().optional(),
   objective: z.string().optional(),
   message: z.string().optional(),
-  type: z.enum(['GENERAL', 'DEMO', 'QUOTE', 'SCREEN_INSTALLATION', 'SCREEN_ADVERTISING', 'PARTNER', 'SITE_ORDER']),
+  type: z.enum([
+    "GENERAL",
+    "DEMO",
+    "QUOTE",
+    "SCREEN_INSTALLATION",
+    "SCREEN_ADVERTISING",
+    "PARTNER",
+    "SITE_ORDER",
+  ]),
 });
 
 export const captureLead = createServerFn({ method: "POST" })
   .validator((data: unknown) => LeadSchema.parse(data))
   .handler(async ({ data }) => {
-    console.log('Server capturing lead:', data);
-    
-    // Simulating database latency
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const lead = await prisma.lead.create({
+      data: {
+        name: data.name.trim(),
+        email: data.email || null,
+        whatsapp: data.whatsapp.trim(),
+        companyName: data.company || null,
+        city: data.city || null,
+        address: data.address || null,
+        establishmentType: data.establishmentType || null,
+        screenCount: data.screenCount ?? null,
+        segment: data.segment || null,
+        objective: data.objective || null,
+        message: data.message || null,
+        type: data.type,
+        status: "NOVO",
+        source: "FORM",
+        ipAddress: getClientIp() || null,
+      },
+    });
 
-    // In production: return await prisma.lead.create({ data });
-    return { success: true, message: "Lead capturado com sucesso!" };
+    return { success: true, message: "Lead capturado com sucesso!", leadId: lead.id };
   });

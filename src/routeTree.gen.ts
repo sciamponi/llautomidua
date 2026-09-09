@@ -10,7 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ParceirosRouteImport } from './routes/parceiros'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminAnunciosRouteImport } from './routes/admin/anuncios'
+import { Route as AdminCampanhasRouteImport } from './routes/admin/campanhas'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin/configuracoes'
+import { Route as AdminEmpresasRouteImport } from './routes/admin/empresas'
+import { Route as AdminLeadsRouteImport } from './routes/admin/leads'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminRelatoriosRouteImport } from './routes/admin/relatorios'
+import { Route as AdminTelasRouteImport } from './routes/admin/telas'
+import { Route as CapturaCampaignIdRouteImport } from './routes/captura/$campaignId'
 import { Route as DiagnosticoIndexRouteImport } from './routes/diagnostico/index'
 import { Route as MediaIndoorIndexRouteImport } from './routes/media-indoor/index'
 import { Route as MembrosIndexRouteImport } from './routes/membros/index'
@@ -27,9 +38,64 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ParceirosRoute = ParceirosRouteImport.update({
   id: '/parceiros',
   path: '/parceiros',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnunciosRoute = AdminAnunciosRouteImport.update({
+  id: '/anuncios',
+  path: '/anuncios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCampanhasRoute = AdminCampanhasRouteImport.update({
+  id: '/campanhas',
+  path: '/campanhas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEmpresasRoute = AdminEmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTelasRoute = AdminTelasRouteImport.update({
+  id: '/telas',
+  path: '/telas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const CapturaCampaignIdRoute = CapturaCampaignIdRouteImport.update({
+  id: '/captura/$campaignId',
+  path: '/captura/$campaignId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoIndexRoute = DiagnosticoIndexRouteImport.update({
@@ -68,9 +134,9 @@ const SolucoesProductSlugRoute = SolucoesProductSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSitesIndexRoute = AdminSitesIndexRouteImport.update({
-  id: '/admin/sites/',
-  path: '/admin/sites/',
-  getParentRoute: () => rootRouteImport,
+  id: '/sites/',
+  path: '/sites/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const SitesTemplateSlugPedidoRoute = SitesTemplateSlugPedidoRouteImport.update({
   id: '/pedido',
@@ -85,9 +151,20 @@ const SitesAprovacaoTokenRoute = SitesAprovacaoTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/parceiros': typeof ParceirosRoute
+  '/admin/anuncios': typeof AdminAnunciosRoute
+  '/admin/campanhas': typeof AdminCampanhasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/telas': typeof AdminTelasRoute
+  '/captura/$campaignId': typeof CapturaCampaignIdRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
@@ -100,8 +177,18 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parceiros': typeof ParceirosRoute
+  '/admin/anuncios': typeof AdminAnunciosRoute
+  '/admin/campanhas': typeof AdminCampanhasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/telas': typeof AdminTelasRoute
+  '/captura/$campaignId': typeof CapturaCampaignIdRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/diagnostico': typeof DiagnosticoIndexRoute
   '/media-indoor': typeof MediaIndoorIndexRoute
   '/membros': typeof MembrosIndexRoute
@@ -114,9 +201,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/parceiros': typeof ParceirosRoute
+  '/admin/anuncios': typeof AdminAnunciosRoute
+  '/admin/campanhas': typeof AdminCampanhasRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/empresas': typeof AdminEmpresasRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/telas': typeof AdminTelasRoute
+  '/captura/$campaignId': typeof CapturaCampaignIdRoute
   '/sites/$templateSlug': typeof SitesTemplateSlugRouteWithChildren
   '/solucoes/$productSlug': typeof SolucoesProductSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/diagnostico/': typeof DiagnosticoIndexRoute
   '/media-indoor/': typeof MediaIndoorIndexRoute
   '/membros/': typeof MembrosIndexRoute
@@ -130,9 +228,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/parceiros'
+    | '/admin/anuncios'
+    | '/admin/campanhas'
+    | '/admin/configuracoes'
+    | '/admin/empresas'
+    | '/admin/leads'
+    | '/admin/login'
+    | '/admin/relatorios'
+    | '/admin/telas'
+    | '/captura/$campaignId'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin/'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
@@ -145,8 +254,18 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/parceiros'
+    | '/admin/anuncios'
+    | '/admin/campanhas'
+    | '/admin/configuracoes'
+    | '/admin/empresas'
+    | '/admin/leads'
+    | '/admin/login'
+    | '/admin/relatorios'
+    | '/admin/telas'
+    | '/captura/$campaignId'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin'
     | '/diagnostico'
     | '/media-indoor'
     | '/membros'
@@ -158,9 +277,20 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/parceiros'
+    | '/admin/anuncios'
+    | '/admin/campanhas'
+    | '/admin/configuracoes'
+    | '/admin/empresas'
+    | '/admin/leads'
+    | '/admin/login'
+    | '/admin/relatorios'
+    | '/admin/telas'
+    | '/captura/$campaignId'
     | '/sites/$templateSlug'
     | '/solucoes/$productSlug'
+    | '/admin/'
     | '/diagnostico/'
     | '/media-indoor/'
     | '/membros/'
@@ -173,7 +303,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ParceirosRoute: typeof ParceirosRoute
+  CapturaCampaignIdRoute: typeof CapturaCampaignIdRoute
   SitesTemplateSlugRoute: typeof SitesTemplateSlugRouteWithChildren
   SolucoesProductSlugRoute: typeof SolucoesProductSlugRoute
   DiagnosticoIndexRoute: typeof DiagnosticoIndexRoute
@@ -182,7 +314,6 @@ export interface RootRouteChildren {
   SitesIndexRoute: typeof SitesIndexRoute
   SolucoesIndexRoute: typeof SolucoesIndexRoute
   SitesAprovacaoTokenRoute: typeof SitesAprovacaoTokenRoute
-  AdminSitesIndexRoute: typeof AdminSitesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -194,11 +325,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/parceiros': {
       id: '/parceiros'
       path: '/parceiros'
       fullPath: '/parceiros'
       preLoaderRoute: typeof ParceirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/anuncios': {
+      id: '/admin/anuncios'
+      path: '/anuncios'
+      fullPath: '/admin/anuncios'
+      preLoaderRoute: typeof AdminAnunciosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/campanhas': {
+      id: '/admin/campanhas'
+      path: '/campanhas'
+      fullPath: '/admin/campanhas'
+      preLoaderRoute: typeof AdminCampanhasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/empresas': {
+      id: '/admin/empresas'
+      path: '/empresas'
+      fullPath: '/admin/empresas'
+      preLoaderRoute: typeof AdminEmpresasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/relatorios': {
+      id: '/admin/relatorios'
+      path: '/relatorios'
+      fullPath: '/admin/relatorios'
+      preLoaderRoute: typeof AdminRelatoriosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/telas': {
+      id: '/admin/telas'
+      path: '/telas'
+      fullPath: '/admin/telas'
+      preLoaderRoute: typeof AdminTelasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/captura/$campaignId': {
+      id: '/captura/$campaignId'
+      path: '/captura/$campaignId'
+      fullPath: '/captura/$campaignId'
+      preLoaderRoute: typeof CapturaCampaignIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico/': {
@@ -252,10 +460,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/sites/': {
       id: '/admin/sites/'
-      path: '/admin/sites'
+      path: '/sites'
       fullPath: '/admin/sites/'
       preLoaderRoute: typeof AdminSitesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/sites/$templateSlug/pedido': {
       id: '/sites/$templateSlug/pedido'
@@ -274,6 +482,34 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminAnunciosRoute: typeof AdminAnunciosRoute
+  AdminCampanhasRoute: typeof AdminCampanhasRoute
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminEmpresasRoute: typeof AdminEmpresasRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminRelatoriosRoute: typeof AdminRelatoriosRoute
+  AdminTelasRoute: typeof AdminTelasRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminSitesIndexRoute: typeof AdminSitesIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnunciosRoute: AdminAnunciosRoute,
+  AdminCampanhasRoute: AdminCampanhasRoute,
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminEmpresasRoute: AdminEmpresasRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminRelatoriosRoute: AdminRelatoriosRoute,
+  AdminTelasRoute: AdminTelasRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminSitesIndexRoute: AdminSitesIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface SitesTemplateSlugRouteChildren {
   SitesTemplateSlugPedidoRoute: typeof SitesTemplateSlugPedidoRoute
 }
@@ -287,7 +523,9 @@ const SitesTemplateSlugRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   ParceirosRoute: ParceirosRoute,
+  CapturaCampaignIdRoute: CapturaCampaignIdRoute,
   SitesTemplateSlugRoute: SitesTemplateSlugRouteWithChildren,
   SolucoesProductSlugRoute: SolucoesProductSlugRoute,
   DiagnosticoIndexRoute: DiagnosticoIndexRoute,
@@ -296,7 +534,6 @@ const rootRouteChildren: RootRouteChildren = {
   SitesIndexRoute: SitesIndexRoute,
   SolucoesIndexRoute: SolucoesIndexRoute,
   SitesAprovacaoTokenRoute: SitesAprovacaoTokenRoute,
-  AdminSitesIndexRoute: AdminSitesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

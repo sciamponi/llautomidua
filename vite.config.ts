@@ -11,5 +11,11 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    importProtection: {
+      // auth.ts is a server-only module (session cookies via @tanstack/react-start/server).
+      // It is only invoked through createServerFn handlers, which the TanStack Start plugin
+      // rewrites to RPC stubs in the client bundle, so it never runs in the browser.
+      ignoreImporters: ["src/lib/auth.ts"],
+    },
   },
 });
