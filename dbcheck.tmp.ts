@@ -3,8 +3,25 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const users = await prisma.user.findMany({ select: { id: true, email: true, name: true, role: true } });
-  console.log(JSON.stringify(users, null, 2));
+  const [users, leads, products, companies, siteOrders, screens, campaigns, courses, templates] =
+    await Promise.all([
+      prisma.user.count(),
+      prisma.lead.count(),
+      prisma.product.count(),
+      prisma.company.count(),
+      prisma.siteOrder.count(),
+      prisma.screen.count(),
+      prisma.campaign.count(),
+      prisma.course.count(),
+      prisma.siteTemplate.count(),
+    ]);
+  console.log(
+    JSON.stringify(
+      { users, leads, products, companies, siteOrders, screens, campaigns, courses, templates },
+      null,
+      2
+    )
+  );
 }
 
 main()
