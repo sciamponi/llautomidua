@@ -1,0 +1,1 @@
+{"t":10,"i":0,"p":{"k":["result","error","context"],"v":[{"t":2,"s":1},{"t":25,"i":1,"s":{"message":{"t":1,"s":"\\nInvalid `prisma.screen.create()` invocation in\\nC:\\\\Users\\\\samue\\\\Downloads\\\\Automatiza\\\\lpas\\\\src\\\\lib\\\\screens.functions.ts:36:32\\n\\n  33 const admin = await getAdm
