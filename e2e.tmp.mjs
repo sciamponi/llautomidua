@@ -99,6 +99,9 @@ try {
   );
 
   const session = await rpc("getSessionUser", "GET");
+  console.error("DEBUG session cookie sent:", JSON.stringify(cookie));
+  console.error("DEBUG session text:", session.text);
+  console.error("DEBUG session result:", JSON.stringify(session.result));
   check(
     "getSessionUser (sessão ativa)",
     session.result?.role === "ADMIN",
