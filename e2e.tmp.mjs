@@ -82,6 +82,8 @@ const step = (label, ok, extra = "") =>
   console.log(`${ok ? "PASS" : "FAIL"} | ${label}${extra ? " | " + extra : ""}`);
 
 let fails = 0;
+const runSuffix = Date.now().toString(36);
+const uid = (base) => `${base}-${runSuffix}`;
 const check = (label, ok, extra = "") => {
   step(label, ok, extra);
   if (!ok) fails++;
@@ -111,9 +113,9 @@ try {
   );
 
   const company = await rpc("createCompany", "POST", {
-    name: "Empresa Teste E2E",
+    name: uid("Empresa Teste E2E"),
     phone: "(11) 99999-0001",
-    email: "contato@empresateste.com",
+    email: `${uid("contato")}@empresateste.com`,
     website: "https://empresateste.com",
     logo: "",
   });
@@ -121,7 +123,7 @@ try {
   const companyId = company.result?.id;
 
   const campaign = await rpc("createCampaign", "POST", {
-    name: "Campanha Teste E2E",
+    name: uid("Campanha Teste E2E"),
     description: "Campanha criada pelo teste ponta a ponta.",
     companyId,
     status: "DRAFT",
@@ -148,7 +150,7 @@ try {
   );
 
   const ad = await rpc("createAd", "POST", {
-    title: "Anúncio Teste E2E",
+    title: uid("Anúncio Teste E2E"),
     description: "Peça publicitária do teste.",
     imageUrl: "",
     videoUrl: "",
@@ -163,8 +165,8 @@ try {
   const adId = ad.result?.id;
 
   const screen = await rpc("createScreen", "POST", {
-    name: "Tela Teste E2E",
-    identifier: "tela-teste-e2e",
+    name: uid("Tela Teste E2E"),
+    identifier: uid("tela-teste-e2e"),
     location: "Centro, São Paulo/SP",
     establishment: "Estabelecimento Teste",
     status: "ACTIVE",
